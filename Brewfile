@@ -10,6 +10,7 @@ brew "starship"
 brew "tmux"
 brew "ngrok"
 brew "lazygit"
+brew "hyperfine"
 
 cask "alacritty"
 cask "brave-browser"
