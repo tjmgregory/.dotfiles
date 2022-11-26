@@ -1,0 +1,21 @@
+[[grammar]]
+name = "typescript"
+source = { git = "https://github.com/tree-sitter/tree-sitter-typescript/tree/master/typescript", rev = "master" }
+
+[[grammar]]
+name = "tsx"
+source = { git = "https://github.com/tree-sitter/tree-sitter-typescript/tree/master/typescript", rev = "master" }
+
+[[grammar]]
+name = "javascript"
+source = { git = "https://github.com/tree-sitter/tree-sitter-typescript/tree/master/typescript", rev = "master" }
+
+[[grammar]]
+name = "jsx"
+source = { git = "https://github.com/tree-sitter/tree-sitter-typescript/tree/master/typescript", rev = "master" }
+
+[[language]]
+name = "typescript"
+# pass format options according to https://github.com/typescript-language-server/typescript-language-server#workspacedidchangeconfiguration omitting the "[language].format." prefix.
+# config = { format = { "semicolons" = "insert", "insertSpaceBeforeFunctionParenthesis" = true } }
+formatter = { command = "prettier-pipe", args = ["file-path"] }

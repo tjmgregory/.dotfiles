@@ -1,0 +1,28 @@
+# Themes: https://github.com/helix-editor/helix/wiki/Themes
+theme = "theo"
+
+[editor]
+line-number = "relative"
+scrolloff = 7
+mouse = false
+cursorline = true
+rulers = [100]
+
+[editor.indent-guides]
+render = true
+
+[editor.lsp]
+display-messages = true
+
+[editor.statusline]
+left = ["spinner", "file-name"]
+right = ["diagnostics", "selections", "position", "position-percentage"]
+
+[editor.file-picker]
+hidden = false
+
+[keys.insert]
+k = { j = "normal_mode" }
+
+[keys.normal]
+C-s = ":w"
