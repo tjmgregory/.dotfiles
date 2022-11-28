@@ -11,6 +11,7 @@ brew "tmux"
 brew "ngrok"
 brew "lazygit"
 brew "hyperfine"
+brew "git-standup"
 
 cask "alacritty"
 cask "brave-browser"
