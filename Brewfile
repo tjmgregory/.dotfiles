@@ -24,7 +24,7 @@ cask "raycast"
 cask "slack"
 cask "spotify"
 cask "trailer"
-cask "whatsapp"
+# cask "whatsapp"
 cask "fig"
 
 # Tilt
