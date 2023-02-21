@@ -20,7 +20,6 @@ cask "pgadmin4"
 cask "raycast"
 cask "spotify"
 cask "trailer"
-# cask "whatsapp"
 
 brew "jq"
 brew "derailed/k9s/k9s"
