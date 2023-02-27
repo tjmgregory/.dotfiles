@@ -1,0 +1,13 @@
+ELEPHANT_DIR="~/work/elephant"
+
+alias eaa="cd $ELEPHANT_DIR/api-admin"
+alias eab="cd $ELEPHANT_DIR/api-billing"
+alias eacp="cd $ELEPHANT_DIR/api-clinical-product"
+alias eai="cd $ELEPHANT_DIR/api-inventory"
+alias eapr="cd $ELEPHANT_DIR/api-patient-register"
+alias eapl="cd $ELEPHANT_DIR/api-price-list"
+alias epc="cd $ELEPHANT_DIR/primary-care"
+alias epcw="cd $ELEPHANT_DIR/primary-care-web"
+alias ewmi="cd $ELEPHANT_DIR/web-mfe-inventory"
+alias ewmpr="cd $ELEPHANT_DIR/web-mfe-patient-register"
+alias ewmpl="cd $ELEPHANT_DIR/web-mfe-price-list"
