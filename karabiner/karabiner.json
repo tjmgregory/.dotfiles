@@ -150,7 +150,7 @@
             ]
           },
           {
-            "description": "ccos + w to open Brave.",
+            "description": "ccos + w to open Arc.",
             "manipulators": [
               {
                 "from": {
@@ -161,7 +161,7 @@
                 },
                 "to": [
                   {
-                    "shell_command": "open -a '/Applications/Brave Browser.app'"
+                    "shell_command": "open -a '/Applications/Arc.app'"
                   }
                 ],
                 "type": "basic"
