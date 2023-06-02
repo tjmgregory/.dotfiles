@@ -24,7 +24,7 @@ alias formatjson='pbpaste | python3 -m json.tool | pbcopy'
 alias isodate='date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n' | tee >(pbcopy)'
 alias ll='ls -la'
 alias text="pbpaste | pbcopy"
-alias uuid='python -c "import uuid; import sys; sys.stdout.write(\"{}\".format(uuid.uuid4()))" | tee >(pbcopy)'
+alias uuid='python3 -c "import uuid; import sys; sys.stdout.write(\"{}\".format(uuid.uuid4()))" | tee >(pbcopy)'
 function sha1 { echo -n "$1" | openssl sha1 | tee >(pbcopy) }
 
 # Full scripts
@@ -42,3 +42,6 @@ export DEBUG_PRINT_LIMIT=100000000
 export PROJECTS=~/projects
 alias pot='cd $PROJECTS/potly'
 alias potwe='cd $PROJECTS/potly/website'
+
+alias k='kubectl'
+[[ "$TERM_PROGRAM" == "vscode" ]] && source <(kubectl completion zsh)
