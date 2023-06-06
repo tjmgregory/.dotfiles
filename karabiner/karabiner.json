@@ -93,7 +93,7 @@
             ]
           },
           {
-            "description": "ccos + 2 to open WhatsApp.",
+            "description": "ccos + 2 to open Beeper.",
             "manipulators": [
               {
                 "from": {
@@ -104,7 +104,7 @@
                 },
                 "to": [
                   {
-                    "shell_command": "open -a '/Applications/WhatsApp.app'"
+                    "shell_command": "open -a '/Applications/Beeper.app'"
                   }
                 ],
                 "type": "basic"
