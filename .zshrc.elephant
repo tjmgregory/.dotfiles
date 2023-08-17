@@ -2,6 +2,9 @@ ELEPHANT_DIR="~/work/elephant"
 
 export AWS_PROFILE=ele-main
 
+#export USE_ACCESS_TOKEN=true
+
+alias e="cd $ELEPHANT_DIR"
 alias eaa="cd $ELEPHANT_DIR/api-admin"
 alias eab="cd $ELEPHANT_DIR/api-billing"
 alias eac="cd $ELEPHANT_DIR/api-consultation"
@@ -22,6 +25,7 @@ alias epc="cd $ELEPHANT_DIR/primary-care"
 alias epcw="cd $ELEPHANT_DIR/primary-care-web"
 alias ewcs="cd $ELEPHANT_DIR/web-config-service"
 alias ewp="cd $ELEPHANT_DIR/web-packages"
+alias ews="cd $ELEPHANT_DIR/web-shell"
 alias ewmi="cd $ELEPHANT_DIR/web-mfe-inventory"
 alias ewmpr="cd $ELEPHANT_DIR/web-mfe-patient-register"
 alias ewmpl="cd $ELEPHANT_DIR/web-mfe-price-list"

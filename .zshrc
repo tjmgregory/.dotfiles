@@ -8,6 +8,8 @@ alias n='npm'
 alias v='vim'
 alias p='pnpm'
 
+alias cat='bat'
+
 # Git
 alias gl='git pull'
 alias gp='git push'
