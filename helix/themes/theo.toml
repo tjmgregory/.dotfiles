@@ -1,4 +1,4 @@
 inherits="bogster"
 
-"ui.background" = { bg = "#000000" }
+"ui.background" = {}
 "diagnostic.error" = { bg="#700000" }
