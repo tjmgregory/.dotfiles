@@ -7,6 +7,8 @@ alias y='yarn'
 alias n='npm'
 alias v='vim'
 alias p='pnpm'
+alias d='deno'
+alias dt='d task'
 
 alias cat='bat'
 
