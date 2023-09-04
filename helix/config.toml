@@ -22,6 +22,14 @@ right = ["diagnostics", "selections", "position", "position-percentage"]
 [editor.file-picker]
 hidden = false
 
+[editor.auto-pairs]
+'(' = ')'
+'{' = '}'
+'[' = ']'
+'"' = '"'
+'`' = '`'
+'<' = '>'
+
 [keys.insert]
 k = { j = "normal_mode" }
 
