@@ -1,7 +1,117 @@
+# TS Server
+[[language]]
+name = "html"
+formatter = { command = 'prettier', args = ["--parser", "html"] }
+
+[[language]]
+name = "json"
+formatter = { command = 'prettier', args = ["--parser", "json"] }
+
+[[language]]
+name = "css"
+formatter = { command = 'prettier', args = ["--parser", "css"] }
+
+# Copied from https://github.com/helix-editor/helix/blob/master/languages.toml#L117-L138
+# [[foo]] notation adds to the foo table as a list item. So each entry for a language
+# presumably overwrites the last with the same name when Helix comes to parse it. Thus, you need
+# all the same keys for it to work.
+[[language]]
+name = "jsx"
+scope = "source.jsx"
+injection-regex = "jsx"
+language-id = "javascriptreact"
+file-types = ["jsx"]
+roots = []
+comment-token = "//"
+language-servers = [ "typescript-language-server", "eslint" ]
+indent = { tab-width = 2, unit = "  " }
+grammar = "javascript"
+auto-format = true
+
+[[language]]
+name = "jsx"
+scope = "source.jsx"
+injection-regex = "jsx"
+language-id = "javascriptreact"
+file-types = ["jsx"]
+roots = []
+comment-token = "//"
+language-servers = [ "typescript-language-server", "eslint" ]
+indent = { tab-width = 2, unit = "  " }
+grammar = "javascript"
+auto-format = true
+
+[[language]]
+name = "typescript"
+scope = "source.ts"
+injection-regex = "(ts|typescript)"
+file-types = ["ts", "mts", "cts"]
+language-id = "typescript"
+shebangs = []
+roots = []
+language-servers = [ "typescript-language-server", "eslint" ]
+indent = { tab-width = 2, unit = "  " }
+auto-format = true
+
+[[language]]
+name = "tsx"
+scope = "source.tsx"
+injection-regex = "(tsx)" # |typescript
+language-id = "typescriptreact"
+file-types = ["tsx"]
+roots = []
+language-servers = ["typescript-language-server", "eslint"]
+indent = { tab-width = 2, unit = "  " }
+auto-format = true
+
+[language-server.eslint]
+args = ["--stdio"]
+command = "vscode-eslint-language-server"
+
+[language-server.eslint.config]
+format = true
+quiet = false
+run = "onType"
+validate = "on"
+codeActionOnSave = { mode = "all" }
+
+[language-server.typescript-language-server.config]
+documentFormatting = false
+hostInfo = "helix"
+
 # Deno
 # [[language]]
 # name = "typescript"
 # file-types = ["ts","js"]
 # language-server = { command = "deno", args = ["lsp"]}
 # config = { deno = { enable = true } }
+# auto-format = true
+
+# [[language]]
+# name = "javascript"
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "js" ] }
+# auto-format = true
+
+# [[language]]
+# name = "json"
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "json" ] }
+
+# [[language]]
+# name = "markdown"
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "md" ] }
+# auto-format = true
+
+# [[language]]
+# name = "typescript"
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "ts" ] }
+# auto-format = true
+
+# [[language]]
+# name = "jsx"
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "jsx" ] }
+# auto-format = true
+
+# [[language]]
+# name = "tsx"
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "tsx" ] }
 # auto-format = true
