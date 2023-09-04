@@ -23,9 +23,10 @@ language-id = "javascriptreact"
 file-types = ["jsx"]
 roots = []
 comment-token = "//"
-language-servers = [ "typescript-language-server", "eslint" ]
+language-servers = ["typescript-language-server", "eslint"]
 indent = { tab-width = 2, unit = "  " }
 grammar = "javascript"
+formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 auto-format = true
 
 [[language]]
@@ -36,9 +37,10 @@ language-id = "javascriptreact"
 file-types = ["jsx"]
 roots = []
 comment-token = "//"
-language-servers = [ "typescript-language-server", "eslint" ]
+language-servers = ["typescript-language-server", "eslint"]
 indent = { tab-width = 2, unit = "  " }
 grammar = "javascript"
+formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 auto-format = true
 
 [[language]]
@@ -49,8 +51,9 @@ file-types = ["ts", "mts", "cts"]
 language-id = "typescript"
 shebangs = []
 roots = []
-language-servers = [ "typescript-language-server", "eslint" ]
+language-servers = ["typescript-language-server", "eslint"]
 indent = { tab-width = 2, unit = "  " }
+formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 auto-format = true
 
 [[language]]
@@ -62,6 +65,7 @@ file-types = ["tsx"]
 roots = []
 language-servers = ["typescript-language-server", "eslint"]
 indent = { tab-width = 2, unit = "  " }
+formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 auto-format = true
 
 [language-server.eslint]
