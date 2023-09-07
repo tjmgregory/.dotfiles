@@ -15,19 +15,9 @@ formatter = { command = 'prettier', args = ["--parser", "css"] }
 # [[foo]] notation adds to the foo table as a list item. So each entry for a language
 # presumably overwrites the last with the same name when Helix comes to parse it. Thus, you need
 # all the same keys for it to work.
-[[language]]
-name = "jsx"
-scope = "source.jsx"
-injection-regex = "jsx"
-language-id = "javascriptreact"
-file-types = ["jsx"]
-roots = []
-comment-token = "//"
-language-servers = ["typescript-language-server", "eslint"]
-indent = { tab-width = 2, unit = "  " }
-grammar = "javascript"
-formatter = { command = 'prettier', args = ["--parser", "typescript"] }
-auto-format = true
+[[grammar]]
+name = "javascript"
+source = { git = "https://github.com/tree-sitter/tree-sitter-javascript", rev = "f772967f7b7bc7c28f845be2420a38472b16a8ee" }
 
 [[language]]
 name = "jsx"
@@ -42,6 +32,10 @@ indent = { tab-width = 2, unit = "  " }
 grammar = "javascript"
 formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 auto-format = true
+
+[[grammar]]
+name = "typescript"
+source = { git = "https://github.com/tree-sitter/tree-sitter-typescript", rev = "b1bf4825d9eaa0f3bdeb1e52f099533328acfbdf", subpath = "typescript" }
 
 [[language]]
 name = "typescript"
@@ -52,6 +46,7 @@ language-id = "typescript"
 shebangs = []
 roots = []
 auto-format = true
+grammar = "typescript"
 # TSC
 # language-servers = ["typescript-language-server", "eslint"]
 # formatter = { command = 'prettier', args = ["--parser", "typescript"] }
@@ -69,6 +64,7 @@ roots = []
 language-servers = ["typescript-language-server", "eslint"]
 indent = { tab-width = 2, unit = "  " }
 formatter = { command = 'prettier', args = ["--parser", "typescript"] }
+grammar = "typescript"
 auto-format = true
 
 [language-server.eslint]
