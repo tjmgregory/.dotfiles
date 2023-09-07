@@ -51,10 +51,13 @@ file-types = ["ts", "mts", "cts"]
 language-id = "typescript"
 shebangs = []
 roots = []
-language-servers = ["typescript-language-server", "eslint"]
-indent = { tab-width = 2, unit = "  " }
-formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 auto-format = true
+# TSC
+# language-servers = ["typescript-language-server", "eslint"]
+# formatter = { command = 'prettier', args = ["--parser", "typescript"] }
+# indent = { tab-width = 2, unit = "  " }
+# Deno
+language-servers = ["deno"]
 
 [[language]]
 name = "tsx"
@@ -83,13 +86,10 @@ codeActionOnSave = { mode = "all" }
 documentFormatting = false
 hostInfo = "helix"
 
-# Deno
-# [[language]]
-# name = "typescript"
-# file-types = ["ts","js"]
-# language-server = { command = "deno", args = ["lsp"]}
-# config = { deno = { enable = true } }
-# auto-format = true
+[language-server.deno]
+command = "deno"
+args = ["lsp"]
+config = { deno = { enable = true } }
 
 # [[language]]
 # name = "javascript"
