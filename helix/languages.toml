@@ -1,23 +1,23 @@
 [[language]]
 name = "html"
 # Pretier
-# formatter = { command = 'prettier', args = ["--parser", "html"] }
+formatter = { command = 'prettier', args = ["--parser", "html"] }
 # Deno
-formatter = { command = 'deno', args = ["fmt", "-", "--ext", "html" ] }
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "html" ] }
 
 [[language]]
 name = "json"
 # Pretier
-# formatter = { command = 'prettier', args = ["--parser", "json"] }
+formatter = { command = 'prettier', args = ["--parser", "json"] }
 # Deno
-formatter = { command = 'deno', args = ["fmt", "-", "--ext", "json" ] }
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "json" ] }
 
 [[language]]
 name = "css"
 # Pretier
-# formatter = { command = 'prettier', args = ["--parser", "css"] }
+formatter = { command = 'prettier', args = ["--parser", "css"] }
 # Deno
-formatter = { command = 'deno', args = ["fmt", "-", "--ext", "css" ] }
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "css" ] }
 
 # Copied from https://github.com/helix-editor/helix/blob/master/languages.toml#L117-L138
 # [[foo]] notation adds to the foo table as a list item. So each entry for a language
@@ -25,7 +25,7 @@ formatter = { command = 'deno', args = ["fmt", "-", "--ext", "css" ] }
 # all the same keys for it to work.
 [[grammar]]
 name = "javascript"
-source = { git = "https://github.com/tree-sitter/tree-sitter-javascript", rev = "f772967f7b7bc7c28f845be2420a38472b16a8ee" }
+source = { git = "https://github.com/tree-sitter/tree-sitter-javascript", rev = "master" }
 
 [[language]]
 name = "jsx"
@@ -43,7 +43,11 @@ auto-format = true
 
 [[grammar]]
 name = "typescript"
-source = { git = "https://github.com/tree-sitter/tree-sitter-typescript", rev = "b1bf4825d9eaa0f3bdeb1e52f099533328acfbdf", subpath = "typescript" }
+source = { git = "https://github.com/tree-sitter/tree-sitter-typescript", rev = "master", subpath = "typescript" }
+
+[[grammar]]
+name = "tsx"
+source = { git = "https://github.com/tree-sitter/tree-sitter-typescript", rev = "master", subpath = "tsx" }
 
 [[language]]
 name = "typescript"
@@ -51,30 +55,27 @@ scope = "source.ts"
 injection-regex = "(ts|typescript)"
 file-types = ["ts", "mts", "cts"]
 language-id = "typescript"
-shebangs = []
-roots = []
+roots = ['package.json']
 auto-format = true
 grammar = "typescript"
 # TSC
-# language-servers = ["typescript-language-server", "eslint"]
-# formatter = { command = 'prettier', args = ["--parser", "typescript"] }
-# indent = { tab-width = 2, unit = "  " }
+language-servers = ["typescript-language-server", "eslint"]
+formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 # Deno
-language-servers = ["deno"]
-formatter = { command = 'deno', args = ["fmt", "-", "--ext", "ts" ] }
+# language-servers = ["deno"]
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "ts" ] }
 
 [[language]]
 name = "tsx"
 scope = "source.tsx"
-injection-regex = "(tsx)" # |typescript
-language-id = "typescriptreact"
+injection-regex = "tsx" # |typescript
 file-types = ["tsx"]
-roots = []
-language-servers = ["typescript-language-server", "eslint"]
-indent = { tab-width = 2, unit = "  " }
-formatter = { command = 'prettier', args = ["--parser", "typescript"] }
-grammar = "typescript"
+language-id = "typescriptreact"
+roots = ['package.json']
 auto-format = true
+grammar = "tsx"
+language-servers = ["typescript-language-server", "eslint"]
+formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 
 [language-server.eslint]
 args = ["--stdio"]
@@ -94,4 +95,8 @@ hostInfo = "helix"
 [language-server.deno]
 command = "deno"
 args = ["lsp"]
-config = { deno = { enable = true } }
+
+# Options: https://deno.land/manual@v1.36.4/advanced/language_server/overview#settings
+# Defaults: https://github.com/denoland/deno/blob/01a761f1d4f7ff4943fbf80464a276b434d8a8f7/cli/lsp/config.rs
+[language-server.deno.config.deno]
+enable = true
