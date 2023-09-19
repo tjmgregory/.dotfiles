@@ -28,6 +28,22 @@ name = "javascript"
 source = { git = "https://github.com/tree-sitter/tree-sitter-javascript", rev = "master" }
 
 [[language]]
+name = "javascript"
+scope = "source.js"
+injection-regex = "(ts|javascript)"
+file-types = ["js", "mjs", "cjs"]
+language-id = "javascript"
+roots = ['package.json']
+auto-format = true
+grammar = "javascript"
+language-servers = ["typescript-language-server", "biome"]
+# language-servers = ["typescript-language-server", "eslint"]
+# language-servers = ["deno"]
+formatter = { command = 'node_modules/.bin/biome', args = ["format", "--stdin-file-path", "test.js"] }
+# formatter = { command = 'prettier', args = ["--parser", "typescript"] }
+# formatter = { command = 'deno', args = ["fmt", "-", "--ext", "ts" ] }
+
+[[language]]
 name = "jsx"
 scope = "source.jsx"
 injection-regex = "jsx"
@@ -35,11 +51,13 @@ language-id = "javascriptreact"
 file-types = ["jsx"]
 roots = []
 comment-token = "//"
-language-servers = ["typescript-language-server", "eslint"]
 indent = { tab-width = 2, unit = "  " }
 grammar = "javascript"
-formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 auto-format = true
+language-servers = ["typescript-language-server", "biome"]
+# language-servers = ["typescript-language-server", "eslint"]
+formatter = { command = 'node_modules/.bin/biome', args = ["format", "--stdin-file-path", "test.jsx"] }
+# formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 
 [[grammar]]
 name = "typescript"
@@ -58,11 +76,11 @@ language-id = "typescript"
 roots = ['package.json']
 auto-format = true
 grammar = "typescript"
-# TSC
-language-servers = ["typescript-language-server", "eslint"]
-formatter = { command = 'prettier', args = ["--parser", "typescript"] }
-# Deno
+language-servers = ["typescript-language-server", "biome"]
+# language-servers = ["typescript-language-server", "eslint"]
 # language-servers = ["deno"]
+formatter = { command = 'node_modules/.bin/biome', args = ["format", "--stdin-file-path", "test.ts"] }
+# formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 # formatter = { command = 'deno', args = ["fmt", "-", "--ext", "ts" ] }
 
 [[language]]
@@ -74,8 +92,14 @@ language-id = "typescriptreact"
 roots = ['package.json']
 auto-format = true
 grammar = "tsx"
-language-servers = ["typescript-language-server", "eslint"]
-formatter = { command = 'prettier', args = ["--parser", "typescript"] }
+language-servers = ["typescript-language-server", "biome"]
+# language-servers = ["typescript-language-server", "eslint"]
+formatter = { command = 'node_modules/.bin/biome', args = ["format", "--stdin-file-path", "test.tsx"] }
+# formatter = { command = 'prettier', args = ["--parser", "typescript"] }
+
+[language-server.biome]
+args = ["lsp-proxy"]
+command = "node_modules/.bin/biome"
 
 [language-server.eslint]
 args = ["--stdio"]
