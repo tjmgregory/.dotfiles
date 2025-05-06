@@ -49,3 +49,9 @@ alias potwe='cd $PROJECTS/potly/website'
 
 alias k='kubectl'
 [[ "$TERM_PROGRAM" == "vscode" ]] && source <(kubectl completion zsh)
+
+# Vocal App
+alias fl='bundle exec fastlane'
+
+# helix-gpt https://github.com/leona/helix-gpt
+export HANDLER=copilot

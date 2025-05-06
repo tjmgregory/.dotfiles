@@ -1,7 +1,5 @@
 ELEPHANT_DIR="~/work/elephant"
 
-export AWS_PROFILE=ele-main
-
 #export USE_ACCESS_TOKEN=true
 
 alias e="cd $ELEPHANT_DIR"
@@ -9,6 +7,7 @@ alias eaa="cd $ELEPHANT_DIR/api-admin"
 alias eab="cd $ELEPHANT_DIR/api-billing"
 alias eac="cd $ELEPHANT_DIR/api-consultation"
 alias eacp="cd $ELEPHANT_DIR/api-clinical-product"
+alias eae="cd $ELEPHANT_DIR/api-encounter"
 alias eaf="cd $ELEPHANT_DIR/api-federation"
 alias eai="cd $ELEPHANT_DIR/api-inventory"
 alias eaI="cd $ELEPHANT_DIR/api-investigation"
