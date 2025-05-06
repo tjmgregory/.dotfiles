@@ -2,3 +2,4 @@ inherits="bogster"
 
 "ui.background" = {}
 "diagnostic.error" = { bg="#700000" }
+"ui.virtual.jump-label" = { fg="#FF0000" }
