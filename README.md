@@ -3,5 +3,6 @@
 Symlink things, i.e.
 
 ```sh
-ln -s ./<your-clone-of-this-repo>/helix/ ~/.config/helix
+ln -s ~/.dotfiles/helix ~/.config/helix
+ln -s ~/.dotfiles/karabiner ~/.config/karabiner
 ```
