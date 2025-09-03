@@ -1,0 +1,10 @@
+{
+  "git.worktrees.scanRepositories": true,
+  "git.worktrees.scanMaxDepth": 4,
+  "git.worktrees.scanIgnoredRepos": false,
+  "git.worktrees.scanFolders": [
+    "~/worktrees"
+  ],
+  "git.worktrees.autoStash": true,
+  "git.worktrees.autoFetch": true
+}

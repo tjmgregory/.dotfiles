@@ -23,14 +23,27 @@
                         ]
                     },
                     {
-                        "description": "ccos + § to open WhatsApp.",
+                        "description": "ccos + l to open Linear.",
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "non_us_backslash",
+                                    "key_code": "l",
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
-                                "to": [{ "shell_command": "open -a '/Applications/ChatGPT.app'" }],
+                                "to": [{ "shell_command": "open -a '/Applications/Linear.app'" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "ccos + s to open Slack.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "s",
+                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
+                                },
+                                "to": [{ "shell_command": "open -a '/Applications/Slack.app'" }],
                                 "type": "basic"
                             }
                         ]
@@ -62,32 +75,6 @@
                         ]
                     },
                     {
-                        "description": "ccos + l to open Linear.",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "l",
-                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
-                                },
-                                "to": [{ "shell_command": "open -a '/Applications/Linear.app'" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "ccos + s to open Slack.",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "s",
-                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
-                                },
-                                "to": [{ "shell_command": "open -a '/Applications/Slack.app'" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
                         "description": "ccos + c to open Cursor.",
                         "manipulators": [
                             {
@@ -101,14 +88,14 @@
                         ]
                     },
                     {
-                        "description": "ccos + e to open Notion Mail.",
+                        "description": "ccos + e to open Ellie.",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "e",
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
-                                "to": [{ "shell_command": "open -a '/Applications/Notion Mail.app'" }],
+                                "to": [{ "shell_command": "open -a /Applications/Ellie.app" }],
                                 "type": "basic"
                             }
                         ]
@@ -127,14 +114,14 @@
                         ]
                     },
                     {
-                        "description": "ccos + w to open Dia.",
+                        "description": "ccos + w to open Arc.",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "w",
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
-                                "to": [{ "shell_command": "open -a '/Applications/Dia.app'" }],
+                                "to": [{ "shell_command": "open -a '/Applications/Arc.app'" }],
                                 "type": "basic"
                             }
                         ]
@@ -161,6 +148,19 @@
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
                                 "to": [{ "shell_command": "open -a '/Applications/Warp.app'" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "ccos + e to open Spark.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "e",
+                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
+                                },
+                                "to": [{ "shell_command": "open -a '/Applications/Setapp/Spark Mail.app'" }],
                                 "type": "basic"
                             }
                         ]
@@ -246,6 +246,19 @@
                 ]
             },
             "devices": [
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "product_id": 834,
+                        "vendor_id": 1452
+                    },
+                    "simple_modifications": [
+                        {
+                            "from": { "key_code": "non_us_backslash" },
+                            "to": [{ "key_code": "escape" }]
+                        }
+                    ]
+                },
                 {
                     "identifiers": {
                         "is_keyboard": true,

@@ -39,3 +39,15 @@ alias k='kubectl'
 
 # helix-gpt https://github.com/leona/helix-gpt
 export HANDLER=copilot
+
+# Kraft Cloud
+export UKC_METRO=fra0
+
+# Rory's Worktree W
+fpath=(~/.zsh/completions $fpath)
+autoload -U compinit && compinit
+source ~/.dotfiles/zsh/worktree-manager.zsh
+
+# Worktree management
+alias wt='~/.dotfiles/bin/wt'
+export PATH="$HOME/.dotfiles/bin:$PATH"
