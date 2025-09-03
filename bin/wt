@@ -287,9 +287,10 @@ clean_worktrees() {
 cd_worktree() {
     local repo_name="$1"
     local branch_name="$2"
+    local print_path_only="$3"
     
     if [[ -z "$repo_name" ]] || [[ -z "$branch_name" ]]; then
-        log_error "Usage: wt cd <repo-name> <branch-name>"
+        log_error "Usage: wt cd <repo-name> <branch-name> [--print-path]"
         return 1
     fi
     
@@ -307,14 +308,8 @@ cd_worktree() {
     
     # If worktree doesn't exist, create it
     if [[ ! -d "$worktree_path" ]]; then
-        log_warning "Worktree doesn't exist for $repo_name/$branch_name"
-        echo -n "Create new worktree? [Y/n]: "
-        read -r response
-        
-        # Default to yes if empty response
-        if [[ -z "$response" ]] || [[ "$response" =~ ^[Yy]$ ]]; then
-            log_info "Creating worktree for $repo_name/$branch_name..."
-            
+        if [[ "$print_path_only" == "--print-path" ]]; then
+            # For --print-path mode, create worktree silently without prompting
             # Create the worktrees directory if it doesn't exist
             mkdir -p "$worktrees_dir"
             
@@ -322,19 +317,43 @@ cd_worktree() {
             cd "$main_repo"
             git worktree add "$worktree_path" "$branch_name" 2>/dev/null || {
                 # If branch doesn't exist, create it
-                log_info "Branch $branch_name doesn't exist, creating it..."
-                git worktree add -b "$branch_name" "$worktree_path"
+                git worktree add -b "$branch_name" "$worktree_path" 2>/dev/null
             }
-            
-            log_success "Created worktree: $worktree_path"
         else
-            log_info "Cancelled worktree creation"
-            return 1
+            log_warning "Worktree doesn't exist for $repo_name/$branch_name"
+            echo -n "Create new worktree? [Y/n]: "
+            read -r response
+            
+            # Default to yes if empty response
+            if [[ -z "$response" ]] || [[ "$response" =~ ^[Yy]$ ]]; then
+                log_info "Creating worktree for $repo_name/$branch_name..."
+                
+                # Create the worktrees directory if it doesn't exist
+                mkdir -p "$worktrees_dir"
+                
+                # Create the worktree
+                cd "$main_repo"
+                git worktree add "$worktree_path" "$branch_name" 2>/dev/null || {
+                    # If branch doesn't exist, create it
+                    log_info "Branch $branch_name doesn't exist, creating it..."
+                    git worktree add -b "$branch_name" "$worktree_path"
+                }
+                
+                log_success "Created worktree: $worktree_path"
+            else
+                log_info "Cancelled worktree creation"
+                return 1
+            fi
         fi
     fi
     
-    log_info "Switching to worktree: $worktree_path"
-    cd "$worktree_path"
+    if [[ "$print_path_only" == "--print-path" ]]; then
+        # Just print the path for the shell function to use
+        echo "$worktree_path"
+    else
+        log_info "Switching to worktree: $worktree_path"
+        cd "$worktree_path"
+    fi
 }
 
 # Main command handling
@@ -352,7 +371,7 @@ case "$1" in
         clean_worktrees
         ;;
     "cd")
-        cd_worktree "$2" "$3"
+        cd_worktree "$2" "$3" "$4"
         ;;
     *)
         usage

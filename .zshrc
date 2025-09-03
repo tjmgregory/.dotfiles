@@ -43,11 +43,27 @@ export HANDLER=copilot
 # Kraft Cloud
 export UKC_METRO=fra0
 
-# Rory's Worktree W
-fpath=(~/.zsh/completions $fpath)
-autoload -U compinit && compinit
-source ~/.dotfiles/zsh/worktree-manager.zsh
 
 # Worktree management
-alias wt='~/.dotfiles/bin/wt'
 export PATH="$HOME/.dotfiles/bin:$PATH"
+
+# Shell function wrapper for wt that handles cd properly
+unalias wt 2>/dev/null  # Remove any existing alias
+wt() {
+    if [[ "$1" == "cd" ]]; then
+        # Handle cd command specially to actually change directory
+        local target_dir
+        target_dir=$(~/.dotfiles/bin/wt cd "$2" "$3" --print-path 2>/dev/null)
+        
+        if [[ $? -eq 0 && -n "$target_dir" && -d "$target_dir" ]]; then
+            cd "$target_dir"
+            echo "Switched to worktree: $target_dir"
+        else
+            # Fallback to regular wt cd behavior (will show output but not change dir)
+            ~/.dotfiles/bin/wt cd "$2" "$3"
+        fi
+    else
+        # For all other commands, just pass through to the script
+        ~/.dotfiles/bin/wt "$@"
+    fi
+}
