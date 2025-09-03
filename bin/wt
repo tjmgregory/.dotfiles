@@ -40,32 +40,43 @@ usage() {
     echo "Usage: wt <command> [options]"
     echo ""
     echo "Commands:"
-    echo "  create <repo-path> <branch-name>    Create a new worktree"
-    echo "  list [repo-name]                    List worktrees (optionally filter by repo)"
-    echo "  remove <repo-name> <branch-name>    Remove a worktree"
-    echo "  clean                               Clean up orphaned worktrees"
-    echo "  cd <repo-name> <branch-name>        Change to worktree directory"
+    echo "  create <repo-name|repo-path> <branch-name>    Create a new worktree"
+    echo "  ls [repo-name]                               List worktrees (optionally filter by repo)"
+    echo "  rm <repo-name> <branch-name>                 Remove a worktree"
+    echo "  clean                                        Clean up orphaned worktrees"
+    echo "  cd <repo-name> <branch-name>                 Change to worktree directory"
     echo ""
     echo "Examples:"
+    echo "  wt create api-patient feature-auth"
     echo "  wt create ~/work/elephant/api-patient feature-auth"
-    echo "  wt list api-patient"
-    echo "  wt remove api-patient feature-auth"
+    echo "  wt ls api-patient"
+    echo "  wt rm api-patient feature-auth"
     echo "  wt cd api-patient feature-auth"
 }
 
 # Create a new worktree
 create_worktree() {
-    local repo_path="$1"
+    local repo_input="$1"
     local branch_name="$2"
     
-    if [[ -z "$repo_path" ]] || [[ -z "$branch_name" ]]; then
-        log_error "Usage: wt create <repo-path> <branch-name>"
+    if [[ -z "$repo_input" ]] || [[ -z "$branch_name" ]]; then
+        log_error "Usage: wt create <repo-name|repo-path> <branch-name>"
         return 1
     fi
     
-    if [[ ! -d "$repo_path" ]]; then
-        log_error "Repository not found: $repo_path"
-        return 1
+    local repo_path=""
+    
+    # Check if it's a full path
+    if [[ "$repo_input" == /* ]] && [[ -d "$repo_input" ]]; then
+        repo_path="$repo_input"
+    else
+        # Try to find by repo name
+        repo_path=$(find_repo_by_name "$repo_input")
+        if [[ -z "$repo_path" ]]; then
+            log_error "Repository not found: $repo_input"
+            log_error "Try using the full path or check available repos with 'wt ls'"
+            return 1
+        fi
     fi
     
     # Get repo name from path
@@ -308,10 +319,10 @@ case "$1" in
     "create")
         create_worktree "$2" "$3"
         ;;
-    "list")
+    "ls"|"list")
         list_worktrees "$2"
         ;;
-    "remove")
+    "rm"|"remove")
         remove_worktree "$2" "$3"
         ;;
     "clean")
