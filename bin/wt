@@ -40,73 +40,19 @@ usage() {
     echo "Usage: wt <command> [options]"
     echo ""
     echo "Commands:"
-    echo "  create <repo-name|repo-path> <branch-name>    Create a new worktree"
+    echo "  cd <repo-name> <branch-name>                 Change to worktree (creates if needed)"
     echo "  ls [repo-name]                               List worktrees (optionally filter by repo)"
     echo "  rm <repo-name> <branch-name>                 Remove a worktree"
     echo "  clean                                        Clean up orphaned worktrees"
-    echo "  cd <repo-name> <branch-name>                 Change to worktree (creates if needed)"
     echo ""
     echo "Examples:"
-    echo "  wt create api-patient feature-auth           # Create worktree"
-    echo "  wt ls api-patient                           # List worktrees for repo"
-    echo "  wt rm api-patient feature-auth             # Remove worktree"
     echo "  wt cd api-patient feature-auth             # Go to worktree (creates if needed)"
     echo "  wt cd api-patient existing-branch          # Go to existing worktree"
+    echo "  wt ls api-patient                           # List worktrees for repo"
+    echo "  wt rm api-patient feature-auth             # Remove worktree"
+    echo "  wt clean                                     # Clean up orphaned worktrees"
 }
 
-# Create a new worktree
-create_worktree() {
-    local repo_input="$1"
-    local branch_name="$2"
-    
-    if [[ -z "$repo_input" ]] || [[ -z "$branch_name" ]]; then
-        log_error "Usage: wt create <repo-name|repo-path> <branch-name>"
-        return 1
-    fi
-    
-    local repo_path=""
-    
-    # Check if it's a full path
-    if [[ "$repo_input" == /* ]] && [[ -d "$repo_input" ]]; then
-        repo_path="$repo_input"
-    else
-        # Try to find by repo name
-        repo_path=$(find_repo_by_name "$repo_input")
-        if [[ -z "$repo_path" ]]; then
-            log_error "Repository not found: $repo_input"
-            log_error "Try using the full path or check available repos with 'wt ls'"
-            return 1
-        fi
-    fi
-    
-    # Get repo name from path
-    local repo_name=$(basename "$repo_path")
-    
-    # Create worktree directory in .worktrees
-    local worktrees_dir=$(get_worktrees_dir "$repo_path")
-    local worktree_path="$worktrees_dir/$branch_name"
-    
-    if [[ -d "$worktree_path" ]]; then
-        log_warning "Worktree already exists: $worktree_path"
-        return 1
-    fi
-    
-    log_info "Creating worktree for $repo_name/$branch_name..."
-    
-    # Create the worktrees directory if it doesn't exist
-    mkdir -p "$worktrees_dir"
-    
-    # Create the worktree
-    cd "$repo_path"
-    git worktree add "$worktree_path" "$branch_name" 2>/dev/null || {
-        # If branch doesn't exist, create it
-        log_info "Branch $branch_name doesn't exist, creating it..."
-        git worktree add -b "$branch_name" "$worktree_path"
-    }
-    
-    log_success "Created worktree: $worktree_path"
-    log_info "To switch to it: cd $worktree_path"
-}
 
 # Get all search directories for repositories
 get_search_dirs() {
