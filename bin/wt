@@ -5,7 +5,12 @@
 
 set -e
 
-WORKTREES_DIR="$HOME/worktrees"
+# Worktrees are now stored in each repo's .worktrees directory
+# This function finds the worktrees directory for a given repo
+get_worktrees_dir() {
+    local repo_path="$1"
+    echo "$repo_path/.worktrees"
+}
 
 # Colors for output
 RED='\033[0;31m'
@@ -66,8 +71,9 @@ create_worktree() {
     # Get repo name from path
     local repo_name=$(basename "$repo_path")
     
-    # Create worktree directory
-    local worktree_path="$WORKTREES_DIR/$repo_name/$branch_name"
+    # Create worktree directory in .worktrees
+    local worktrees_dir=$(get_worktrees_dir "$repo_path")
+    local worktree_path="$worktrees_dir/$branch_name"
     
     if [[ -d "$worktree_path" ]]; then
         log_warning "Worktree already exists: $worktree_path"
@@ -76,8 +82,8 @@ create_worktree() {
     
     log_info "Creating worktree for $repo_name/$branch_name..."
     
-    # Create the directory structure
-    mkdir -p "$(dirname "$worktree_path")"
+    # Create the worktrees directory if it doesn't exist
+    mkdir -p "$worktrees_dir"
     
     # Create the worktree
     cd "$repo_path"
@@ -91,38 +97,97 @@ create_worktree() {
     log_info "To switch to it: cd $worktree_path"
 }
 
+# Get all search directories for repositories
+get_search_dirs() {
+    local search_dirs=()
+    
+    # Add ~/work/*/* directories (work contains folders which contain git repos)
+    if [[ -d "$HOME/work" ]]; then
+        for work_folder in "$HOME/work"/*; do
+            if [[ -d "$work_folder" ]]; then
+                for repo in "$work_folder"/*; do
+                    if [[ -d "$repo" ]] && [[ -d "$repo/.git" ]]; then
+                        search_dirs+=("$(dirname "$repo")")
+                    fi
+                done
+            fi
+        done
+    fi
+    
+    # Add ~/projects (projects contains git repos directly)
+    if [[ -d "$HOME/projects" ]]; then
+        search_dirs+=("$HOME/projects")
+    fi
+    
+    # Remove duplicates and sort
+    printf '%s\n' "${search_dirs[@]}" | sort -u
+}
+
+# Find a repository by name across all search directories
+find_repo_by_name() {
+    local repo_name="$1"
+    
+    while IFS= read -r search_dir; do
+        for repo in "$search_dir"/*; do
+            if [[ -d "$repo" ]] && [[ "$(basename "$repo")" == "$repo_name" ]]; then
+                echo "$repo"
+                return 0
+            fi
+        done
+    done < <(get_search_dirs)
+    
+    return 1
+}
+
 # List worktrees
 list_worktrees() {
     local filter="$1"
     
     if [[ -n "$filter" ]]; then
         log_info "Worktrees for $filter:"
-        if [[ -d "$WORKTREES_DIR/$filter" ]]; then
-            for branch in "$WORKTREES_DIR/$filter"/*; do
-                if [[ -d "$branch" ]]; then
-                    local branch_name=$(basename "$branch")
-                    echo "  $filter/$branch_name -> $branch"
-                fi
-            done
+        local repo_path
+        repo_path=$(find_repo_by_name "$filter")
+        
+        if [[ -n "$repo_path" ]]; then
+            local worktrees_dir=$(get_worktrees_dir "$repo_path")
+            if [[ -d "$worktrees_dir" ]]; then
+                for branch in "$worktrees_dir"/*; do
+                    if [[ -d "$branch" ]]; then
+                        local branch_name=$(basename "$branch")
+                        echo "  $filter/$branch_name -> $branch"
+                    fi
+                done
+            else
+                log_warning "No worktrees found for $filter"
+            fi
         else
-            log_warning "No worktrees found for $filter"
+            log_warning "Repository not found: $filter"
         fi
     else
         log_info "All worktrees:"
-        if [[ -d "$WORKTREES_DIR" ]]; then
-            for repo in "$WORKTREES_DIR"/*; do
-                if [[ -d "$repo" ]]; then
+        local found_any=false
+        
+        while IFS= read -r search_dir; do
+            for repo in "$search_dir"/*; do
+                if [[ -d "$repo" ]] && [[ -d "$repo/.git" ]]; then
                     local repo_name=$(basename "$repo")
-                    echo "  $repo_name:"
-                    for branch in "$repo"/*; do
-                        if [[ -d "$branch" ]]; then
-                            local branch_name=$(basename "$branch")
-                            echo "    $branch_name -> $branch"
-                        fi
-                    done
+                    local worktrees_dir=$(get_worktrees_dir "$repo")
+                    if [[ -d "$worktrees_dir" ]]; then
+                        local parent_dir=$(basename "$(dirname "$repo")")
+                        echo "  $parent_dir/$repo_name:"
+                        for branch in "$worktrees_dir"/*; do
+                            if [[ -d "$branch" ]]; then
+                                local branch_name=$(basename "$branch")
+                                echo "    $branch_name -> $branch"
+                                found_any=true
+                            fi
+                        done
+                    fi
                 fi
             done
-        else
+        done < <(get_search_dirs)
+        
+        if [[ "$found_any" == "false" ]]; then
             log_info "No worktrees found"
         fi
     fi
@@ -138,7 +203,17 @@ remove_worktree() {
         return 1
     fi
     
-    local worktree_path="$WORKTREES_DIR/$repo_name/$branch_name"
+    # Find the main repo
+    local main_repo
+    main_repo=$(find_repo_by_name "$repo_name")
+    
+    if [[ -z "$main_repo" ]]; then
+        log_error "Repository not found: $repo_name"
+        return 1
+    fi
+    
+    local worktrees_dir=$(get_worktrees_dir "$main_repo")
+    local worktree_path="$worktrees_dir/$branch_name"
     
     if [[ ! -d "$worktree_path" ]]; then
         log_error "Worktree not found: $worktree_path"
@@ -147,26 +222,11 @@ remove_worktree() {
     
     log_info "Removing worktree: $worktree_path"
     
-    # Find the main repo to remove the worktree properly
-    local main_repo=""
-    for repo in ~/work/elephant/*; do
-        if [[ -d "$repo" ]] && [[ "$(basename "$repo")" == "$repo_name" ]]; then
-            main_repo="$repo"
-            break
-        fi
-    done
+    cd "$main_repo"
+    git worktree remove "$worktree_path" --force
     
-    if [[ -n "$main_repo" ]]; then
-        cd "$main_repo"
-        git worktree remove "$worktree_path" --force
-    else
-        log_warning "Could not find main repo for $repo_name, removing directory only"
-        rm -rf "$worktree_path"
-    fi
-    
-    # Clean up empty directories
-    rmdir "$(dirname "$worktree_path")" 2>/dev/null || true
-    rmdir "$WORKTREES_DIR/$repo_name" 2>/dev/null || true
+    # Clean up empty worktrees directory
+    rmdir "$worktrees_dir" 2>/dev/null || true
     
     log_success "Removed worktree: $worktree_path"
 }
@@ -175,35 +235,35 @@ remove_worktree() {
 clean_worktrees() {
     log_info "Cleaning up orphaned worktrees..."
     
-    if [[ ! -d "$WORKTREES_DIR" ]]; then
-        log_info "No worktrees directory found"
-        return 0
-    fi
-    
     local cleaned=0
     
-    for repo in "$WORKTREES_DIR"/*; do
-        if [[ -d "$repo" ]]; then
-            local repo_name=$(basename "$repo")
-            
-            for branch in "$repo"/*; do
-                if [[ -d "$branch" ]]; then
-                    local branch_name=$(basename "$branch")
-                    local worktree_path="$branch"
+    while IFS= read -r search_dir; do
+        for repo in "$search_dir"/*; do
+            if [[ -d "$repo" ]] && [[ -d "$repo/.git" ]]; then
+                local repo_name=$(basename "$repo")
+                local worktrees_dir=$(get_worktrees_dir "$repo")
+                
+                if [[ -d "$worktrees_dir" ]]; then
+                    for branch in "$worktrees_dir"/*; do
+                        if [[ -d "$branch" ]]; then
+                            local branch_name=$(basename "$branch")
+                            local worktree_path="$branch"
+                            
+                            # Check if this is still a valid worktree
+                            if [[ ! -d "$worktree_path/.git" ]]; then
+                                log_info "Removing orphaned worktree: $worktree_path"
+                                rm -rf "$worktree_path"
+                                ((cleaned++))
+                            fi
+                        fi
+                    done
                     
-                    # Check if this is still a valid worktree
-                    if [[ ! -d "$worktree_path/.git" ]]; then
-                        log_info "Removing orphaned worktree: $worktree_path"
-                        rm -rf "$worktree_path"
-                        ((cleaned++))
-                    fi
+                    # Remove empty worktrees directory
+                    rmdir "$worktrees_dir" 2>/dev/null || true
                 fi
-            done
-            
-            # Remove empty repo directory
-            rmdir "$repo" 2>/dev/null || true
-        fi
-    done
+            fi
+        done
+    done < <(get_search_dirs)
     
     if [[ $cleaned -eq 0 ]]; then
         log_info "No orphaned worktrees found"
@@ -222,7 +282,17 @@ cd_worktree() {
         return 1
     fi
     
-    local worktree_path="$WORKTREES_DIR/$repo_name/$branch_name"
+    # Find the main repo
+    local main_repo
+    main_repo=$(find_repo_by_name "$repo_name")
+    
+    if [[ -z "$main_repo" ]]; then
+        log_error "Repository not found: $repo_name"
+        return 1
+    fi
+    
+    local worktrees_dir=$(get_worktrees_dir "$main_repo")
+    local worktree_path="$worktrees_dir/$branch_name"
     
     if [[ ! -d "$worktree_path" ]]; then
         log_error "Worktree not found: $worktree_path"
