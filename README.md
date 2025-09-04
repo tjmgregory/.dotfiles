@@ -9,7 +9,7 @@ ln -s ~/.dotfiles/karabiner ~/.config/karabiner
 
 ## Worktree Management
 
-This dotfiles setup includes a comprehensive worktree management system. For detailed documentation, see [`ai/worktrees.md`](ai/worktrees.md).
+This dotfiles setup includes a comprehensive worktree management system using Git worktrees for parallel development.
 
 ### Quick Reference
 
@@ -29,4 +29,7 @@ wt remove my-repo feature-branch
 wt clean
 ```
 
-For complete usage instructions, architecture details, and integration guides, see the [full WorkTrees documentation](ai/worktrees.md).
+### Documentation
+
+- **[WorkTrees Workflow Guide](ai/worktrees.md)** - Conceptual understanding and workflow patterns
+- **[WT Script Documentation](bin/wt.md)** - Detailed command reference and implementation

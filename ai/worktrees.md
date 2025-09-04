@@ -1,146 +1,165 @@
-# WorkTrees Management System
+# WorkTrees: Development Workflow Understanding
 
 ## Overview
 
-This dotfiles setup includes a comprehensive worktree management system that provides a standardized approach to managing Git worktrees across multiple repositories. The system stores worktrees in each repository's `.worktrees` directory, providing clean organization and avoiding conflicts with Git's internal worktree management.
+This system uses Git worktrees to enable parallel development across multiple branches without the overhead of switching branches in a single repository. Worktrees allow you to have multiple working directories for the same repository, each checked out to different branches.
 
-## Architecture & Design Decisions
+## Core Concept
 
-### Worktree Location Strategy
-- **Location**: Each repository's `.worktrees` directory
-- **Path**: `<repo-path>/.worktrees/<branch-name>/`
+**Worktrees** are separate working directories that share the same Git repository history. Instead of switching branches in one directory, you can have multiple directories each working on different branches simultaneously.
 
-### Key Benefits
-- Keeps worktrees organized within each repository
-- Avoids conflicts with Git's internal worktree management
-- Uses a global gitignore to ignore `.worktrees` folders
-- Provides clean separation between repositories
-- Easy to find and manage within each repository
-- Works with both Crystal worktree managers and VS Code
+### Why Use Worktrees?
 
-## Directory Structure
+- **Parallel Development**: Work on multiple features/branches simultaneously
+- **No Branch Switching Overhead**: Avoid the time cost of switching branches
+- **Clean Separation**: Each branch has its own working directory
+- **Easy Context Switching**: Jump between different work contexts instantly
 
-Worktrees are stored as:
+## Our Implementation Strategy
+
+### Storage Location
+- **Pattern**: Each repository manages its own worktrees
+- **Location**: `<repo-path>/.worktrees/<branch-name>/`
+- **Philosophy**: Keep worktrees close to their parent repository
+
+### Management Approach
+- **Tool**: Custom `wt` script for standardized management
+- **Integration**: Works with VS Code Git Worktree Manager extension
+- **Organization**: Repository-specific worktree directories
+
+## Workflow Patterns
+
+### Feature Development
+1. **Start**: `wt cd my-repo feature-name` - Creates and switches to feature worktree
+2. **Work**: Develop in the dedicated worktree directory
+3. **Context Switch**: `wt cd my-repo other-feature` - Switch to different feature
+4. **Return**: `wt cd my-repo feature-name` - Return to original feature
+
+### Bug Fixing
+1. **Create**: `wt cd my-repo bugfix-123` - Create worktree for bug fix
+2. **Fix**: Work on the bug in isolation
+3. **Test**: Test the fix without affecting other work
+4. **Cleanup**: `wt remove my-repo bugfix-123` - Remove when done
+
+### Code Review
+1. **Checkout**: `wt cd my-repo pr-456` - Create worktree for PR branch
+2. **Review**: Examine code in dedicated directory
+3. **Test**: Run tests or make small changes
+4. **Cleanup**: Remove worktree when review is complete
+
+## Mental Model
+
+### Repository Structure
 ```
-~/work/elephant/my-repo/
+my-repo/
 ├── .git/                    # Main repository
-├── .worktrees/             # Worktrees directory (gitignored)
-│   ├── feature-branch/     # Worktree for feature-branch
-│   └── bugfix-123/         # Worktree for bugfix-123
+├── .worktrees/             # Worktrees directory
+│   ├── feature-auth/       # Feature branch worktree
+│   ├── bugfix-123/         # Bug fix worktree
+│   └── pr-456/            # PR review worktree
 └── ...                     # Main repository files
 ```
 
-## Management Script: `wt`
+### Development Flow
+1. **Main Branch**: Keep main repository on stable branch (main/master)
+2. **Feature Work**: All feature development happens in worktrees
+3. **Isolation**: Each worktree is completely isolated
+4. **Sharing**: All worktrees share the same Git history and can merge/push
 
-The `wt` script provides comprehensive worktree management functionality located at `~/.dotfiles/bin/wt`.
+## Benefits in Practice
 
-### Available Commands
+### For AI Agents
+- **Clear Context**: Each worktree represents a specific development context
+- **Isolated Changes**: Changes in one worktree don't affect others
+- **Predictable Structure**: Consistent location pattern across all repositories
+- **Easy Navigation**: Simple commands to switch between contexts
 
-```bash
-# Create a new worktree
-wt create <repo-path> <branch-name>
+### For Development
+- **No Stashing**: Never need to stash changes when switching contexts
+- **Parallel Work**: Work on multiple features simultaneously
+- **Clean History**: Each worktree maintains clean commit history
+- **Easy Cleanup**: Remove worktrees when work is complete
 
-# List all worktrees
-wt list
+## Integration Points
 
-# List worktrees for a specific repo
-wt list <repo-name>
+### VS Code
+- **Extension**: Git Worktree Manager automatically discovers worktrees
+- **Workspace**: Each worktree can be opened as separate VS Code workspace
+- **IntelliSense**: Full language support in each worktree
 
-# Remove a worktree
-wt remove <repo-name> <branch-name>
-
-# Switch to a worktree directory (creates if needed)
-wt cd <repo-name> <branch-name>
-
-# Clean up orphaned worktrees
-wt clean
-```
-
-### Command Examples
-
-```bash
-# Create and switch to a new worktree
-wt cd api-patient feature-auth
-
-# Go to existing worktree
-wt cd api-patient existing-branch
-
-# List worktrees for specific repository
-wt ls api-patient
-
-# Remove a worktree
-wt rm api-patient feature-auth
-
-# Clean up orphaned worktrees
-wt clean
-```
-
-## Implementation Details
-
-### Worktree Creation Process
-1. Creates the `.worktrees` directory if it doesn't exist
-2. Attempts to create worktree from existing branch
-3. If branch doesn't exist, creates new branch automatically
-4. Provides clear feedback and error handling
-
-### Repository Discovery
-The script searches multiple directories for repositories:
-- `~/work/elephant/` (job repositories)
-- `~/projects/` (personal projects)
-- Additional search paths as configured
-
-### Error Handling & User Experience
-- Color-coded output (INFO, SUCCESS, WARNING, ERROR)
-- Interactive prompts for worktree creation
-- Graceful handling of missing branches
-- Automatic cleanup of orphaned worktrees
-
-## VS Code Integration
-
-Configure the Git Worktree Manager extension with:
-- **Worktree Path Template**: `$BASE_PATH/.worktrees`
-- **Worktree Subdirectory Template**: `$INDEX`
-
-This allows VS Code to automatically discover and manage worktrees created by the `wt` script.
-
-## Shell Integration
-
-The system includes:
-- Shell aliases for quick access
-- PATH setup for the `wt` script
-- Shell functions for seamless directory switching
-
-## Migration & Standardization
-
-The system has been standardized to:
-- Store worktrees in each repository's `.worktrees` directory
-- Migrate existing worktrees from scattered locations
-- Configure VS Code to scan `.worktrees` directories within repositories
-- Add shell aliases and PATH setup
+### Terminal/Shell
+- **Navigation**: `wt cd` commands for quick directory switching
+- **Listing**: `wt list` to see all active worktrees
+- **Management**: `wt remove` and `wt clean` for maintenance
 
 ## Best Practices
 
-1. **Consistent Naming**: Use descriptive branch names that indicate the feature or fix
-2. **Regular Cleanup**: Run `wt clean` periodically to remove orphaned worktrees
-3. **Repository Organization**: Keep work repositories in `~/work/elephant/` and personal projects in `~/projects/`
-4. **VS Code Integration**: Use the Git Worktree Manager extension for seamless IDE integration
+### Naming Conventions
+- **Features**: `feature-auth`, `feature-payments`
+- **Bug Fixes**: `bugfix-123`, `fix-login-issue`
+- **PRs**: `pr-456`, `review-auth-changes`
+- **Experiments**: `experiment-new-ui`, `spike-performance`
 
-## Troubleshooting
+### Workflow Discipline
+1. **One Purpose**: Each worktree should have a single, clear purpose
+2. **Regular Cleanup**: Remove worktrees when work is complete
+3. **Consistent Naming**: Use descriptive, consistent branch names
+4. **Main Branch**: Keep main repository on stable branch
 
-### Common Issues
-- **Worktree already exists**: The script will detect existing worktrees and offer to switch to them
-- **Branch doesn't exist**: The script will automatically create the branch if it doesn't exist
-- **Orphaned worktrees**: Use `wt clean` to remove worktrees that no longer have corresponding branches
+### AI Agent Guidelines
+- **Context Awareness**: Always check which worktree you're working in
+- **Isolation Respect**: Changes in one worktree don't affect others
+- **Cleanup**: Suggest removing worktrees when work is complete
+- **Navigation**: Use `wt` commands for worktree management
 
-### Debugging
-- Use `wt list` to see all current worktrees
-- Check the `.worktrees` directory in your repository for physical worktree locations
-- Verify VS Code settings if worktrees aren't appearing in the IDE
+## Common Scenarios
 
-## Future Enhancements
+### Starting New Feature
+```bash
+# Create and switch to new feature worktree
+wt cd my-repo feature-user-dashboard
 
-Potential improvements identified:
-- Enhanced AI context sharing across different tools
-- Better integration with multiple AI assistants (Claude, Cursor, Crystal)
-- Streamlined documentation workflow
-- Centralized knowledge hub for preferences and workflow patterns
+# Work in the new directory
+# All changes are isolated to this worktree
+```
+
+### Switching Between Features
+```bash
+# Switch to different feature
+wt cd my-repo feature-payments
+
+# Previous worktree remains unchanged
+# Can switch back anytime
+```
+
+### Code Review Workflow
+```bash
+# Create worktree for PR review
+wt cd my-repo pr-789
+
+# Review code, run tests, make suggestions
+# All isolated from other work
+
+# Clean up when done
+wt remove my-repo pr-789
+```
+
+## Troubleshooting Mental Models
+
+### "Where am I?"
+- Use `pwd` to see current directory
+- Use `wt list` to see all worktrees
+- Check if you're in a `.worktrees` directory
+
+### "Why can't I see my changes?"
+- Verify you're in the correct worktree
+- Check if you're in the main repository vs worktree
+- Use `git status` to see current branch
+
+### "How do I get back to main?"
+- `wt cd my-repo main` - Switch to main branch worktree
+- Or navigate to main repository directory directly
+
+## Reference
+
+For detailed implementation and command reference, see [`../bin/wt.md`](../bin/wt.md).

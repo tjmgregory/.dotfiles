@@ -16,7 +16,9 @@
 - Configured VS Code to scan `.worktrees` directories within repositories
 - Added shell aliases and PATH setup
 
-**Documentation**: See [`ai/worktrees.md`](ai/worktrees.md) for complete implementation details, usage instructions, and integration guides.
+**Documentation**: 
+- [`ai/worktrees.md`](ai/worktrees.md) - Workflow understanding and patterns
+- [`bin/wt.md`](bin/wt.md) - Script implementation and command reference
 
 ## Current Pain Points Identified
 
