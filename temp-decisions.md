@@ -2,28 +2,21 @@
 
 ## Worktree Standardization (Completed)
 
-**Decision**: Centralized worktree location at `~/worktrees/<repo-name>/<branch-name>/`
+**Decision**: Store worktrees in each repository's `.worktrees` directory
 
 **Rationale**: 
 - Avoids Git weirdness (worktrees outside main repos)
-- Predictable location for all worktrees
-- Easy to find and manage
+- Keeps worktrees organized within each repository
+- Easy to find and manage within each repo
 - Works with both Crystal worktree managers and VS Code
 
 **Implementation**:
 - Created `wt` management script in `~/.dotfiles/bin/wt`
 - Migrated existing worktrees from scattered locations
-- Configured VS Code to scan `~/worktrees` directory
+- Configured VS Code to scan `.worktrees` directories within repositories
 - Added shell aliases and PATH setup
 
-**Commands**:
-```bash
-wt create <repo-path> <branch-name>    # Create new worktree
-wt list [repo-name]                    # List worktrees
-wt remove <repo-name> <branch-name>    # Remove worktree
-wt cd <repo-name> <branch-name>        # Switch to worktree
-wt clean                               # Clean orphaned worktrees
-```
+**Documentation**: See [`ai/worktrees.md`](ai/worktrees.md) for complete implementation details, usage instructions, and integration guides.
 
 ## Current Pain Points Identified
 
