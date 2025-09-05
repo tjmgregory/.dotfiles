@@ -153,14 +153,14 @@
                         ]
                     },
                     {
-                        "description": "ccos + t to open Warp.",
+                        "description": "ccos + t to open Ghostty.",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "t",
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
-                                "to": [{ "shell_command": "open -a '/Applications/Warp.app'" }],
+                                "to": [{ "shell_command": "open -a '/Applications/Ghostty.app'" }],
                                 "type": "basic"
                             }
                         ]
