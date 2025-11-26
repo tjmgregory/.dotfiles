@@ -56,20 +56,20 @@
                                     "key_code": "1",
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
-                                "to": [{ "shell_command": "open -a '/Applications/Blitzit.app'" }],
+                                "to": [{ "shell_command": "open -a WhatsApp.app" }],
                                 "type": "basic"
                             }
                         ]
                     },
                     {
-                        "description": "ccos + 2 to open WhatsApp.",
+                        "description": "ccos + 2 to open Mail.",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "2",
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
-                                "to": [{ "shell_command": "open -a '/Applications/WhatsApp.app'" }],
+                                "to": [{ "shell_command": "open -a Mail.app" }],
                                 "type": "basic"
                             }
                         ]
@@ -114,19 +114,6 @@
                         ]
                     },
                     {
-                        "description": "ccos + e to open Mail.",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "e",
-                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
-                                },
-                                "to": [{ "shell_command": "open -a Mail" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
                         "description": "ccos + r to open Reminders.",
                         "manipulators": [
                             {
@@ -140,14 +127,14 @@
                         ]
                     },
                     {
-                        "description": "ccos + w to open Dia.",
+                        "description": "ccos + w to open Comet.",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "w",
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
-                                "to": [{ "shell_command": "open -a Dia" }],
+                                "to": [{ "shell_command": "open -a Comet" }],
                                 "type": "basic"
                             }
                         ]
