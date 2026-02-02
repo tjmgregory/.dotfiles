@@ -207,10 +207,20 @@ Skill creation involves these steps:
 2. Plan reusable skill contents (scripts, references, assets)
 3. Initialize the skill (run init_skill.py)
 4. Edit the skill (implement resources and write SKILL.md)
-5. Package the skill (run package_skill.py)
-6. Iterate based on real usage
+5. Iterate based on real usage
 
 Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
+
+## Skill Location & Availability
+
+Skills can live in two places:
+
+| Location | Availability | Use Case |
+|----------|-------------|----------|
+| `~/.dotfiles/agents/skills/` | All IDEs, all projects | General-purpose skills |
+| `<project>/skills/` | IDEs when in that project | Project-specific workflows |
+
+A project skill can be **promoted** to global availability via symlink, keeping the source of truth in the project.
 
 ### Step 1: Understanding the Skill with Concrete Examples
 
@@ -257,19 +267,29 @@ To establish the skill's contents, analyze each concrete example to create a lis
 
 At this point, it is time to actually create the skill.
 
-Skip this step only if the skill being developed already exists, and iteration or packaging is needed. In this case, continue to the next step.
+Skip this step only if the skill being developed already exists. In this case, continue to the next step.
 
-When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
+When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires.
 
-Usage:
+**Creating a global skill (available to all IDEs):**
 
 ```bash
-scripts/init_skill.py <skill-name> --path <output-directory>
+scripts/init_skill.py <skill-name>
 ```
 
-The script:
+**Creating a project-local skill:**
 
-- Creates the skill directory at the specified path
+```bash
+# First, set up the project for local skills (one-time)
+scripts/setup_project_skills.py <project-path>
+
+# Then create the skill
+scripts/init_skill.py <skill-name> --path <project-path>/skills
+```
+
+The init script:
+
+- Creates the skill directory
 - Generates a SKILL.md template with proper frontmatter and TODO placeholders
 - Creates example resource directories: `scripts/`, `references/`, and `assets/`
 - Adds example files in each directory that can be customized or deleted
@@ -317,36 +337,9 @@ Do not include any other fields in YAML frontmatter.
 
 Write instructions for using the skill and its bundled resources.
 
-### Step 5: Packaging a Skill
+### Step 5: Iterate
 
-Once development of the skill is complete, it must be packaged into a distributable .skill file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
-
-```bash
-scripts/package_skill.py <path/to/skill-folder>
-```
-
-Optional output directory specification:
-
-```bash
-scripts/package_skill.py <path/to/skill-folder> ./dist
-```
-
-The packaging script will:
-
-1. **Validate** the skill automatically, checking:
-
-   - YAML frontmatter format and required fields
-   - Skill naming conventions and directory structure
-   - Description completeness and quality
-   - File organization and resource references
-
-2. **Package** the skill if validation passes, creating a .skill file named after the skill (e.g., `my-skill.skill`) that includes all files and maintains the proper directory structure for distribution. The .skill file is a zip file with a .skill extension.
-
-If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
-
-### Step 6: Iterate
-
-After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
+After completing the skill, test it on real tasks. Users may request improvements based on how the skill performs.
 
 **Iteration workflow:**
 
@@ -354,3 +347,25 @@ After testing the skill, users may request improvements. Often this happens righ
 2. Notice struggles or inefficiencies
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again
+
+## Additional Operations
+
+### Promoting a Project Skill to Global
+
+If a project-local skill should be available everywhere:
+
+```bash
+scripts/promote_skill.py <project-path>/skills/<skill-name>
+```
+
+This creates a symlink in `~/.dotfiles/agents/skills/` pointing to the project skill. The source of truth remains in the project.
+
+### Packaging for External Distribution
+
+To share a skill with others outside your setup:
+
+```bash
+scripts/package_skill.py <path/to/skill-folder>
+```
+
+This creates a `.skill` file (zip format). The script validates the skill first.

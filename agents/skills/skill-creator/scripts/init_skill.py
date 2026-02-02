@@ -3,16 +3,18 @@
 Skill Initializer - Creates a new skill from template
 
 Usage:
-    init_skill.py <skill-name> --path <path>
+    init_skill.py <skill-name>              # Creates in ~/.dotfiles/agents/skills/
+    init_skill.py <skill-name> --path <path> # Creates in custom location
 
 Examples:
-    init_skill.py my-new-skill --path skills/public
-    init_skill.py my-api-helper --path skills/private
-    init_skill.py custom-skill --path /custom/location
+    init_skill.py my-new-skill                        # Global skill (default)
+    init_skill.py project-helper --path ./skills      # Project-local skill
 """
 
 import sys
 from pathlib import Path
+
+DEFAULT_SKILLS_PATH = Path.home() / ".dotfiles/agents/skills"
 
 
 SKILL_TEMPLATE = """---
@@ -271,21 +273,25 @@ def init_skill(skill_name, path):
 
 
 def main():
-    if len(sys.argv) < 4 or sys.argv[2] != '--path':
-        print("Usage: init_skill.py <skill-name> --path <path>")
+    if len(sys.argv) < 2:
+        print("Usage: init_skill.py <skill-name> [--path <path>]")
         print("\nSkill name requirements:")
         print("  - Hyphen-case identifier (e.g., 'data-analyzer')")
         print("  - Lowercase letters, digits, and hyphens only")
         print("  - Max 40 characters")
         print("  - Must match directory name exactly")
         print("\nExamples:")
-        print("  init_skill.py my-new-skill --path skills/public")
-        print("  init_skill.py my-api-helper --path skills/private")
-        print("  init_skill.py custom-skill --path /custom/location")
+        print("  init_skill.py my-new-skill                   # Global skill (default)")
+        print("  init_skill.py project-helper --path ./skills # Project-local skill")
+        print(f"\nDefault path: {DEFAULT_SKILLS_PATH}")
         sys.exit(1)
 
     skill_name = sys.argv[1]
-    path = sys.argv[3]
+
+    # Parse optional --path argument
+    path = DEFAULT_SKILLS_PATH
+    if len(sys.argv) >= 4 and sys.argv[2] == '--path':
+        path = sys.argv[3]
 
     print(f"🚀 Initializing skill: {skill_name}")
     print(f"   Location: {path}")
