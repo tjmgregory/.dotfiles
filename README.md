@@ -5,6 +5,9 @@ Symlink things, i.e.
 ```sh
 ln -s ~/.dotfiles/helix ~/.config/helix
 ln -s ~/.dotfiles/karabiner ~/.config/karabiner
+ln -s ~/.dotfiles/claude/CLAUDE.md ~/.claude/CLAUDE.md
+ln -s ~/.dotfiles/claude/settings.json ~/.claude/settings.json
+ln -s ~/.dotfiles/claude/skills ~/.claude/skills
 ```
 
 ## Worktree Management
