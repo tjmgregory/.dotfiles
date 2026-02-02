@@ -1,12 +1,13 @@
 ---
-name: conventional-commit
-description: Create conventional commit messages following best conventions. Use when committing code changes, writing commit messages, or formatting git history. Follows conventional commits specification.
+name: commit
+description: Use this skill whenever committing code changes. Automatically applies conventional commit format for clear, consistent commit messages.
+trigger: auto
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
-# Conventional Commit Messages
+# Commit
 
 Follow these conventions when creating commits.
 
