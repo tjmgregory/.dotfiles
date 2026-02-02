@@ -1,14 +1,22 @@
 # .dotfiles
 
-Symlink things, i.e.
+Symlink things:
 
 ```sh
+# General
 ln -s ~/.dotfiles/helix ~/.config/helix
 ln -s ~/.dotfiles/karabiner ~/.config/karabiner
+
+# Claude Code
 ln -s ~/.dotfiles/claude/CLAUDE.md ~/.claude/CLAUDE.md
 ln -s ~/.dotfiles/claude/settings.json ~/.claude/settings.json
-ln -s ~/.dotfiles/claude/skills ~/.claude/skills
+ln -s ~/.dotfiles/agents/skills ~/.claude/skills
+
+# Cursor
+ln -s ~/.dotfiles/agents/skills ~/.cursor/skills
 ```
+
+Skills are consolidated in `agents/skills/` following the [agentskills.io](https://agentskills.io/) standard and shared between Claude and Cursor.
 
 ## Worktree Management
 
