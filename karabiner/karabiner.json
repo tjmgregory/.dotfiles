@@ -23,32 +23,6 @@
                         ]
                     },
                     {
-                        "description": "ccos + § to open WhatsApp.",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "non_us_backslash",
-                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
-                                },
-                                "to": [{ "shell_command": "open -a '/Applications/ChatGPT.app'" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "ccos + 3 to open ChatGPT.",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "3",
-                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
-                                },
-                                "to": [{ "shell_command": "open -a ChatGPT" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
                         "description": "ccos + 1 to open WhatsApp.",
                         "manipulators": [
                             {
@@ -70,6 +44,45 @@
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
                                 "to": [{ "shell_command": "open -a Mail.app" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "ccos + 8 to open ChatGPT.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "8",
+                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
+                                },
+                                "to": [{ "shell_command": "open -a ChatGPT" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "ccos + 9 to open ChatGPT.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "9",
+                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
+                                },
+                                "to": [{ "shell_command": "open -a Claude" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "ccos + 0 to open Gemini.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "0",
+                                    "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
+                                },
+                                "to": [{ "shell_command": "open https://gemini.google.com/app" }],
                                 "type": "basic"
                             }
                         ]
@@ -192,14 +205,14 @@
                         ]
                     },
                     {
-                        "description": "ccos + d to open TablePlus.",
+                        "description": "ccos + d to open SpanishDictionary.",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "d",
                                     "modifiers": { "mandatory": ["shift", "control", "command", "option"] }
                                 },
-                                "to": [{ "shell_command": "open -a '/Applications/Setapp/TablePlus.app'" }],
+                                "to": [{ "shell_command": "open -a '/Applications/SpanishDictionary.com.app'" }],
                                 "type": "basic"
                             }
                         ]
