@@ -1,3 +1,5 @@
 .specstory/
 .zshrc.secret
 .worktrees/
+
+settings.local.json
