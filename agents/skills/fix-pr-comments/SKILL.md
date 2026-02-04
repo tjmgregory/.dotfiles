@@ -32,14 +32,25 @@ Address GitHub PR comments by assessing each one, making valid changes, and repl
 
 4. **Plan ALL changes before editing** — line numbers shift once you start editing.
 
-5. **Make changes, commit, push**:
+5. **Make changes and commit**:
    ```bash
    git add <specific-files>
    git commit -m "Address PR review comments"
+   ```
+
+6. **If changes were made**: Update PR description, then push:
+   ```bash
+   # Append summary to PR body (review agents read this on push)
+   gh pr edit --body "$(gh pr view --json body -q .body)
+
+   ---
+   ## Comments Addressed
+   - [Brief summary of each change made]
+   "
    git push
    ```
 
-6. **Reply to EACH comment thread** using the correct endpoint:
+7. **Reply to EACH comment thread** using the correct endpoint:
    ```bash
    # For review comments (have pull_request_review_id):
    gh api repos/{owner}/{repo}/pulls/{pr}/comments -X POST \
@@ -82,5 +93,5 @@ I want to make sure I address this correctly.
 
 - **`[🤖 YourName]:`** prefix on EVERY reply — substitute your AI name (Claude, GPT, etc.)
 - **Reply to ALL comments** — each gets its own API call
-- **Push before replying** — changes must be committed first
+- **Update PR description, then push, then reply** — in that order
 - **Use `--field in_reply_to`** for review comments (not `/replies` endpoint)
