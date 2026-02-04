@@ -1,125 +1,86 @@
 ---
 name: fix-pr-comments
 description: Address comments on a GitHub PR. Reply directly to comment threads where possible. Fetches all comments, plans changes, makes code changes, commits, and replies to each thread.
-license: MIT
-metadata:
-  version: "1.0.0"
 ---
 
 # Fix PR Comments
 
-Address comments on a GitHub PR. Reply directly to comment threads where possible.
+Address GitHub PR comments by assessing each one, making valid changes, and replying with rationale.
 
-## Important Instructions
+## Workflow
 
-1. **Reply directly to comment threads**: Use the GitHub API to reply DIRECTLY to each review comment thread. NEVER create new PR-level comments as responses to line comments.
+1. **Fetch PR info and ALL comments** (use `--paginate` for all pages):
+   ```bash
+   gh pr view --json number,headRepositoryOwner,headRepository
+   gh api repos/{owner}/{repo}/pulls/{pr}/comments --paginate
+   gh api repos/{owner}/{repo}/issues/{pr}/comments --paginate
+   ```
 
-2. **MANDATORY: Prefix ALL comments**: EVERY comment you write MUST be prefixed with "[Claude]: " to distinguish from human comments.
+2. **Assess each comment** using this framework:
 
-3. **Complete workflow for addressing PR comments**:
+   | Assessment | Action | Reply |
+   |------------|--------|-------|
+   | **Valid & clear** | Make the change | Brief summary of change |
+   | **Valid but disagree** | No change | Technical rationale for current approach |
+   | **Invalid/incorrect** | No change | Explain why suggestion doesn't apply |
+   | **Unclear** | No change | Ask clarifying question |
 
-   a. **Get PR details**:
-      ```bash
-      gh pr view --json number,headRepositoryOwner,headRepository -q '{number: .number, owner: .headRepositoryOwner.login, repo: .headRepository.name}'
-      ```
+3. **For comments with line numbers**: Fetch file at the referenced commit (line numbers are commit-specific):
+   ```bash
+   git show {commit_id}:{file_path}
+   ```
 
-   b. **Fetch ALL comments** (CRITICAL: GitHub API is paginated - you MUST get ALL pages):
-      - Review comments: `gh api repos/{owner}/{repo}/pulls/{pull_number}/comments --paginate`
-      - PR issue comments: `gh api repos/{owner}/{repo}/issues/{pull_number}/comments --paginate`
-      - Review threads: `gh api repos/{owner}/{repo}/pulls/{pull_number}/reviews --paginate`
+4. **Plan ALL changes before editing** — line numbers shift once you start editing.
 
-      **PAGINATION WARNING**:
-      - The GitHub API returns max 100 items per page by default
-      - Use `--paginate` flag to automatically fetch ALL pages
-      - **You MUST ensure you have ALL comments before proceeding**
+5. **Make changes, commit, push**:
+   ```bash
+   git add <specific-files>
+   git commit -m "Address PR review comments"
+   git push
+   ```
 
-   c. **CRITICAL: Get original context and create a complete plan BEFORE making ANY changes**:
-      - Read EVERY comment carefully - DO NOT MISS ANY
-      - **For comments with line numbers**:
-        - Each comment includes a `commit_id` or `original_commit_id` field
-        - Line numbers refer to the file at THAT specific commit, NOT the current file
-        - You MUST fetch the file content from that commit:
-          ```bash
-          gh api repos/{owner}/{repo}/contents/{path}?ref={commit_sha}
-          # OR use git to check out that specific version:
-          git show {commit_sha}:{file_path}
-          ```
-      - For each comment, assess your understanding:
-        - **Fully understand**: Proceed with planning the change
-        - **Any confusion**: Do NOT attempt the change. Instead, reply asking for clarification and leave unresolved
-      - Note the exact line numbers and file paths referenced in each comment AT THE COMMIT THEY REFERENCE
-      - Plan out all changes needed for comments you understand
-      - Use TodoWrite tool to track each change you need to make
-      - **WARNING**: Once you start editing files, line numbers will shift! You MUST understand all changes before starting
+6. **Reply to EACH comment thread** using the correct endpoint:
+   ```bash
+   # For review comments (have pull_request_review_id):
+   gh api repos/{owner}/{repo}/pulls/{pr}/comments -X POST \
+     --field body="[🤖 YourName]: Your reply" \
+     --field in_reply_to={comment_id}
 
-   d. **Make the requested code changes**: Execute your plan by addressing each comment systematically
+   # For issue comments (general PR comments):
+   gh api repos/{owner}/{repo}/issues/{pr}/comments -X POST \
+     -f body="[🤖 YourName]: Your reply"
+   ```
 
-   e. **Commit and push changes**:
-      ```bash
-      git add -A
-      git commit -m "Address PR review comments"
-      git push
-      ```
+## Reply Templates
 
-   f. **Reply to EACH comment thread individually** after pushing:
+Use `[🤖 YourName]:` prefix where "YourName" is your AI model name (e.g., Claude, GPT, Gemini).
 
-      **CRITICAL**: You MUST reply DIRECTLY to each review comment thread. The correct approach depends on the comment type:
+**Change made:**
+```
+[🤖 YourName]: Done — updated X to use Y as suggested.
+```
 
-      **For Review Comments (comments with `pull_request_review_id`):**
-      - Use: `gh api repos/{owner}/{repo}/pulls/{pull_number}/comments -X POST --field body="[Claude]: Your reply here" --field in_reply_to={comment_id}`
-      - This creates proper threaded replies within the review comment discussion
-      - Each reply will show `"in_reply_to_id": {original_comment_id}` in the response
+**Valid but disagree:**
+```
+[🤖 YourName]: Keeping the current approach because [technical reason].
+The suggestion would [tradeoff/issue]. Happy to discuss further.
+```
 
-      **For Standalone Comments (comments without `pull_request_review_id`):**
-      - Use: `gh api repos/{owner}/{repo}/pulls/comments/{comment_id}/replies -X POST -f body="[Claude]: Your reply here"`
-      - This is rare - most PR comments are review comments
+**Invalid/doesn't apply:**
+```
+[🤖 YourName]: No change made — [explain why suggestion doesn't apply,
+e.g., "this code path only handles X case" or "Y is already handled at line Z"].
+```
 
-      **NEVER use `/issues/{issue_number}/comments`** - this creates general PR comments, not threaded replies!
+**Need clarification:**
+```
+[🤖 YourName]: Could you clarify [specific question]?
+I want to make sure I address this correctly.
+```
 
-      **Reply Examples:**
-      - Simple changes: `[Claude]: Done`
-      - Complex changes: `[Claude]: Refactored the validation logic to handle edge cases as requested`
-      - Confusion: `[Claude]: I need clarification on this comment. Could you please elaborate on [specific confusion]?`
+## Critical Rules
 
-   **IMPORTANT**:
-   - Make a SEPARATE API call for EACH comment thread
-   - ALWAYS check if you got ALL comments by counting them and verifying none are missed
-   - The `--field` parameter properly handles data types (use `--field` not `-f`)
-
-4. **Address all types of comments**:
-   - Line-specific comments (review comments)
-   - File-level comments
-   - PR-wide review comments
-   - General PR comments (issue comments)
-
-5. **Critical requirements**:
-   - **ALWAYS push your changes** before replying to comments (only for comments you understood and addressed)
-   - **Reply to EVERY SINGLE comment individually IN ITS THREAD**:
-     - Use the correct API endpoint for the comment type
-     - Make separate API calls for each comment - no batching!
-     - Simple changes: Just reply "[Claude]: Done"
-     - Complex changes: "[Claude]: " + explanation of what you changed
-     - Confused: "[Claude]: " + ask for clarification and don't make changes
-   - **Never skip comments** - either address them or ask for clarification
-   - **Don't over-explain** - simple fixes don't need explanations
-   - **VERIFY you replied to ALL comments** - missing even one comment is unacceptable
-
-6. **Debugging GitHub API Issues**:
-   - If `/pulls/comments/{id}/replies` returns 404, the comment is likely a review comment (has `pull_request_review_id`)
-   - Review comments need the `in_reply_to` approach: `/pulls/{pull_number}/comments` with `--field in_reply_to={comment_id}`
-   - Use `--field` instead of `-f` for proper data type handling
-   - Always check the response for `"in_reply_to_id"` to confirm proper threading
-
-## Workflow Summary
-
-1. Fetch ALL comments (use --paginate to get every page!)
-2. **PLAN all changes** (before any edits, while line numbers are still accurate!)
-3. Make all code changes according to your plan
-4. Commit and push
-5. Reply to each comment individually using the correct API endpoint
-
-**NEVER MISS A COMMENT**: PRs can have 100+ comments across multiple pages. Missing even one comment is unacceptable.
-
-**ALWAYS IDENTIFY YOURSELF**: Every single comment MUST start with "[Claude]: " - no exceptions!
-
-**USE CORRECT API ENDPOINTS**: Review comments (most common) need `--field in_reply_to={comment_id}` approach, not `/replies`.
+- **`[🤖 YourName]:`** prefix on EVERY reply — substitute your AI name (Claude, GPT, etc.)
+- **Reply to ALL comments** — each gets its own API call
+- **Push before replying** — changes must be committed first
+- **Use `--field in_reply_to`** for review comments (not `/replies` endpoint)
