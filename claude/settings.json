@@ -51,7 +51,13 @@
       "Skill(beads:*)",
       "WebFetch",
       "WebSearch",
-      "Write"
+      "Write",
+      "~/.claude/skills/end/scripts/append-journal.sh",
+      "~/.claude/skills/end/scripts/create-kb-item.sh",
+      "~/.claude/skills/end/scripts/sync-kb.sh",
+      "~/.claude/skills/end/scripts/update-counter.sh",
+      "~/.claude/skills/start/scripts/detect-tracker.sh",
+      "~/.claude/skills/start/scripts/get-project-name.sh"
     ],
     "deny": [
       "Bash(rm -rf /)"
