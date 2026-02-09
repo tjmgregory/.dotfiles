@@ -375,50 +375,97 @@ scripts/package_skill.py <path/to/skill-folder>
 
 ## Validation Checklist
 
-Before finalizing a skill, verify against this checklist:
+Before finalizing a skill, verify against this checklist.
+
+### Process Verification
+
+- [ ] Concrete usage examples gathered before writing (Step 1)
+- [ ] Reusable resources identified from examples (Step 2)
+- [ ] Init script example files deleted if unused
+- [ ] Scripts tested by actually running them
+
+### Frontmatter
+
+**Name:**
+- [ ] Lowercase letters, numbers, and hyphens only
+- [ ] Max 64 characters
+- [ ] Gerund form preferred (`processing-pdfs`) or justified alternative
+- [ ] Avoids vague (`helper`), generic (`documents`), or reserved (`claude`) words
+
+**Description:**
+- [ ] Max 1024 characters
+- [ ] Written in third person (not "I can help" or "This skill should be used")
+- [ ] Includes both what the skill does AND when to use it
+- [ ] Includes key trigger terms and phrases
+- [ ] Lists required dependencies if skill requires other skills
 
 ### Core Quality
 
-- [ ] Description written in third person (not "I can help" or "This skill should be used")
-- [ ] Description includes both what the skill does AND when to use it
-- [ ] Description includes key trigger terms and phrases
-- [ ] SKILL.md body is under 500 lines
-- [ ] Additional details are in separate reference files (if needed)
-- [ ] No time-sensitive information (or in "old patterns" section)
-- [ ] Consistent terminology throughout
+- [ ] SKILL.md body under 500 lines
+- [ ] Additional details in separate reference files (if needed)
+- [ ] No time-sensitive information (or in collapsed "old patterns" section using `<details>`)
+- [ ] Consistent terminology throughout (one term per concept)
+- [ ] Single recommended approach with escape hatch (not many options)
 - [ ] Examples are concrete, not abstract
-- [ ] File references are one level deep from SKILL.md
+- [ ] File references one level deep from SKILL.md
 - [ ] Progressive disclosure used appropriately
-- [ ] Workflows have clear sequential steps
+
+### Bundled Resources
+
+**Scripts (`scripts/`):**
+- [ ] Only included when code repeatedly rewritten or deterministic reliability needed
+- [ ] Scripts solve problems rather than punt to Claude
+- [ ] Error handling explicit and helpful
+- [ ] No "voodoo constants" (all values justified with comments)
+- [ ] Required packages listed in instructions
+- [ ] Execution intent clear ("Run X" vs "See X for reference")
+- [ ] MCP tools use fully qualified names (`ServerName:tool_name`)
+
+**References (`references/`):**
+- [ ] Files >10k words have grep patterns in SKILL.md
+- [ ] Files >100 lines have table of contents
+- [ ] No duplication between SKILL.md and reference files
+
+**Assets (`assets/`):**
+- [ ] Contains only output files (templates, images, fonts), not documentation
 
 ### Files and Paths
 
 - [ ] All file paths use forward slashes (`scripts/helper.py`, not `scripts\helper.py`)
-- [ ] Paths are relative to skill directory
-- [ ] Files are named descriptively (`form_validation.md`, not `doc2.md`)
-- [ ] No extraneous files (README.md, CHANGELOG.md, etc.)
+- [ ] Paths relative to skill directory
+- [ ] Files named descriptively (`form_validation.md`, not `doc2.md`)
+- [ ] No extraneous files (README.md, CHANGELOG.md, INSTALLATION_GUIDE.md, etc.)
 
-### Scripts (if applicable)
+### Workflows and Output (if applicable)
 
-- [ ] Scripts solve problems rather than punt to Claude
-- [ ] Error handling is explicit and helpful
-- [ ] No "voodoo constants" (all values justified with comments)
-- [ ] Required packages listed in instructions
-- [ ] Scripts have clear documentation
-- [ ] Execution intent clear ("Run X" vs "See X for reference")
+- [ ] Complex tasks provide process overview near beginning of SKILL.md
+- [ ] Workflows have clear sequential steps
+- [ ] Conditional workflows have explicit decision point guidance
+- [ ] Quality-critical operations use feedback loops (validate → fix → repeat)
 - [ ] Validation/verification steps for critical operations
-- [ ] Feedback loops for quality-critical tasks
+- [ ] Output templates provided where consistency needed
+- [ ] Template strictness matches requirements (strict vs flexible guidance)
+- [ ] Input/output examples for quality-dependent output
 
 ### Testing
 
+- [ ] Baseline performance measured WITHOUT skill first
 - [ ] At least three evaluation scenarios created
 - [ ] Tested with real usage scenarios
 - [ ] Tested with Haiku, Sonnet, and Opus (if using multiple models)
 - [ ] Iteration based on observed behavior, not assumptions
+- [ ] Watch for: unexpected exploration paths
+- [ ] Watch for: missed connections to reference files
+- [ ] Watch for: overreliance on certain sections (move to SKILL.md if repeated)
+- [ ] Watch for: ignored bundled files (may be unnecessary)
 
 ### Composite Skills (if referencing other skills)
 
 - [ ] References describe WHEN to use other skills, not HOW they work
-- [ ] No implementation details of referenced skills are included
-- [ ] Handoff points are explicit about the situation, not the mechanism
-- [ ] Skill can be understood without knowing referenced skills' internals
+- [ ] No implementation details of referenced skills included
+- [ ] Handoff points explicit about the situation, not the mechanism
+- [ ] Skill understandable without knowing referenced skills' internals
+- [ ] Tested in isolation first
+- [ ] Tested with referenced skills available
+- [ ] Tested with referenced skills missing (graceful handling)
+- [ ] Verified updates to referenced skills don't require changes here
