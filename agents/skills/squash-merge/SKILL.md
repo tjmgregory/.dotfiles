@@ -61,7 +61,7 @@ PR: #<number>
 ### 4. Execute Squash Merge
 
 ```bash
-gh pr merge <PR_NUMBER> --squash --delete-branch \
+gh pr merge <PR_NUMBER> --squash \
   --subject "<type>(<scope>): <summary>" \
   --body "$(cat <<'EOF'
 <body content>
@@ -71,10 +71,22 @@ EOF
 )"
 ```
 
-### 5. Verify
+**Note:** Don't use `--delete-branch` as it fails when the branch is checked out in a worktree.
+
+### 5. Clean Up
 
 ```bash
+# Verify merge succeeded
 gh pr view <PR_NUMBER> --json state,mergedAt
+
+# If using worktrees, remove worktree first
+git worktree remove .worktrees/<branch-name>
+
+# Delete local branch
+git branch -d <branch-name>
+
+# Update main
+git pull origin main
 ```
 
 ## Type Selection
