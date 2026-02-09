@@ -1,7 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
-license: Complete terms in LICENSE.txt
+description: Creates and manages agent skills that extend Claude's capabilities with specialized knowledge, workflows, or tool integrations. Use when user says "create a skill", "make a skill", "new skill", "update skill", or asks about skill structure, bundled resources, or skill best practices.
 ---
 
 # Skill Creator
@@ -109,7 +108,7 @@ A skill should only contain essential files that directly support its functional
 - CHANGELOG.md
 - etc.
 
-The skill should only contain the information needed for an AI agent to do the job at hand. It should not contain auxilary context about the process that went into creating it, setup and testing procedures, user-facing documentation, etc. Creating additional documentation files just adds clutter and confusion.
+The skill should only contain the information needed for an AI agent to do the job at hand. It should not contain auxiliary context about the process that went into creating it, setup and testing procedures, user-facing documentation, etc. Creating additional documentation files just adds clutter and confusion.
 
 ### Progressive Disclosure Design Principle
 
@@ -198,6 +197,14 @@ Claude reads REDLINING.md or OOXML.md only when the user needs those features.
 
 - **Avoid deeply nested references** - Keep references one level deep from SKILL.md. All reference files should link directly from SKILL.md.
 - **Structure longer reference files** - For files longer than 100 lines, include a table of contents at the top so Claude can see the full scope when previewing.
+
+## Best Practices References
+
+Consult these guides for detailed best practices:
+
+- **Writing scripts for skills**: See [references/script-best-practices.md](references/script-best-practices.md) for execution intent, error handling, MCP tool references, and feedback loops
+- **Content and terminology**: See [references/content-guidelines.md](references/content-guidelines.md) for time-sensitive info, consistent terminology, file path conventions, and avoiding too many options
+- **Testing and evaluation**: See [references/evaluation-guide.md](references/evaluation-guide.md) for evaluation-driven development and multi-model testing
 
 ## Skill Creation Process
 
@@ -302,12 +309,13 @@ When editing the (newly-generated or existing) skill, remember that the skill is
 
 #### Learn Proven Design Patterns
 
-Consult these helpful guides based on your skill's needs:
+Consult these reference guides based on your skill's needs:
 
-- **Multi-step processes**: See references/workflows.md for sequential workflows and conditional logic
-- **Specific output formats or quality standards**: See references/output-patterns.md for template and example patterns
-
-These files contain established best practices for effective skill design.
+- **Multi-step processes**: See [references/workflows.md](references/workflows.md) for sequential workflows and conditional logic
+- **Output formats**: See [references/output-patterns.md](references/output-patterns.md) for template and example patterns
+- **Script best practices**: See [references/script-best-practices.md](references/script-best-practices.md) for error handling, execution intent, and MCP tools
+- **Content guidelines**: See [references/content-guidelines.md](references/content-guidelines.md) for terminology, file paths, and avoiding pitfalls
+- **Testing and evaluation**: See [references/evaluation-guide.md](references/evaluation-guide.md) for evaluation-driven development
 
 #### Start with Reusable Skill Contents
 
@@ -325,11 +333,20 @@ Any example files and directories not needed for the skill should be deleted. Th
 
 Write the YAML frontmatter with `name` and `description`:
 
-- `name`: The skill name
-- `description`: This is the primary triggering mechanism for your skill, and helps Claude understand when to use the skill.
-  - Include both what the Skill does and specific triggers/contexts for when to use it.
-  - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Claude.
-  - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+**name** (max 64 characters):
+- Use lowercase letters, numbers, and hyphens only
+- Prefer gerund form (verb + -ing): `processing-pdfs`, `analyzing-spreadsheets`, `creating-skills`
+- Acceptable alternatives: noun phrases (`pdf-processing`) or action-oriented (`process-pdfs`)
+- Avoid vague names (`helper`, `utils`), overly generic (`documents`, `data`), or reserved words (`anthropic`, `claude`)
+
+**description** (max 1024 characters):
+- **Always write in third person** - The description is injected into the system prompt, and inconsistent point-of-view causes discovery problems.
+  - **Good**: "Processes Excel files and generates reports"
+  - **Avoid**: "I can help you process Excel files"
+  - **Avoid**: "This skill should be used when..."
+- Include both what the skill does AND specific triggers for when to use it
+- Include all "when to use" information here - Not in the body. The body is only loaded after triggering.
+- Example: "Extracts text and tables from PDF files, fills forms, merges documents. Use when working with PDF files or when user mentions PDFs, forms, or document extraction."
 
 Do not include any other fields in YAML frontmatter.
 
@@ -347,6 +364,8 @@ After completing the skill, test it on real tasks. Users may request improvement
 2. Notice struggles or inefficiencies
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again
+
+For detailed guidance on testing and evaluation, see [references/evaluation-guide.md](references/evaluation-guide.md).
 
 ## Additional Operations
 
@@ -369,3 +388,46 @@ scripts/package_skill.py <path/to/skill-folder>
 ```
 
 This creates a `.skill` file (zip format). The script validates the skill first.
+
+## Validation Checklist
+
+Before finalizing a skill, verify against this checklist:
+
+### Core Quality
+
+- [ ] Description written in third person (not "I can help" or "This skill should be used")
+- [ ] Description includes both what the skill does AND when to use it
+- [ ] Description includes key trigger terms and phrases
+- [ ] SKILL.md body is under 500 lines
+- [ ] Additional details are in separate reference files (if needed)
+- [ ] No time-sensitive information (or in "old patterns" section)
+- [ ] Consistent terminology throughout
+- [ ] Examples are concrete, not abstract
+- [ ] File references are one level deep from SKILL.md
+- [ ] Progressive disclosure used appropriately
+- [ ] Workflows have clear sequential steps
+
+### Files and Paths
+
+- [ ] All file paths use forward slashes (`scripts/helper.py`, not `scripts\helper.py`)
+- [ ] Paths are relative to skill directory
+- [ ] Files are named descriptively (`form_validation.md`, not `doc2.md`)
+- [ ] No extraneous files (README.md, CHANGELOG.md, etc.)
+
+### Scripts (if applicable)
+
+- [ ] Scripts solve problems rather than punt to Claude
+- [ ] Error handling is explicit and helpful
+- [ ] No "voodoo constants" (all values justified with comments)
+- [ ] Required packages listed in instructions
+- [ ] Scripts have clear documentation
+- [ ] Execution intent clear ("Run X" vs "See X for reference")
+- [ ] Validation/verification steps for critical operations
+- [ ] Feedback loops for quality-critical tasks
+
+### Testing
+
+- [ ] At least three evaluation scenarios created
+- [ ] Tested with real usage scenarios
+- [ ] Tested with Haiku, Sonnet, and Opus (if using multiple models)
+- [ ] Iteration based on observed behavior, not assumptions
