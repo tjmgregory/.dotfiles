@@ -1,31 +1,38 @@
 ---
-name: skill-creator
-description: Creates and manages agent skills that extend Claude's capabilities with specialized knowledge, workflows, or tool integrations. Use when user says "create a skill", "make a skill", "new skill", "update skill", or asks about skill structure, bundled resources, or skill best practices.
+name: creating-skills
+description: Creates and manages agent skills that extend Claude's capabilities with specialized knowledge, workflows, or tool integrations. Use when user says "create a skill", "make a skill", "new skill", "update skill", "how do I make a skill", or asks about skill structure, SKILL.md, frontmatter, bundled resources, or skill best practices.
 ---
 
-# Skill Creator
+# Creating Skills
 
-This skill provides guidance for creating effective skills.
+## Contents
+
+- [About Skills](#about-skills) - What skills are in the Anthropic ecosystem
+- [Core Principles](#core-principles) - Conciseness, degrees of freedom, skill anatomy
+- [Best Practices References](#best-practices-references) - Links to detailed guides
+- [Skill Creation Process](#skill-creation-process) - 5-step workflow
+- [Additional Operations](#additional-operations) - Promoting, packaging skills
+- [Validation Checklist](#validation-checklist) - Pre-release verification
 
 ## About Skills
 
-Skills are modular, self-contained packages that extend Claude's capabilities by providing
-specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
-domains or tasks—they transform Claude from a general-purpose agent into a specialized agent
-equipped with procedural knowledge that no model can fully possess.
+Skills are filesystem-based packages that provide Claude with domain-specific capabilities. Each skill is a directory containing:
 
-### What Skills Provide
+- **SKILL.md** (required) - YAML frontmatter (name + description) plus markdown instructions
+- **Bundled resources** (optional) - Scripts, references, and assets
 
-1. Specialized workflows - Multi-step procedures for specific domains
-2. Tool integrations - Instructions for working with specific file formats or APIs
-3. Domain expertise - Company-specific knowledge, schemas, business logic
-4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
+**Progressive loading**: Skills load in stages to minimize context usage:
+1. **Metadata** - Name and description always in system prompt (~100 tokens per skill)
+2. **SKILL.md body** - Loaded only when skill triggers
+3. **Bundled resources** - Loaded only as needed by Claude
+
+This means many skills can be installed without context penalty.
 
 ## Core Principles
 
 ### Concise is Key
 
-The context window is a public good. Skills share the context window with everything else Claude needs: system prompt, conversation history, other Skills' metadata, and the actual user request.
+The context window is a public good. Skills share it with the system prompt, conversation history, other skills' metadata, and the user's request.
 
 **Default assumption: Claude is already very smart.** Only add context Claude doesn't already have. Challenge each piece of information: "Does Claude really need this explanation?" and "Does this paragraph justify its token cost?"
 
@@ -143,36 +150,7 @@ Extract text with pdfplumber:
 
 Claude loads FORMS.md, REFERENCE.md, or EXAMPLES.md only when needed.
 
-**Pattern 2: Domain-specific organization**
-
-For Skills with multiple domains, organize content by domain to avoid loading irrelevant context:
-
-```
-bigquery-skill/
-├── SKILL.md (overview and navigation)
-└── reference/
-    ├── finance.md (revenue, billing metrics)
-    ├── sales.md (opportunities, pipeline)
-    ├── product.md (API usage, features)
-    └── marketing.md (campaigns, attribution)
-```
-
-When a user asks about sales metrics, Claude only reads sales.md.
-
-Similarly, for skills supporting multiple frameworks or variants, organize by variant:
-
-```
-cloud-deploy/
-├── SKILL.md (workflow + provider selection)
-└── references/
-    ├── aws.md (AWS deployment patterns)
-    ├── gcp.md (GCP deployment patterns)
-    └── azure.md (Azure deployment patterns)
-```
-
-When the user chooses AWS, Claude only reads aws.md.
-
-**Pattern 3: Conditional details**
+**Pattern 2: Conditional details**
 
 Show basic content, link to advanced content:
 
@@ -278,21 +256,24 @@ At this point, it is time to actually create the skill.
 
 Skip this step only if the skill being developed already exists. In this case, continue to the next step.
 
-When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires.
+When creating a new skill from scratch, run the init script. It generates a template skill directory with everything required.
+
+**Requirements**: Python 3.x
 
 **Creating a global skill (available to all IDEs):**
 
 ```bash
+# Run the init script with the skill name
 scripts/init_skill.py <skill-name>
 ```
 
 **Creating a project-local skill:**
 
 ```bash
-# First, set up the project for local skills (one-time)
+# First, run setup for the project (one-time)
 scripts/setup_project_skills.py <project-path>
 
-# Then create the skill
+# Then run init with the project path
 scripts/init_skill.py <skill-name> --path <project-path>/skills
 ```
 
@@ -377,20 +358,20 @@ For detailed guidance on testing and evaluation, see [references/evaluation-guid
 If a project-local skill should be available everywhere:
 
 ```bash
+# Run the promote script with the skill path
 scripts/promote_skill.py <project-path>/skills/<skill-name>
 ```
 
-This creates a symlink in `~/.dotfiles/agents/skills/` pointing to the project skill. The source of truth remains in the project.
+This creates a symlink in `~/.dotfiles/agents/skills/` pointing to the project skill.
 
 ### Packaging for External Distribution
 
 To share a skill with others outside your setup:
 
 ```bash
+# Run the package script - it validates then creates a .skill file (zip format)
 scripts/package_skill.py <path/to/skill-folder>
 ```
-
-This creates a `.skill` file (zip format). The script validates the skill first.
 
 ## Validation Checklist
 
