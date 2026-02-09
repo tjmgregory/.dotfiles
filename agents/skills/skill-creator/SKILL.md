@@ -205,6 +205,7 @@ Consult these guides for detailed best practices:
 - **Writing scripts for skills**: See [references/script-best-practices.md](references/script-best-practices.md) for execution intent, error handling, MCP tool references, and feedback loops
 - **Content and terminology**: See [references/content-guidelines.md](references/content-guidelines.md) for time-sensitive info, consistent terminology, file path conventions, and avoiding too many options
 - **Testing and evaluation**: See [references/evaluation-guide.md](references/evaluation-guide.md) for evaluation-driven development and multi-model testing
+- **Composite skills**: See [references/composite-skills.md](references/composite-skills.md) for skills that reference or hand off to other skills
 
 ## Skill Creation Process
 
@@ -252,6 +253,7 @@ To turn concrete examples into an effective skill, analyze each example by:
 
 1. Considering how to execute on the example from scratch
 2. Identifying what scripts, references, and assets would be helpful when executing these workflows repeatedly
+3. Identifying whether any part of the workflow should hand off to another skill (see [references/composite-skills.md](references/composite-skills.md))
 
 Example: When building a `pdf-editor` skill to handle queries like "Help me rotate this PDF," the analysis shows:
 
@@ -316,6 +318,7 @@ Consult these reference guides based on your skill's needs:
 - **Script best practices**: See [references/script-best-practices.md](references/script-best-practices.md) for error handling, execution intent, and MCP tools
 - **Content guidelines**: See [references/content-guidelines.md](references/content-guidelines.md) for terminology, file paths, and avoiding pitfalls
 - **Testing and evaluation**: See [references/evaluation-guide.md](references/evaluation-guide.md) for evaluation-driven development
+- **Composite skills**: See [references/composite-skills.md](references/composite-skills.md) for referencing other skills without leaking their implementation
 
 #### Start with Reusable Skill Contents
 
@@ -431,3 +434,10 @@ Before finalizing a skill, verify against this checklist:
 - [ ] Tested with real usage scenarios
 - [ ] Tested with Haiku, Sonnet, and Opus (if using multiple models)
 - [ ] Iteration based on observed behavior, not assumptions
+
+### Composite Skills (if referencing other skills)
+
+- [ ] References describe WHEN to use other skills, not HOW they work
+- [ ] No implementation details of referenced skills are included
+- [ ] Handoff points are explicit about the situation, not the mechanism
+- [ ] Skill can be understood without knowing referenced skills' internals
