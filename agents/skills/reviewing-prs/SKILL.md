@@ -65,12 +65,21 @@ The comments file format:
 
 ### 4. Reply to Existing Threads
 
-Review each existing comment thread and reply where valuable:
+**First, check for threads awaiting your input.** Look for:
+- Threads where the last comment mentions Claude or asks a question
+- Threads where someone replied to a previous `[Claude]:` comment
+- Unresolved discussions that could benefit from technical input
+
+**Then, avoid double-replying.** Before replying to any thread:
+1. Check if any comment in that thread starts with `[Claude]:`
+2. If Claude already replied AND no one asked a follow-up → skip
+3. If someone replied after Claude's comment → consider responding
 
 | Thread state | Action |
 |--------------|--------|
-| Unanswered question | Answer if you can help |
-| Ongoing discussion | Add perspective if useful |
+| Question directed at Claude | Reply |
+| Follow-up after Claude's comment | Reply if asked or helpful |
+| Claude already replied, no follow-up | Skip |
 | Resolved/agreed | Skip |
 
 Reply to each thread individually:
@@ -128,5 +137,7 @@ See [references/comment-templates.md](references/comment-templates.md) for more 
 - **Inline comments are primary** — put feedback on specific lines, not in summary
 - **One review submission** — batch all new comments together
 - **Reply individually** — each thread reply is a separate call
-- **Don't duplicate** — check existing threads before commenting
+- **Never double-comment** — before posting, check existing comments for `[Claude]:` on the same path/line
+- **Never double-reply** — before replying, check if Claude already replied to that thread
+- **Prioritize awaiting threads** — respond to threads where someone asked Claude a question or replied to Claude
 - **Read before commenting** — understand context before critiquing
