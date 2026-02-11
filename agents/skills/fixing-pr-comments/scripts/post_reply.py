@@ -2,19 +2,19 @@
 """
 Post a reply to a PR comment thread with duplicate prevention.
 
-Usage (CLI args):
-    # Reply to a review comment (inline on code)
-    post_reply.py <pr> --comment-id 123456 --name Claude --body "Your reply"
-
-    # Reply to an issue comment (general PR discussion)
-    post_reply.py <pr> --issue-comment-id 789 --name Claude --body "Your reply"
-
-    # Check if an agent already replied (dry run)
-    post_reply.py <pr> --comment-id 123456 --check-only
-
-Usage (JSON stdin - preferred for AI agents):
+Usage (JSON via stdin):
     post_reply.py <<'EOF'
     {"pr": "123", "comment_id": 456, "body": "Your reply"}
+    EOF
+
+    # Reply to an issue comment (general PR discussion)
+    post_reply.py <<'EOF'
+    {"pr": "123", "issue_comment_id": 789, "body": "Your reply"}
+    EOF
+
+    # Check if an agent already replied (dry run)
+    post_reply.py <<'EOF'
+    {"pr": "123", "comment_id": 456, "check_only": true}
     EOF
 
 JSON input fields:
@@ -39,7 +39,6 @@ Exit codes:
     3 - Already replied (duplicate prevention triggered)
 """
 
-import argparse
 import json
 import subprocess
 import sys
@@ -156,57 +155,41 @@ def post_issue_comment(owner: str, repo: str, pr_num: str, body: str) -> dict:
 
 
 def parse_args():
-    """Parse arguments from stdin JSON or CLI args."""
-    # Check for JSON input via stdin (AI-friendly mode)
-    if not sys.stdin.isatty():
-        try:
-            data = json.load(sys.stdin)
-            pr_ref = data.get("pr") or data.get("pr_ref")
+    """Parse arguments from stdin JSON."""
+    if sys.stdin.isatty():
+        print("Error: This script requires JSON input via stdin", file=sys.stderr)
+        print("Usage: post_reply.py <<'EOF'", file=sys.stderr)
+        print('{"pr": "123", "comment_id": 456, "body": "Your reply"}', file=sys.stderr)
+        print("EOF", file=sys.stderr)
+        output_json({"error": "This script requires JSON input via stdin"})
+        sys.exit(1)
 
-            # Validate required fields
-            if not pr_ref:
-                print("Error: Missing required field 'pr' or 'pr_ref'", file=sys.stderr)
-                output_json({"error": "Missing required field 'pr' or 'pr_ref'"})
-                sys.exit(1)
+    try:
+        data = json.load(sys.stdin)
+        pr_ref = data.get("pr") or data.get("pr_ref")
 
-            # Create a namespace object to match argparse interface
-            class Args:
-                pass
-            args = Args()
-            args.pr_ref = pr_ref
-            args.comment_id = data.get("comment_id")
-            args.issue_comment_id = data.get("issue_comment_id")
-            args.name = data.get("name", "Claude")
-            args.body = data.get("body")
-            args.check_only = data.get("check_only", False)
-            args.force = data.get("force", False)
-            return args
-        except json.JSONDecodeError as e:
-            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
-            output_json({"error": f"Invalid JSON input: {e}"})
+        # Validate required fields
+        if not pr_ref:
+            print("Error: Missing required field 'pr' or 'pr_ref'", file=sys.stderr)
+            output_json({"error": "Missing required field 'pr' or 'pr_ref'"})
             sys.exit(1)
 
-    # Fallback to CLI args (human-friendly mode)
-    parser = argparse.ArgumentParser(
-        description='Post a reply to a PR comment with duplicate prevention.',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
-    )
-
-    parser.add_argument('pr_ref', help='PR number or full GitHub PR URL')
-    parser.add_argument('--comment-id', type=int,
-                        help='Review comment ID to reply to (inline comments)')
-    parser.add_argument('--issue-comment-id', type=int,
-                        help='Issue comment ID (for general PR discussion replies)')
-    parser.add_argument('--name', default='Claude',
-                        help='Agent name for reply prefix (default: Claude)')
-    parser.add_argument('--body', help='Reply message (prefix added automatically)')
-    parser.add_argument('--check-only', action='store_true',
-                        help='Only check if an agent already replied, do not post')
-    parser.add_argument('--force', action='store_true',
-                        help='Post even if an agent already replied')
-
-    return parser.parse_args()
+        # Create a namespace object for consistency
+        class Args:
+            pass
+        args = Args()
+        args.pr_ref = pr_ref
+        args.comment_id = data.get("comment_id")
+        args.issue_comment_id = data.get("issue_comment_id")
+        args.name = data.get("name", "Claude")
+        args.body = data.get("body")
+        args.check_only = data.get("check_only", False)
+        args.force = data.get("force", False)
+        return args
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+        output_json({"error": f"Invalid JSON input: {e}"})
+        sys.exit(1)
 
 
 def main():

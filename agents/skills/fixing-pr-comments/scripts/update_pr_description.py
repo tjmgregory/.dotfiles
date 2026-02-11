@@ -2,10 +2,7 @@
 """
 Append a "Comments Addressed" section to a PR description.
 
-Usage (CLI args):
-    update_pr_description.py <pr> --summary "- Fixed null check\\n- Added error handling"
-
-Usage (JSON stdin - preferred for AI agents):
+Usage (JSON via stdin):
     update_pr_description.py <<'EOF'
     {"pr": "123", "summary": "- Fixed null check\n- Added error handling"}
     EOF
@@ -27,7 +24,6 @@ Exit codes:
     2 - GitHub API error
 """
 
-import argparse
 import subprocess
 import sys
 import re
@@ -85,51 +81,42 @@ def update_pr_body(owner: str, repo: str, pr_num: str, new_body: str) -> None:
 
 
 def parse_args():
-    """Parse arguments from stdin JSON or CLI args."""
-    # Check for JSON input via stdin (AI-friendly mode)
-    if not sys.stdin.isatty():
-        try:
-            data = json.load(sys.stdin)
-            pr_ref = data.get("pr") or data.get("pr_ref")
-            summary = data.get("summary")
+    """Parse arguments from stdin JSON."""
+    if sys.stdin.isatty():
+        print("Error: This script requires JSON input via stdin", file=sys.stderr)
+        print("Usage: update_pr_description.py <<'EOF'", file=sys.stderr)
+        print('{"pr": "123", "summary": "- Fixed X\\n- Added Y"}', file=sys.stderr)
+        print("EOF", file=sys.stderr)
+        output_json({"error": "This script requires JSON input via stdin"})
+        sys.exit(1)
 
-            # Validate required fields
-            if not pr_ref:
-                print("Error: Missing required field 'pr' or 'pr_ref'", file=sys.stderr)
-                output_json({"error": "Missing required field 'pr' or 'pr_ref'"})
-                sys.exit(1)
-            if not summary:
-                print("Error: Missing required field 'summary'", file=sys.stderr)
-                output_json({"error": "Missing required field 'summary'"})
-                sys.exit(1)
+    try:
+        data = json.load(sys.stdin)
+        pr_ref = data.get("pr") or data.get("pr_ref")
+        summary = data.get("summary")
 
-            # Create a namespace object to match argparse interface
-            class Args:
-                pass
-            args = Args()
-            args.pr_ref = pr_ref
-            args.summary = summary
-            args.replace = data.get("replace", False)
-            return args
-        except json.JSONDecodeError as e:
-            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
-            output_json({"error": f"Invalid JSON input: {e}"})
+        # Validate required fields
+        if not pr_ref:
+            print("Error: Missing required field 'pr' or 'pr_ref'", file=sys.stderr)
+            output_json({"error": "Missing required field 'pr' or 'pr_ref'"})
+            sys.exit(1)
+        if not summary:
+            print("Error: Missing required field 'summary'", file=sys.stderr)
+            output_json({"error": "Missing required field 'summary'"})
             sys.exit(1)
 
-    # Fallback to CLI args (human-friendly mode)
-    parser = argparse.ArgumentParser(
-        description='Append "Comments Addressed" section to PR description.',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
-    )
-
-    parser.add_argument('pr_ref', help='PR number or full GitHub PR URL')
-    parser.add_argument('--summary', required=True,
-                        help='Summary of changes made (supports \\n for newlines)')
-    parser.add_argument('--replace', action='store_true',
-                        help='Replace existing "Comments Addressed" section instead of appending')
-
-    return parser.parse_args()
+        # Create a namespace object for consistency
+        class Args:
+            pass
+        args = Args()
+        args.pr_ref = pr_ref
+        args.summary = summary
+        args.replace = data.get("replace", False)
+        return args
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+        output_json({"error": f"Invalid JSON input: {e}"})
+        sys.exit(1)
 
 
 def main():

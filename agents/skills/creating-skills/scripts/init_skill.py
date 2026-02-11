@@ -2,11 +2,12 @@
 """
 Skill Initializer - Creates a new skill from template
 
-Usage (CLI args):
-    init_skill.py <skill-name>              # Creates in ~/.dotfiles/agents/skills/
-    init_skill.py <skill-name> --path <path> # Creates in custom location
+Usage (JSON via stdin):
+    init_skill.py <<'EOF'
+    {"name": "my-new-skill"}
+    EOF
 
-Usage (JSON stdin - preferred for AI agents):
+    # With custom path:
     init_skill.py <<'EOF'
     {"name": "my-new-skill", "path": "./skills"}
     EOF
@@ -284,37 +285,28 @@ def init_skill(skill_name, path):
 
 
 def parse_args():
-    """Parse arguments from stdin JSON or CLI args."""
-    # Check for JSON input via stdin (AI-friendly mode)
-    if not sys.stdin.isatty():
-        try:
-            data = json.load(sys.stdin)
-            name = data.get("name") or data.get("skill_name")
-            if not name:
-                print("Error: Missing required field 'name'", file=sys.stderr)
-                output_json({"error": "Missing required field 'name'"})
-                sys.exit(1)
-            path = data.get("path", str(DEFAULT_SKILLS_PATH))
-            return name, path
-        except json.JSONDecodeError as e:
-            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
-            output_json({"error": f"Invalid JSON input: {e}"})
-            sys.exit(1)
-
-    # Fallback to CLI args
-    if len(sys.argv) < 2:
-        print("Usage: init_skill.py <skill-name> [--path <path>]", file=sys.stderr)
-        output_json({"error": "Usage: init_skill.py <skill-name> [--path <path>]"})
+    """Parse arguments from stdin JSON."""
+    if sys.stdin.isatty():
+        print("Error: This script requires JSON input via stdin", file=sys.stderr)
+        print("Usage: init_skill.py <<'EOF'", file=sys.stderr)
+        print('{"name": "my-skill"}', file=sys.stderr)
+        print("EOF", file=sys.stderr)
+        output_json({"error": "This script requires JSON input via stdin"})
         sys.exit(1)
 
-    skill_name = sys.argv[1]
-
-    # Parse optional --path argument
-    path = DEFAULT_SKILLS_PATH
-    if len(sys.argv) >= 4 and sys.argv[2] == '--path':
-        path = sys.argv[3]
-
-    return skill_name, path
+    try:
+        data = json.load(sys.stdin)
+        name = data.get("name") or data.get("skill_name")
+        if not name:
+            print("Error: Missing required field 'name'", file=sys.stderr)
+            output_json({"error": "Missing required field 'name'"})
+            sys.exit(1)
+        path = data.get("path", str(DEFAULT_SKILLS_PATH))
+        return name, path
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+        output_json({"error": f"Invalid JSON input: {e}"})
+        sys.exit(1)
 
 
 def main():

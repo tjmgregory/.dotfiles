@@ -33,7 +33,7 @@ Categorize before acting. See [references/reply-templates.md](references/reply-t
 | Invalid / N/A | No change | Explain why |
 | Unclear | No change | Ask clarifying question |
 
-**Skip threads where Claude already replied** (look for `[Claude]:` prefix) unless someone followed up after.
+**Skip threads where an agent already replied** (look for `[🤖` prefix) unless someone followed up after.
 
 ### 3. Plan All Changes
 
@@ -62,7 +62,9 @@ git push
 ### 6. Update PR Description
 
 ```bash
-scripts/update_pr_description.py <pr> --summary "- Fixed X\n- Added Y"
+scripts/update_pr_description.py <<'EOF'
+{"pr": "123", "summary": "- Fixed X\n- Added Y"}
+EOF
 ```
 
 Keep summary brief — one line per change made.
@@ -71,17 +73,21 @@ Keep summary brief — one line per change made.
 
 For review comments (inline on code):
 ```bash
-scripts/post_reply.py <pr> --comment-id <id> --name Claude --body "Your reply"
+scripts/post_reply.py <<'EOF'
+{"pr": "123", "comment_id": 456, "name": "Claude", "body": "Your reply"}
+EOF
 ```
 
 For issue comments (general discussion):
 ```bash
-scripts/post_reply.py <pr> --issue-comment-id <id> --name Claude --body "Your reply"
+scripts/post_reply.py <<'EOF'
+{"pr": "123", "issue_comment_id": 789, "name": "Claude", "body": "Your reply"}
+EOF
 ```
 
 The script:
 - Adds `[🤖 {name}]:` prefix automatically
-- Prevents double-replies (use `--force` to override)
+- Prevents double-replies (add `"force": true` to override)
 
 ## Rules
 

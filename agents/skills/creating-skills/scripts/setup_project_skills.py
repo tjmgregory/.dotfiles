@@ -5,10 +5,7 @@ Setup Project Skills - Configure a project directory for local skills
 Creates the skills/ directory and IDE symlinks so that project-local skills
 are discoverable by Claude Code, Cursor, and other IDEs.
 
-Usage (CLI args):
-    setup_project_skills.py <project-path>
-
-Usage (JSON stdin - preferred for AI agents):
+Usage (JSON via stdin):
     setup_project_skills.py <<'EOF'
     {"path": "~/projects/my-app"}
     EOF
@@ -99,29 +96,27 @@ def setup_project_skills(project_path):
 
 
 def parse_args():
-    """Parse arguments from stdin JSON or CLI args."""
-    # Check for JSON input via stdin (AI-friendly mode)
-    if not sys.stdin.isatty():
-        try:
-            data = json.load(sys.stdin)
-            path = data.get("path") or data.get("project_path")
-            if not path:
-                print("Error: Missing required field 'path'", file=sys.stderr)
-                output_json({"error": "Missing required field 'path'"})
-                sys.exit(1)
-            return path
-        except json.JSONDecodeError as e:
-            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
-            output_json({"error": f"Invalid JSON input: {e}"})
-            sys.exit(1)
-
-    # Fallback to CLI args
-    if len(sys.argv) < 2:
-        print("Usage: setup_project_skills.py <project-path>", file=sys.stderr)
-        output_json({"error": "Usage: setup_project_skills.py <project-path>"})
+    """Parse arguments from stdin JSON."""
+    if sys.stdin.isatty():
+        print("Error: This script requires JSON input via stdin", file=sys.stderr)
+        print("Usage: setup_project_skills.py <<'EOF'", file=sys.stderr)
+        print('{"path": "/path/to/project"}', file=sys.stderr)
+        print("EOF", file=sys.stderr)
+        output_json({"error": "This script requires JSON input via stdin"})
         sys.exit(1)
 
-    return sys.argv[1]
+    try:
+        data = json.load(sys.stdin)
+        path = data.get("path") or data.get("project_path")
+        if not path:
+            print("Error: Missing required field 'path'", file=sys.stderr)
+            output_json({"error": "Missing required field 'path'"})
+            sys.exit(1)
+        return path
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+        output_json({"error": f"Invalid JSON input: {e}"})
+        sys.exit(1)
 
 
 def main():

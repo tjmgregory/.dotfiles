@@ -263,18 +263,23 @@ When creating a new skill from scratch, run the init script. It generates a temp
 **Creating a global skill (available to all IDEs):**
 
 ```bash
-# Run the init script with the skill name
-scripts/init_skill.py <skill-name>
+scripts/init_skill.py <<'EOF'
+{"name": "my-skill"}
+EOF
 ```
 
 **Creating a project-local skill:**
 
 ```bash
 # First, run setup for the project (one-time)
-scripts/setup_project_skills.py <project-path>
+scripts/setup_project_skills.py <<'EOF'
+{"path": "/path/to/project"}
+EOF
 
 # Then run init with the project path
-scripts/init_skill.py <skill-name> --path <project-path>/skills
+scripts/init_skill.py <<'EOF'
+{"name": "my-skill", "path": "/path/to/project/skills"}
+EOF
 ```
 
 The init script:
@@ -358,8 +363,9 @@ For detailed guidance on testing and evaluation, see [references/evaluation-guid
 If a project-local skill should be available everywhere:
 
 ```bash
-# Run the promote script with the skill path
-scripts/promote_skill.py <project-path>/skills/<skill-name>
+scripts/promote_skill.py <<'EOF'
+{"path": "/path/to/project/skills/my-skill"}
+EOF
 ```
 
 This creates a symlink in `~/.dotfiles/agents/skills/` pointing to the project skill.
@@ -369,8 +375,9 @@ This creates a symlink in `~/.dotfiles/agents/skills/` pointing to the project s
 To share a skill with others outside your setup:
 
 ```bash
-# Run the package script - it validates then creates a .skill file (zip format)
-scripts/package_skill.py <path/to/skill-folder>
+scripts/package_skill.py <<'EOF'
+{"path": "/path/to/skill-folder"}
+EOF
 ```
 
 ## Validation Checklist

@@ -47,62 +47,57 @@ For a complete example, see `fixing-pr-comments/scripts/fetch_comments.sh` which
 
 ## Structured Input for AI Permissioning
 
-Scripts should accept JSON input via stdin (in addition to or instead of command-line arguments). AI permission systems struggle with complex CLI arguments that require quoting, escaping, or special characters.
+Scripts should accept JSON input via stdin only — do not provide CLI argument fallbacks. AI permission systems struggle with complex CLI arguments that require quoting, escaping, or special characters.
 
-**Why this matters:**
+**Why JSON-only via stdin:**
 - Permission prompts display the command being run
-- Complex arguments with quotes/escapes are hard to parse and validate
+- Complex CLI arguments with quotes/escapes are hard to parse and validate
 - JSON input is unambiguous and self-documenting
 - Easier for AIs to construct correctly
+- CLI fallbacks encourage the wrong pattern — if it exists, AI may use it
+- Humans can still use heredocs for manual testing
 
-**Good** - Accept JSON via stdin:
+**Good** - JSON-only via stdin:
 ```python
 #!/usr/bin/env python3
 import sys
 import json
 
 def main():
-    # Accept JSON from stdin
-    if not sys.stdin.isatty():
-        data = json.load(sys.stdin)
-        pr_ref = data["pr"]
-        body = data["body"]
-    else:
-        # Fallback to CLI args for manual use
-        import argparse
-        parser = argparse.ArgumentParser()
-        parser.add_argument("pr")
-        parser.add_argument("--body")
-        args = parser.parse_args()
-        pr_ref, body = args.pr, args.body
+    if sys.stdin.isatty():
+        print("Error: This script requires JSON input via stdin", file=sys.stderr)
+        print("Usage: script.py <<'EOF'", file=sys.stderr)
+        print('{"pr": "123", "body": "Your message"}', file=sys.stderr)
+        print("EOF", file=sys.stderr)
+        sys.exit(1)
+
+    data = json.load(sys.stdin)
+    pr_ref = data["pr"]
+    body = data["body"]
 ```
 
 **Usage:**
 ```bash
-# AI-friendly: heredoc with JSON (command first, multiline support, no escaping)
+# Heredoc with JSON (command first, multiline support, no escaping)
 ./post_reply.py <<'EOF'
 {
   "pr": "123",
   "body": "Fixed the issue.\nAdded tests too."
 }
 EOF
-
-# Human-friendly: CLI args still work
-./post_reply.py 123 --body "Fixed the issue"
 ```
 
-**Bad** - Complex CLI arguments only:
+**Bad** - CLI arguments (even as fallback):
 ```bash
 # Hard to permission, easy to get quoting wrong
 ./post_reply.py 123 --body "He said \"hello\" and it's working"
 ```
 
-**Why heredocs over echo:**
+**Why heredocs:**
 - Command appears first (easier to scan permission prompts)
 - Multiline JSON is natural, no `\n` escaping needed
 - `<<'EOF'` prevents shell variable expansion (safe for arbitrary content)
-
-For scripts that need both modes, check `sys.stdin.isatty()` to detect if input is being piped.
+- Works for both AI and human callers
 
 ## Execution Intent Clarity
 

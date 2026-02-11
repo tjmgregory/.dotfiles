@@ -2,10 +2,7 @@
 """
 Skill Packager - Creates a distributable .skill file of a skill folder
 
-Usage (CLI args):
-    package_skill.py <path/to/skill-folder> [output-directory]
-
-Usage (JSON stdin - preferred for AI agents):
+Usage (JSON via stdin):
     package_skill.py <<'EOF'
     {"path": "/path/to/skill", "output_dir": "./dist"}
     EOF
@@ -92,32 +89,28 @@ def package_skill(skill_path, output_dir=None):
 
 
 def parse_args():
-    """Parse arguments from stdin JSON or CLI args."""
-    # Check for JSON input via stdin (AI-friendly mode)
-    if not sys.stdin.isatty():
-        try:
-            data = json.load(sys.stdin)
-            path = data.get("path") or data.get("skill_path")
-            if not path:
-                print("Error: Missing required field 'path'", file=sys.stderr)
-                output_json({"error": "Missing required field 'path'"})
-                sys.exit(1)
-            output_dir = data.get("output_dir")
-            return path, output_dir
-        except json.JSONDecodeError as e:
-            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
-            output_json({"error": f"Invalid JSON input: {e}"})
-            sys.exit(1)
-
-    # Fallback to CLI args
-    if len(sys.argv) < 2:
-        print("Usage: package_skill.py <path/to/skill-folder> [output-directory]", file=sys.stderr)
-        output_json({"error": "Usage: package_skill.py <path/to/skill-folder> [output-directory]"})
+    """Parse arguments from stdin JSON."""
+    if sys.stdin.isatty():
+        print("Error: This script requires JSON input via stdin", file=sys.stderr)
+        print("Usage: package_skill.py <<'EOF'", file=sys.stderr)
+        print('{"path": "/path/to/skill"}', file=sys.stderr)
+        print("EOF", file=sys.stderr)
+        output_json({"error": "This script requires JSON input via stdin"})
         sys.exit(1)
 
-    skill_path = sys.argv[1]
-    output_dir = sys.argv[2] if len(sys.argv) > 2 else None
-    return skill_path, output_dir
+    try:
+        data = json.load(sys.stdin)
+        path = data.get("path") or data.get("skill_path")
+        if not path:
+            print("Error: Missing required field 'path'", file=sys.stderr)
+            output_json({"error": "Missing required field 'path'"})
+            sys.exit(1)
+        output_dir = data.get("output_dir")
+        return path, output_dir
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+        output_json({"error": f"Invalid JSON input: {e}"})
+        sys.exit(1)
 
 
 def main():
