@@ -2,7 +2,7 @@
 """
 Post a reply to a PR comment thread with duplicate prevention.
 
-Usage:
+Usage (CLI args):
     # Reply to a review comment (inline on code)
     post_reply.py <pr> --comment-id 123456 --name Claude --body "Your reply"
 
@@ -12,7 +12,25 @@ Usage:
     # Check if an agent already replied (dry run)
     post_reply.py <pr> --comment-id 123456 --check-only
 
+Usage (JSON stdin - preferred for AI agents):
+    post_reply.py <<'EOF'
+    {"pr": "123", "comment_id": 456, "body": "Your reply"}
+    EOF
+
+JSON input fields:
+    pr/pr_ref: PR number or URL (required)
+    comment_id: Review comment ID for inline comments
+    issue_comment_id: Issue comment ID for general discussion
+    name: Agent name prefix (default: "Claude")
+    body: Reply message
+    check_only: Boolean, just check if already replied
+    force: Boolean, post even if already replied
+
 The script automatically formats replies as: [🤖 {name}]: {body}
+
+Outputs JSON to stdout:
+    Success: {"status": "ok", "comment_id": 123, "action": "posted|already_replied|no_reply_found"}
+    Error:   {"error": "message"}
 
 Exit codes:
     0 - Success (or already replied in check mode)
@@ -26,6 +44,11 @@ import json
 import subprocess
 import sys
 import re
+
+
+def output_json(data: dict) -> None:
+    """Output structured JSON to stdout."""
+    print(json.dumps(data))
 
 
 def parse_pr_reference(pr_ref: str) -> tuple[str, str, str]:
@@ -132,7 +155,38 @@ def post_issue_comment(owner: str, repo: str, pr_num: str, body: str) -> dict:
         raise RuntimeError(f"GitHub API error: {error_msg}")
 
 
-def main():
+def parse_args():
+    """Parse arguments from stdin JSON or CLI args."""
+    # Check for JSON input via stdin (AI-friendly mode)
+    if not sys.stdin.isatty():
+        try:
+            data = json.load(sys.stdin)
+            pr_ref = data.get("pr") or data.get("pr_ref")
+
+            # Validate required fields
+            if not pr_ref:
+                print("Error: Missing required field 'pr' or 'pr_ref'", file=sys.stderr)
+                output_json({"error": "Missing required field 'pr' or 'pr_ref'"})
+                sys.exit(1)
+
+            # Create a namespace object to match argparse interface
+            class Args:
+                pass
+            args = Args()
+            args.pr_ref = pr_ref
+            args.comment_id = data.get("comment_id")
+            args.issue_comment_id = data.get("issue_comment_id")
+            args.name = data.get("name", "Claude")
+            args.body = data.get("body")
+            args.check_only = data.get("check_only", False)
+            args.force = data.get("force", False)
+            return args
+        except json.JSONDecodeError as e:
+            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+            output_json({"error": f"Invalid JSON input: {e}"})
+            sys.exit(1)
+
+    # Fallback to CLI args (human-friendly mode)
     parser = argparse.ArgumentParser(
         description='Post a reply to a PR comment with duplicate prevention.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -152,20 +206,27 @@ def main():
     parser.add_argument('--force', action='store_true',
                         help='Post even if an agent already replied')
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
 
     if not args.comment_id and not args.issue_comment_id:
         print("Error: Must specify --comment-id or --issue-comment-id", file=sys.stderr)
+        output_json({"error": "Must specify --comment-id or --issue-comment-id"})
         return 1
 
     if not args.check_only and not args.body:
         print("Error: --body is required unless using --check-only", file=sys.stderr)
+        output_json({"error": "--body is required unless using --check-only"})
         return 1
 
     try:
         owner, repo, pr_num = parse_pr_reference(args.pr_ref)
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
+        output_json({"error": str(e)})
         return 1
 
     # Check for existing agent reply (review comments only - has threading)
@@ -174,15 +235,18 @@ def main():
         if has_agent_replied(thread):
             if args.check_only:
                 print("An agent has already replied to this thread.", file=sys.stderr)
+                output_json({"status": "ok", "action": "already_replied", "comment_id": args.comment_id})
                 return 0
             if not args.force:
                 print("Error: An agent already replied to this thread. Use --force to reply anyway.",
                       file=sys.stderr)
+                output_json({"error": "An agent already replied to this thread", "comment_id": args.comment_id})
                 return 3
             print("Warning: Posting duplicate reply (--force used).", file=sys.stderr)
 
         if args.check_only:
             print("No existing agent reply found.", file=sys.stderr)
+            output_json({"status": "ok", "action": "no_reply_found", "comment_id": args.comment_id})
             return 0
 
     # Format the reply with prefix
@@ -191,11 +255,23 @@ def main():
     # Post the reply
     try:
         if args.comment_id:
-            post_review_comment_reply(owner, repo, pr_num, args.comment_id, formatted_body)
+            response = post_review_comment_reply(owner, repo, pr_num, args.comment_id, formatted_body)
+            output_json({
+                "status": "ok",
+                "action": "posted",
+                "comment_id": response.get("id"),
+                "in_reply_to": args.comment_id
+            })
         else:
-            post_issue_comment(owner, repo, pr_num, formatted_body)
+            response = post_issue_comment(owner, repo, pr_num, formatted_body)
+            output_json({
+                "status": "ok",
+                "action": "posted",
+                "comment_id": response.get("id")
+            })
         return 0
-    except RuntimeError:
+    except RuntimeError as e:
+        output_json({"error": str(e)})
         return 2
 
 

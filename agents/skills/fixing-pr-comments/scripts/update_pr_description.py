@@ -2,10 +2,24 @@
 """
 Append a "Comments Addressed" section to a PR description.
 
-Usage:
-    update_pr_description.py <pr> --summary "- Fixed null check\n- Added error handling"
+Usage (CLI args):
+    update_pr_description.py <pr> --summary "- Fixed null check\\n- Added error handling"
+
+Usage (JSON stdin - preferred for AI agents):
+    update_pr_description.py <<'EOF'
+    {"pr": "123", "summary": "- Fixed null check\n- Added error handling"}
+    EOF
+
+JSON input fields:
+    pr/pr_ref: PR number or URL (required)
+    summary: Summary of changes made (required)
+    replace: Boolean, replace existing section instead of appending
 
 The script safely appends to existing PR body without overwriting.
+
+Outputs JSON to stdout:
+    Success: {"status": "ok", "action": "created|appended|replaced", "pr_number": 123}
+    Error:   {"error": "message"}
 
 Exit codes:
     0 - Success
@@ -18,6 +32,11 @@ import subprocess
 import sys
 import re
 import json
+
+
+def output_json(data: dict) -> None:
+    """Output structured JSON to stdout."""
+    print(json.dumps(data))
 
 
 def parse_pr_reference(pr_ref: str) -> tuple[str, str, str]:
@@ -65,7 +84,39 @@ def update_pr_body(owner: str, repo: str, pr_num: str, new_body: str) -> None:
         raise RuntimeError(f"Failed to update PR body: {e.stderr}")
 
 
-def main():
+def parse_args():
+    """Parse arguments from stdin JSON or CLI args."""
+    # Check for JSON input via stdin (AI-friendly mode)
+    if not sys.stdin.isatty():
+        try:
+            data = json.load(sys.stdin)
+            pr_ref = data.get("pr") or data.get("pr_ref")
+            summary = data.get("summary")
+
+            # Validate required fields
+            if not pr_ref:
+                print("Error: Missing required field 'pr' or 'pr_ref'", file=sys.stderr)
+                output_json({"error": "Missing required field 'pr' or 'pr_ref'"})
+                sys.exit(1)
+            if not summary:
+                print("Error: Missing required field 'summary'", file=sys.stderr)
+                output_json({"error": "Missing required field 'summary'"})
+                sys.exit(1)
+
+            # Create a namespace object to match argparse interface
+            class Args:
+                pass
+            args = Args()
+            args.pr_ref = pr_ref
+            args.summary = summary
+            args.replace = data.get("replace", False)
+            return args
+        except json.JSONDecodeError as e:
+            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+            output_json({"error": f"Invalid JSON input: {e}"})
+            sys.exit(1)
+
+    # Fallback to CLI args (human-friendly mode)
     parser = argparse.ArgumentParser(
         description='Append "Comments Addressed" section to PR description.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -78,12 +129,17 @@ def main():
     parser.add_argument('--replace', action='store_true',
                         help='Replace existing "Comments Addressed" section instead of appending')
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
 
     try:
         owner, repo, pr_num = parse_pr_reference(args.pr_ref)
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
+        output_json({"error": str(e)})
         return 1
 
     # Fetch current body
@@ -91,6 +147,7 @@ def main():
         current_body = get_pr_body(owner, repo, pr_num)
     except RuntimeError as e:
         print(f"Error: {e}", file=sys.stderr)
+        output_json({"error": str(e)})
         return 2
 
     # Process summary (convert literal \n to newlines)
@@ -101,7 +158,8 @@ def main():
     new_section = f"\n\n---\n{section_header}\n{summary}"
 
     # Check if section already exists
-    if section_header in current_body:
+    section_existed = section_header in current_body
+    if section_existed:
         if args.replace:
             # Replace existing section (everything from header to next --- or end)
             pattern = rf'\n*---\n{re.escape(section_header)}.*?(?=\n---|\Z)'
@@ -122,9 +180,12 @@ def main():
     # Update the PR
     try:
         update_pr_body(owner, repo, pr_num, new_body)
+        action = "replaced" if (section_existed and args.replace) else "appended" if section_existed else "created"
+        output_json({"status": "ok", "action": action, "pr_number": int(pr_num)})
         return 0
     except RuntimeError as e:
         print(f"Error: {e}", file=sys.stderr)
+        output_json({"error": str(e)})
         return 2
 
 
