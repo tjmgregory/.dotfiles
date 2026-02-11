@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 """
-Post a GitHub PR review with proper JSON handling and error management.
+Post a GitHub PR review with inline comments. Summary body is optional.
 
 Usage:
-    post_review.py <pr_url_or_number> --body "Review summary" --event COMMENT
-    post_review.py <pr_url_or_number> --body "LGTM" --event APPROVE
-    post_review.py <pr_url_or_number> --body "Needs fixes" --event REQUEST_CHANGES --comments-file comments.json
+    # Inline comments only (preferred)
+    post_review.py <pr> --event COMMENT --comments-file comments.json
+
+    # With optional summary
+    post_review.py <pr> --event COMMENT --comments-file comments.json --body "Optional summary"
+
+    # Reply to existing thread
+    post_review.py <pr> --reply-to 123456 --body "Your reply"
+
+    # Approve/request changes
+    post_review.py <pr> --event APPROVE
+    post_review.py <pr> --event REQUEST_CHANGES --body "Blocking issues" --comments-file comments.json
 
 Comments file format (JSON array):
     [
@@ -59,8 +68,8 @@ def parse_pr_reference(pr_ref: str) -> tuple[str, str, str]:
     except subprocess.CalledProcessError:
         raise ValueError("Not in a git repository and no full PR URL provided")
 
-    # Parse remote URL (handles HTTPS and SSH)
-    remote_match = re.search(r'github\.com[:/]([^/]+)/([^/.]+)', remote_url)
+    # Parse remote URL (handles HTTPS and SSH, with or without .git suffix)
+    remote_match = re.search(r'github\.com[:/]([^/]+)/(.+?)(?:\.git)?$', remote_url)
     if not remote_match:
         raise ValueError(f"Could not parse GitHub owner/repo from remote: {remote_url}")
 
@@ -100,29 +109,33 @@ def post_review(owner: str, repo: str, pr_num: str, body: str, event: str,
     Raises:
         RuntimeError: If the API call fails
     """
-    # Build the gh api command
+    # Validate comments if provided
+    if comments:
+        for i, comment in enumerate(comments):
+            validate_comment(comment, i)
+
+    # Build request payload as JSON (required for arrays to work correctly)
+    payload = {
+        'event': event,
+        'body': body,
+    }
+    if comments:
+        payload['comments'] = comments
+
+    # Use --input to pass JSON payload via stdin (--field stringifies arrays incorrectly)
     cmd = [
         'gh', 'api',
         f'repos/{owner}/{repo}/pulls/{pr_num}/reviews',
         '-X', 'POST',
-        '--field', f'body={body}',
-        '--field', f'event={event}',
+        '--input', '-',
     ]
-
-    # Add comments if provided
-    if comments:
-        # Validate each comment
-        for i, comment in enumerate(comments):
-            validate_comment(comment, i)
-
-        # gh api --field expects JSON for array values
-        cmd.extend(['--field', f'comments={json.dumps(comments)}'])
 
     print(f"Posting {event} review to {owner}/{repo}#{pr_num}...", file=sys.stderr)
 
     try:
         result = subprocess.run(
             cmd,
+            input=json.dumps(payload),
             capture_output=True,
             text=True,
             check=True
@@ -191,7 +204,7 @@ def main():
     )
 
     parser.add_argument('pr_ref', help='PR number or full GitHub PR URL')
-    parser.add_argument('--body', required=True, help='Review summary body')
+    parser.add_argument('--body', default='', help='Review summary body (optional for inline-only reviews)')
     parser.add_argument('--event', required=True,
                         choices=['APPROVE', 'REQUEST_CHANGES', 'COMMENT'],
                         help='Review event type')
@@ -211,6 +224,9 @@ def main():
 
     # Handle reply mode
     if args.reply_to:
+        if not args.body:
+            print("Error: --body is required when using --reply-to", file=sys.stderr)
+            return 1
         try:
             reply_to_comment(owner, repo, pr_num, args.reply_to, args.body)
             return 0

@@ -1,135 +1,143 @@
 ---
 name: reviewing-prs
-description: Reviews GitHub PRs by analyzing diffs, posting inline comments, and engaging with existing comment threads. Use when asked to "review PR", "review this PR", "give feedback on PR", or when given a PR URL/number to review.
+description: Reviews GitHub PRs by analyzing diffs file-by-file and posting inline comments directly on diff lines. Use when asked to "review PR", "review this PR", "give feedback on PR", or when given a PR URL/number to review.
 ---
 
 # Reviewing PRs
 
-Analyze a GitHub PR's changes, post constructive feedback, and engage with existing discussions.
+Review PRs file-by-file, posting inline comments directly on diff lines. Inline comments are the primary output—they're actionable, trackable, and tied to specific code. Summary comments are rarely needed.
 
-**Process overview**: Fetch data → Analyze diff → Read context → Assess threads → Post review → Verify success
+**Process**: Fetch data → Review each file → Post inline comments → Reply to threads → Verify
 
 ## Workflow
 
 ### 1. Fetch PR Data
 
-Run the fetch script to get PR info, diff, and all comment threads:
-
 ```bash
 scripts/fetch_pr_data.sh <pr_url_or_number>
 ```
 
-The script handles pagination automatically and outputs structured data.
+This returns PR info, the full diff, and all existing comment threads.
 
-### 2. Analyze the Diff
+### 2. Review Each File
 
-Review the diff for:
-- Logic errors or bugs
-- Security vulnerabilities
-- Performance concerns
-- Missing edge cases
-- Code clarity issues
-- Inconsistencies with surrounding code style
+Go through the diff **file by file**. For each changed file:
 
-### 3. Read Base Branch Context
+1. **Read the diff hunk** — understand what changed
+2. **Read base branch context if needed** — when the diff references code you can't see:
+   ```bash
+   gh api repos/{owner}/{repo}/contents/{path}?ref={base_branch} | jq -r .content | base64 --decode
+   ```
+3. **Identify issues** — bugs, security holes, performance problems, missing edge cases
+4. **Note the exact diff line numbers** for each issue (these go in your inline comments)
 
-Read the base branch version of files when:
-- Changed code references functions/classes not visible in the diff
-- You need to understand the existing pattern being modified
-- Comment threads reference code you haven't seen
-- The change's impact is unclear without surrounding context
+Build up a list of inline comments as you go. Each comment needs:
+- `path`: the file path
+- `line`: the line number in the **new version** of the file (the `+` lines in the diff)
+- `body`: your comment, prefixed with `[Claude]:`
 
-```bash
-gh api repos/{owner}/{repo}/contents/{path}?ref={base_branch} | jq -r .content | base64 --decode
-```
+### 3. Post Inline Comments
 
-### 4. Assess Existing Comment Threads
-
-Review each thread and decide whether to reply:
-
-| Thread State | Action |
-|--------------|--------|
-| Unanswered question | Answer if you can help |
-| Ongoing discussion | Add perspective if valuable |
-| Resolved/agreed | Skip—no reply needed |
-| Needs clarification | Ask follow-up question |
-
-### 5. Post the Review
-
-Use the post script to submit your review with inline comments:
+Submit all inline comments in a single review:
 
 ```bash
-# Create a comments file (JSON array)
-cat > /tmp/review_comments.json << 'EOF'
-[
-  {"path": "src/file.ts", "line": 42, "body": "[Claude]: Your comment here"}
-]
-EOF
-
-# Post the review
 scripts/post_review.py <pr_url_or_number> \
-  --body "Review summary here" \
   --event COMMENT \
-  --comments-file /tmp/review_comments.json
+  --comments-file /tmp/comments.json
 ```
 
-**Review events** — default to `COMMENT` unless you have strong justification:
+The comments file format:
+```json
+[
+  {"path": "src/auth.ts", "line": 42, "body": "[Claude]: This null check won't catch undefined"},
+  {"path": "src/api.ts", "line": 18, "body": "[Claude]: SQL injection risk—use parameterized query"}
+]
+```
 
-| Event | Use when |
-|-------|----------|
-| `COMMENT` | Feedback only (default—approval decisions need human judgment) |
-| `APPROVE` | Changes are correct and ready to merge |
-| `REQUEST_CHANGES` | Must-fix blockers before merge |
+**Review events:**
+| Event | When to use |
+|-------|-------------|
+| `COMMENT` | Default—inline feedback only |
+| `APPROVE` | No issues found, ready to merge |
+| `REQUEST_CHANGES` | Blocking issues that must be fixed |
 
-### 6. Reply to Existing Threads
+**Skip the summary body** unless there's cross-cutting feedback that doesn't belong on any specific line.
+
+### 4. Reply to Existing Threads
+
+**First, check for threads awaiting your input.** Look for:
+- Threads where the last comment mentions Claude or asks a question
+- Threads where someone replied to a previous `[Claude]:` comment
+- Unresolved discussions that could benefit from technical input
+
+**Then, avoid double-replying.** Before replying to any thread:
+1. Check if any comment in that thread starts with `[Claude]:`
+2. If Claude already replied AND no one asked a follow-up → skip
+3. If someone replied after Claude's comment → consider responding
+
+| Thread state | Action |
+|--------------|--------|
+| Question directed at Claude | Reply |
+| Follow-up after Claude's comment | Reply if asked or helpful |
+| Claude already replied, no follow-up | Skip |
+| Resolved/agreed | Skip |
 
 Reply to each thread individually:
-
 ```bash
 scripts/post_review.py <pr_url_or_number> \
   --reply-to <comment_id> \
-  --body "[Claude]: Your reply" \
+  --body "[Claude]: Your reply here" \
   --event COMMENT
 ```
 
-### 7. Verify Success
+### 5. Verify
 
-After posting, confirm the review was submitted:
-
+Confirm your comments posted:
 ```bash
 gh pr view <pr_number> --comments
 ```
 
-Check that your comments appear. If any failed, review error messages and retry.
+## Writing Inline Comments
 
-## Write Effective Comments
+**Prefix with `[Claude]:`** — identifies automated feedback.
 
-**Prefix every comment** with `[Claude]:` to identify automated feedback.
+**Be specific** — reference the exact issue and suggest a fix:
+```
+[Claude]: This could throw if `user` is null. Consider:
+```suggestion
+if (user?.email) {
+```
+```
 
-**Be constructive** — focus on improvement, not criticism.
+**Prioritize** — distinguish blockers from suggestions:
+```
+[Claude]: Blocker: This exposes the API key in logs.
+```
+```
+[Claude]: Nit: Could rename to `fetchUserData` for clarity.
+```
 
-**Be specific** — reference exact lines and suggest fixes.
+**Ask questions** when intent is unclear:
+```
+[Claude]: What happens if this returns an empty array? Should we handle that case?
+```
 
-**Prioritize** — distinguish blockers from nice-to-haves.
-
-**Ask questions** — when intent is unclear, ask rather than assume.
-
-**Respect author intent** — suggest, don't dictate style preferences.
-
-See [references/comment-templates.md](references/comment-templates.md) for ready-to-use templates.
+See [references/comment-templates.md](references/comment-templates.md) for more templates.
 
 ## Handle Errors
 
-| Error | Likely Cause | Fix |
-|-------|--------------|-----|
-| 404 Not Found | PR doesn't exist or no access | Verify PR URL and permissions |
-| 401/403 | Authentication issue | Run `gh auth status` and re-authenticate |
-| 422 Unprocessable | Comment line not in diff | Use line numbers from the diff, not the file |
-| Rate limited | Too many API calls | Wait and retry, or batch comments |
+| Error | Cause | Fix |
+|-------|-------|-----|
+| 422 Unprocessable | Line number not in diff | Use diff line numbers, not file line numbers |
+| 404 Not Found | PR doesn't exist or no access | Check PR URL and permissions |
+| 401/403 | Auth issue | Run `gh auth status` |
 
-## Follow These Rules
+## Rules
 
-- **One review submission** — batch all new comments into a single review
-- **Reply individually** — each thread reply is a separate API call
-- **Don't duplicate** — skip points already made in existing threads
-- **Read before reviewing** — understand full context before commenting
+- **Inline comments are primary** — put feedback on specific lines, not in summary
+- **One review submission** — batch all new comments together
+- **Reply individually** — each thread reply is a separate call
+- **Never double-comment** — before posting, check existing comments for `[Claude]:` on the same path/line
+- **Never double-reply** — before replying, check if Claude already replied to that thread
+- **Prioritize awaiting threads** — respond to threads where someone asked Claude a question or replied to Claude
+- **Read before commenting** — understand context before critiquing
