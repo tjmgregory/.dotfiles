@@ -1,13 +1,32 @@
 #!/usr/bin/env python3
 """
 Quick validation script for skills - minimal version
+
+Usage (CLI args):
+    quick_validate.py <skill_directory>
+
+Usage (JSON stdin - preferred for AI agents):
+    quick_validate.py <<'EOF'
+    {"path": "/path/to/skill"}
+    EOF
+
+Outputs JSON to stdout:
+    Success: {"status": "ok", "valid": true, "message": "Skill is valid!"}
+    Invalid: {"status": "ok", "valid": false, "message": "Error description"}
+    Error:   {"error": "message"}
 """
 
 import sys
 import os
 import re
+import json
 import yaml
 from pathlib import Path
+
+
+def output_json(data: dict) -> None:
+    """Output structured JSON to stdout."""
+    print(json.dumps(data))
 
 def validate_skill(skill_path):
     """Basic validation of a skill"""
@@ -85,11 +104,41 @@ def validate_skill(skill_path):
 
     return True, "Skill is valid!"
 
-if __name__ == "__main__":
+def parse_args():
+    """Parse arguments from stdin JSON or CLI args."""
+    # Check for JSON input via stdin (AI-friendly mode)
+    if not sys.stdin.isatty():
+        try:
+            data = json.load(sys.stdin)
+            path = data.get("path") or data.get("skill_path")
+            if not path:
+                print("Error: Missing required field 'path'", file=sys.stderr)
+                output_json({"error": "Missing required field 'path'"})
+                sys.exit(1)
+            return path
+        except json.JSONDecodeError as e:
+            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+            output_json({"error": f"Invalid JSON input: {e}"})
+            sys.exit(1)
+
+    # Fallback to CLI args
     if len(sys.argv) != 2:
-        print("Usage: python quick_validate.py <skill_directory>")
+        print("Usage: python quick_validate.py <skill_directory>", file=sys.stderr)
+        output_json({"error": "Usage: quick_validate.py <skill_directory>"})
         sys.exit(1)
-    
-    valid, message = validate_skill(sys.argv[1])
-    print(message)
+
+    return sys.argv[1]
+
+
+if __name__ == "__main__":
+    skill_path = parse_args()
+    valid, message = validate_skill(skill_path)
+
+    print(message, file=sys.stderr)
+    output_json({
+        "status": "ok",
+        "valid": valid,
+        "message": message,
+        "path": str(skill_path)
+    })
     sys.exit(0 if valid else 1)

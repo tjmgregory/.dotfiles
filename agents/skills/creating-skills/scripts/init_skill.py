@@ -2,17 +2,32 @@
 """
 Skill Initializer - Creates a new skill from template
 
-Usage:
+Usage (CLI args):
     init_skill.py <skill-name>              # Creates in ~/.dotfiles/agents/skills/
     init_skill.py <skill-name> --path <path> # Creates in custom location
 
-Examples:
-    init_skill.py my-new-skill                        # Global skill (default)
-    init_skill.py project-helper --path ./skills      # Project-local skill
+Usage (JSON stdin - preferred for AI agents):
+    init_skill.py <<'EOF'
+    {"name": "my-new-skill", "path": "./skills"}
+    EOF
+
+JSON input fields:
+    name/skill_name: Name of the skill (required)
+    path: Directory to create skill in (optional, defaults to ~/.dotfiles/agents/skills)
+
+Outputs JSON to stdout:
+    Success: {"status": "ok", "path": "/path/to/new-skill"}
+    Error:   {"error": "message"}
 """
 
 import sys
+import json
 from pathlib import Path
+
+
+def output_json(data: dict) -> None:
+    """Output structured JSON to stdout."""
+    print(json.dumps(data))
 
 DEFAULT_SKILLS_PATH = Path.home() / ".dotfiles/agents/skills"
 
@@ -209,16 +224,14 @@ def init_skill(skill_name, path):
 
     # Check if directory already exists
     if skill_dir.exists():
-        print(f"❌ Error: Skill directory already exists: {skill_dir}")
-        return None
+        return None, f"Skill directory already exists: {skill_dir}"
 
     # Create skill directory
     try:
         skill_dir.mkdir(parents=True, exist_ok=False)
-        print(f"✅ Created skill directory: {skill_dir}")
+        print(f"Created skill directory: {skill_dir}", file=sys.stderr)
     except Exception as e:
-        print(f"❌ Error creating directory: {e}")
-        return None
+        return None, f"Error creating directory: {e}"
 
     # Create SKILL.md from template
     skill_title = title_case_skill_name(skill_name)
@@ -230,10 +243,9 @@ def init_skill(skill_name, path):
     skill_md_path = skill_dir / 'SKILL.md'
     try:
         skill_md_path.write_text(skill_content)
-        print("✅ Created SKILL.md")
+        print("Created SKILL.md", file=sys.stderr)
     except Exception as e:
-        print(f"❌ Error creating SKILL.md: {e}")
-        return None
+        return None, f"Error creating SKILL.md: {e}"
 
     # Create resource directories with example files
     try:
@@ -243,47 +255,56 @@ def init_skill(skill_name, path):
         example_script = scripts_dir / 'example.py'
         example_script.write_text(EXAMPLE_SCRIPT.format(skill_name=skill_name))
         example_script.chmod(0o755)
-        print("✅ Created scripts/example.py")
+        print("Created scripts/example.py", file=sys.stderr)
 
         # Create references/ directory with example reference doc
         references_dir = skill_dir / 'references'
         references_dir.mkdir(exist_ok=True)
         example_reference = references_dir / 'api_reference.md'
         example_reference.write_text(EXAMPLE_REFERENCE.format(skill_title=skill_title))
-        print("✅ Created references/api_reference.md")
+        print("Created references/api_reference.md", file=sys.stderr)
 
         # Create assets/ directory with example asset placeholder
         assets_dir = skill_dir / 'assets'
         assets_dir.mkdir(exist_ok=True)
         example_asset = assets_dir / 'example_asset.txt'
         example_asset.write_text(EXAMPLE_ASSET)
-        print("✅ Created assets/example_asset.txt")
+        print("Created assets/example_asset.txt", file=sys.stderr)
     except Exception as e:
-        print(f"❌ Error creating resource directories: {e}")
-        return None
+        return None, f"Error creating resource directories: {e}"
 
     # Print next steps
-    print(f"\n✅ Skill '{skill_name}' initialized successfully at {skill_dir}")
-    print("\nNext steps:")
-    print("1. Edit SKILL.md to complete the TODO items and update the description")
-    print("2. Customize or delete the example files in scripts/, references/, and assets/")
-    print("3. Run the validator when ready to check the skill structure")
+    print(f"Skill '{skill_name}' initialized successfully at {skill_dir}", file=sys.stderr)
+    print("Next steps:", file=sys.stderr)
+    print("1. Edit SKILL.md to complete the TODO items and update the description", file=sys.stderr)
+    print("2. Customize or delete the example files in scripts/, references/, and assets/", file=sys.stderr)
+    print("3. Run the validator when ready to check the skill structure", file=sys.stderr)
 
-    return skill_dir
+    return skill_dir, None
 
 
-def main():
+def parse_args():
+    """Parse arguments from stdin JSON or CLI args."""
+    # Check for JSON input via stdin (AI-friendly mode)
+    if not sys.stdin.isatty():
+        try:
+            data = json.load(sys.stdin)
+            name = data.get("name") or data.get("skill_name")
+            if not name:
+                print("Error: Missing required field 'name'", file=sys.stderr)
+                output_json({"error": "Missing required field 'name'"})
+                sys.exit(1)
+            path = data.get("path", str(DEFAULT_SKILLS_PATH))
+            return name, path
+        except json.JSONDecodeError as e:
+            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+            output_json({"error": f"Invalid JSON input: {e}"})
+            sys.exit(1)
+
+    # Fallback to CLI args
     if len(sys.argv) < 2:
-        print("Usage: init_skill.py <skill-name> [--path <path>]")
-        print("\nSkill name requirements:")
-        print("  - Hyphen-case identifier (e.g., 'data-analyzer')")
-        print("  - Lowercase letters, digits, and hyphens only")
-        print("  - Max 40 characters")
-        print("  - Must match directory name exactly")
-        print("\nExamples:")
-        print("  init_skill.py my-new-skill                   # Global skill (default)")
-        print("  init_skill.py project-helper --path ./skills # Project-local skill")
-        print(f"\nDefault path: {DEFAULT_SKILLS_PATH}")
+        print("Usage: init_skill.py <skill-name> [--path <path>]", file=sys.stderr)
+        output_json({"error": "Usage: init_skill.py <skill-name> [--path <path>]"})
         sys.exit(1)
 
     skill_name = sys.argv[1]
@@ -293,15 +314,22 @@ def main():
     if len(sys.argv) >= 4 and sys.argv[2] == '--path':
         path = sys.argv[3]
 
-    print(f"🚀 Initializing skill: {skill_name}")
-    print(f"   Location: {path}")
-    print()
+    return skill_name, path
 
-    result = init_skill(skill_name, path)
+
+def main():
+    skill_name, path = parse_args()
+
+    print(f"Initializing skill: {skill_name}", file=sys.stderr)
+    print(f"Location: {path}", file=sys.stderr)
+
+    result, error = init_skill(skill_name, path)
 
     if result:
+        output_json({"status": "ok", "path": str(result), "name": skill_name})
         sys.exit(0)
     else:
+        output_json({"error": error})
         sys.exit(1)
 
 
