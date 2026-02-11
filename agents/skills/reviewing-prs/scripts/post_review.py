@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 """
-Post a GitHub PR review with proper JSON handling and error management.
+Post a GitHub PR review with inline comments. Summary body is optional.
 
 Usage:
-    post_review.py <pr_url_or_number> --body "Review summary" --event COMMENT
-    post_review.py <pr_url_or_number> --body "LGTM" --event APPROVE
-    post_review.py <pr_url_or_number> --body "Needs fixes" --event REQUEST_CHANGES --comments-file comments.json
+    # Inline comments only (preferred)
+    post_review.py <pr> --event COMMENT --comments-file comments.json
+
+    # With optional summary
+    post_review.py <pr> --event COMMENT --comments-file comments.json --body "Optional summary"
+
+    # Reply to existing thread
+    post_review.py <pr> --reply-to 123456 --body "Your reply"
+
+    # Approve/request changes
+    post_review.py <pr> --event APPROVE
+    post_review.py <pr> --event REQUEST_CHANGES --body "Blocking issues" --comments-file comments.json
 
 Comments file format (JSON array):
     [
@@ -191,7 +200,7 @@ def main():
     )
 
     parser.add_argument('pr_ref', help='PR number or full GitHub PR URL')
-    parser.add_argument('--body', required=True, help='Review summary body')
+    parser.add_argument('--body', default='', help='Review summary body (optional for inline-only reviews)')
     parser.add_argument('--event', required=True,
                         choices=['APPROVE', 'REQUEST_CHANGES', 'COMMENT'],
                         help='Review event type')
@@ -211,6 +220,9 @@ def main():
 
     # Handle reply mode
     if args.reply_to:
+        if not args.body:
+            print("Error: --body is required when using --reply-to", file=sys.stderr)
+            return 1
         try:
             reply_to_comment(owner, repo, pr_num, args.reply_to, args.body)
             return 0
