@@ -33,7 +33,7 @@ Go through the diff **file by file**. For each changed file:
 
 Build up a list of inline comments as you go. Each comment needs:
 - `path`: the file path
-- `line`: the line number **in the diff** (not the original file)
+- `line`: the line number in the **new version** of the file (the `+` lines in the diff)
 - `body`: your comment, prefixed with `[Claude]:`
 
 ### 3. Post Inline Comments

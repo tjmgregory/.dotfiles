@@ -42,10 +42,11 @@ else
         exit 1
     fi
 
-    # Extract owner/repo from remote URL (handles both HTTPS and SSH)
-    if [[ "$REMOTE_URL" =~ github\.com[:/]([^/]+)/([^/.]+) ]]; then
+    # Extract owner/repo from remote URL (handles both HTTPS and SSH, with or without .git suffix)
+    if [[ "$REMOTE_URL" =~ github\.com[:/]([^/]+)/(.+) ]]; then
         OWNER="${BASH_REMATCH[1]}"
         REPO="${BASH_REMATCH[2]}"
+        REPO="${REPO%.git}"  # Strip .git suffix if present
     else
         echo "Error: Could not parse GitHub owner/repo from remote: $REMOTE_URL" >&2
         exit 1

@@ -68,8 +68,8 @@ def parse_pr_reference(pr_ref: str) -> tuple[str, str, str]:
     except subprocess.CalledProcessError:
         raise ValueError("Not in a git repository and no full PR URL provided")
 
-    # Parse remote URL (handles HTTPS and SSH)
-    remote_match = re.search(r'github\.com[:/]([^/]+)/([^/.]+)', remote_url)
+    # Parse remote URL (handles HTTPS and SSH, with or without .git suffix)
+    remote_match = re.search(r'github\.com[:/]([^/]+)/(.+?)(?:\.git)?$', remote_url)
     if not remote_match:
         raise ValueError(f"Could not parse GitHub owner/repo from remote: {remote_url}")
 
@@ -109,29 +109,33 @@ def post_review(owner: str, repo: str, pr_num: str, body: str, event: str,
     Raises:
         RuntimeError: If the API call fails
     """
-    # Build the gh api command
+    # Validate comments if provided
+    if comments:
+        for i, comment in enumerate(comments):
+            validate_comment(comment, i)
+
+    # Build request payload as JSON (required for arrays to work correctly)
+    payload = {
+        'event': event,
+        'body': body,
+    }
+    if comments:
+        payload['comments'] = comments
+
+    # Use --input to pass JSON payload via stdin (--field stringifies arrays incorrectly)
     cmd = [
         'gh', 'api',
         f'repos/{owner}/{repo}/pulls/{pr_num}/reviews',
         '-X', 'POST',
-        '--field', f'body={body}',
-        '--field', f'event={event}',
+        '--input', '-',
     ]
-
-    # Add comments if provided
-    if comments:
-        # Validate each comment
-        for i, comment in enumerate(comments):
-            validate_comment(comment, i)
-
-        # gh api --field expects JSON for array values
-        cmd.extend(['--field', f'comments={json.dumps(comments)}'])
 
     print(f"Posting {event} review to {owner}/{repo}#{pr_num}...", file=sys.stderr)
 
     try:
         result = subprocess.run(
             cmd,
+            input=json.dumps(payload),
             capture_output=True,
             text=True,
             check=True
