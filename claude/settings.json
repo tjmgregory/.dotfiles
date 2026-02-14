@@ -78,8 +78,11 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
   "enabledPlugins": {
-    "beads@beads-marketplace": true,
     "typescript-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true
   },
@@ -93,5 +96,6 @@
         "mcp"
       ]
     }
-  }
+  },
+  "effortLevel": "medium"
 }
