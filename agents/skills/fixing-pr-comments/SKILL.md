@@ -21,8 +21,11 @@ Returns JSON with:
 - `info` — PR metadata (title, branch, head SHA)
 - `review_comments` — Inline comments on code (have file path + line)
 - `issue_comments` — General PR discussion
+- `reviews` — Review body comments (the top-level message submitted with approve/request changes/comment, filtered to non-empty bodies)
 
 ### 2. Assess Each Comment
+
+Process all three comment types: `review_comments` (inline on code), `issue_comments` (general discussion), and `reviews` (review body comments). Prioritize inline comments first, then review bodies, then general discussion.
 
 Categorize before acting. See [references/reply-templates.md](references/reply-templates.md) for examples.
 
@@ -39,9 +42,14 @@ Categorize before acting. See [references/reply-templates.md](references/reply-t
 
 List changes BEFORE editing — line numbers shift after edits.
 
-For each comment requiring code changes:
+For inline review comments requiring code changes:
 1. Note file path and line number (`line` field = line in PR head branch)
 2. Read the file to understand context
+3. Plan the specific edit
+
+For review bodies and issue comments requiring code changes:
+1. Identify which files/code the comment refers to (may need to search)
+2. Read the relevant files to understand context
 3. Plan the specific edit
 
 ### 4. Edit Code and Commit
@@ -85,13 +93,22 @@ scripts/post_reply.py <<'EOF'
 EOF
 ```
 
+For review bodies (submitted with approve/request changes/comment):
+```bash
+scripts/post_reply.py <<'EOF'
+{"pr": "123", "review_id": 101, "name": "Claude", "body": "Your reply"}
+EOF
+```
+Posts as an issue comment (no "reply to review" API). Duplicate detection compares the review's `submitted_at` against issue comments to avoid double-replying.
+
 The script:
 - Adds `[🤖 {name}]:` prefix automatically
 - Prevents double-replies (add `"force": true` to override)
 
 ## Rules
 
-- **Reply to ALL comments** — every thread gets a response
+- **Reply to ALL comments** — every inline thread and top-level comment gets a response
+- **Inline first, then root** — prioritize inline review comments, then address top-level PR comments
 - **Push before replying** — ensures code changes are visible when reviewer reads reply
 - **Plan before editing** — avoids line number drift issues
 - **Never skip unclear comments** — ask for clarification instead

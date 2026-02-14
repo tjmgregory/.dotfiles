@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 #
-# Fetch PR info and all comments (review + issue) with pagination.
+# Fetch PR info and all comments (review + issue + review bodies) with pagination.
 # Usage: fetch_comments.sh <pr_url_or_number>
 #
-# Outputs JSON: { info, review_comments, issue_comments }
-# Review comments have line numbers; issue comments are general PR discussion.
+# Outputs JSON: { info, review_comments, issue_comments, reviews }
+# Review comments have line numbers; issue comments are general PR discussion;
+# reviews are the top-level body submitted with each review (approve/request changes/comment).
 
 set -euo pipefail
 
@@ -64,12 +65,16 @@ REVIEW_COMMENTS=$(gh api --paginate "repos/$OWNER/$REPO/pulls/$PR_NUM/comments" 
 echo "Fetching issue comments..." >&2
 ISSUE_COMMENTS=$(gh api --paginate "repos/$OWNER/$REPO/issues/$PR_NUM/comments" 2>/dev/null || echo "[]")
 
+echo "Fetching reviews..." >&2
+REVIEWS=$(gh api --paginate "repos/$OWNER/$REPO/pulls/$PR_NUM/reviews" 2>/dev/null || echo "[]")
+
 # Output structured JSON
 if command -v jq &>/dev/null; then
     jq -n \
         --argjson info "$INFO" \
         --argjson review_comments "$REVIEW_COMMENTS" \
         --argjson issue_comments "$ISSUE_COMMENTS" \
+        --argjson reviews "$REVIEWS" \
         --arg owner "$OWNER" \
         --arg repo "$REPO" \
         '{
@@ -77,7 +82,8 @@ if command -v jq &>/dev/null; then
             repo: $repo,
             info: $info,
             review_comments: $review_comments,
-            issue_comments: $issue_comments
+            issue_comments: $issue_comments,
+            reviews: [$reviews[] | select(.body != null and .body != "")]
         }'
 else
     echo "=== PR INFO ==="
@@ -88,6 +94,9 @@ else
     echo ""
     echo "=== ISSUE COMMENTS ==="
     echo "$ISSUE_COMMENTS"
+    echo ""
+    echo "=== REVIEWS ==="
+    echo "$REVIEWS"
 fi
 
 echo "Done." >&2

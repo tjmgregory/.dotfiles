@@ -21,12 +21,17 @@ JSON input fields:
     pr/pr_ref: PR number or URL (required)
     comment_id: Review comment ID for inline comments
     issue_comment_id: Issue comment ID for general discussion
+    review_id: Review ID for review body comments (reply posted as issue comment)
     name: Agent name prefix (default: "Claude")
     body: Reply message
     check_only: Boolean, just check if already replied
     force: Boolean, post even if already replied
 
-The script automatically formats replies as: [🤖 {name}]: {body}
+For inline review comments, replies are formatted as: [🤖 {name}]: {body}
+For issue comments and review bodies, replies include a hidden marker and quote:
+    <!-- reply-to: issue_comment:789 -->
+    > first line of original comment...
+    [🤖 {name}]: {body}
 
 Outputs JSON to stdout:
     Success: {"status": "ok", "comment_id": 123, "action": "posted|already_replied|no_reply_found"}
@@ -75,9 +80,31 @@ def parse_pr_reference(pr_ref: str) -> tuple[str, str, str]:
     return remote_match.group(1), remote_match.group(2), pr_ref
 
 
-def format_reply(name: str, body: str) -> str:
-    """Format reply with robot emoji and agent name prefix."""
-    return f"[🤖 {name}]: {body}"
+def reply_to_marker(comment_type: str, comment_id: int) -> str:
+    """Generate a hidden HTML marker linking a reply to its source comment."""
+    return f"<!-- reply-to: {comment_type}:{comment_id} -->"
+
+
+def quote_snippet(text: str, max_len: int = 100) -> str:
+    """Create a short blockquote snippet from comment text."""
+    if not text:
+        return ""
+    # Take first line, truncate if needed
+    first_line = text.strip().split('\n')[0].strip()
+    if len(first_line) > max_len:
+        first_line = first_line[:max_len] + "..."
+    return f"> {first_line}"
+
+
+def format_reply(name: str, body: str, marker: str = "", quote: str = "") -> str:
+    """Format reply with optional marker, quote, and agent name prefix."""
+    parts = []
+    if marker:
+        parts.append(marker)
+    if quote:
+        parts.append(quote)
+    parts.append(f"[🤖 {name}]: {body}")
+    return "\n\n".join(parts)
 
 
 def get_thread_replies(owner: str, repo: str, pr_num: str, comment_id: int) -> list[dict]:
@@ -133,6 +160,51 @@ def post_review_comment_reply(owner: str, repo: str, pr_num: str,
         raise RuntimeError(f"GitHub API error: {error_msg}")
 
 
+def has_reply_marker(owner: str, repo: str, pr_num: str, marker: str) -> bool:
+    """Check if any issue comment contains the given reply-to marker."""
+    cmd = [
+        'gh', 'api', '--paginate',
+        f'repos/{owner}/{repo}/issues/{pr_num}/comments'
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        all_comments = json.loads(result.stdout) if result.stdout else []
+    except subprocess.CalledProcessError:
+        return False
+
+    return any(marker in c.get('body', '') for c in all_comments)
+
+
+def get_issue_comment_body(owner: str, repo: str, pr_num: str,
+                           issue_comment_id: int) -> str:
+    """Fetch the body of a specific issue comment."""
+    cmd = [
+        'gh', 'api',
+        f'repos/{owner}/{repo}/issues/comments/{issue_comment_id}'
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        comment = json.loads(result.stdout) if result.stdout else {}
+        return comment.get('body', '')
+    except subprocess.CalledProcessError:
+        return ""
+
+
+def get_review_body(owner: str, repo: str, pr_num: str,
+                    review_id: int) -> str:
+    """Fetch the body of a specific review."""
+    cmd = [
+        'gh', 'api',
+        f'repos/{owner}/{repo}/pulls/{pr_num}/reviews/{review_id}'
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        review = json.loads(result.stdout) if result.stdout else {}
+        return review.get('body', '')
+    except subprocess.CalledProcessError:
+        return ""
+
+
 def post_issue_comment(owner: str, repo: str, pr_num: str, body: str) -> dict:
     """Post a general issue comment (not inline on code)."""
     cmd = [
@@ -181,6 +253,7 @@ def parse_args():
         args.pr_ref = pr_ref
         args.comment_id = data.get("comment_id")
         args.issue_comment_id = data.get("issue_comment_id")
+        args.review_id = data.get("review_id")
         args.name = data.get("name", "Claude")
         args.body = data.get("body")
         args.check_only = data.get("check_only", False)
@@ -195,9 +268,9 @@ def parse_args():
 def main():
     args = parse_args()
 
-    if not args.comment_id and not args.issue_comment_id:
-        print("Error: Must specify --comment-id or --issue-comment-id", file=sys.stderr)
-        output_json({"error": "Must specify --comment-id or --issue-comment-id"})
+    if not args.comment_id and not args.issue_comment_id and not args.review_id:
+        print("Error: Must specify comment_id, issue_comment_id, or review_id", file=sys.stderr)
+        output_json({"error": "Must specify comment_id, issue_comment_id, or review_id"})
         return 1
 
     if not args.check_only and not args.body:
@@ -212,32 +285,66 @@ def main():
         output_json({"error": str(e)})
         return 1
 
-    # Check for existing agent reply (review comments only - has threading)
+    # Determine comment type, target ID, and marker for duplicate detection
     if args.comment_id:
+        comment_type = "comment"
+        target_id = args.comment_id
+    elif args.issue_comment_id:
+        comment_type = "issue_comment"
+        target_id = args.issue_comment_id
+    elif args.review_id:
+        comment_type = "review"
+        target_id = args.review_id
+    else:
+        comment_type = None
+        target_id = None
+
+    # Check for existing agent reply
+    if comment_type == "comment":
+        # Inline review comments have native threading — check the thread
         thread = get_thread_replies(owner, repo, pr_num, args.comment_id)
-        if has_agent_replied(thread):
-            if args.check_only:
-                print("An agent has already replied to this thread.", file=sys.stderr)
-                output_json({"status": "ok", "action": "already_replied", "comment_id": args.comment_id})
-                return 0
-            if not args.force:
-                print("Error: An agent already replied to this thread. Use --force to reply anyway.",
-                      file=sys.stderr)
-                output_json({"error": "An agent already replied to this thread", "comment_id": args.comment_id})
-                return 3
-            print("Warning: Posting duplicate reply (--force used).", file=sys.stderr)
+        already_replied = has_agent_replied(thread)
+    elif comment_type in ("issue_comment", "review"):
+        # Non-threaded types use a hidden marker for precise detection
+        marker = reply_to_marker(comment_type, target_id)
+        already_replied = has_reply_marker(owner, repo, pr_num, marker)
+    else:
+        already_replied = False
 
+    if already_replied:
         if args.check_only:
-            print("No existing agent reply found.", file=sys.stderr)
-            output_json({"status": "ok", "action": "no_reply_found", "comment_id": args.comment_id})
+            print("An agent has already replied to this thread.", file=sys.stderr)
+            output_json({"status": "ok", "action": "already_replied", "comment_id": target_id})
             return 0
+        if not args.force:
+            print("Error: An agent already replied to this thread. Use --force to reply anyway.",
+                  file=sys.stderr)
+            output_json({"error": "An agent already replied to this thread", "comment_id": target_id})
+            return 3
+        print("Warning: Posting duplicate reply (--force used).", file=sys.stderr)
 
-    # Format the reply with prefix
-    formatted_body = format_reply(args.name, args.body)
+    if args.check_only:
+        print("No existing agent reply found.", file=sys.stderr)
+        output_json({"status": "ok", "action": "no_reply_found", "comment_id": target_id})
+        return 0
+
+    # Build the reply body
+    if comment_type == "comment":
+        # Inline review comments — simple prefix, threading handles context
+        formatted_body = format_reply(args.name, args.body)
+    else:
+        # Non-threaded types — add marker + short quote for context
+        marker = reply_to_marker(comment_type, target_id)
+        if comment_type == "issue_comment":
+            original_body = get_issue_comment_body(owner, repo, pr_num, args.issue_comment_id)
+        else:
+            original_body = get_review_body(owner, repo, pr_num, args.review_id)
+        quote = quote_snippet(original_body)
+        formatted_body = format_reply(args.name, args.body, marker=marker, quote=quote)
 
     # Post the reply
     try:
-        if args.comment_id:
+        if comment_type == "comment":
             response = post_review_comment_reply(owner, repo, pr_num, args.comment_id, formatted_body)
             output_json({
                 "status": "ok",
@@ -250,7 +357,8 @@ def main():
             output_json({
                 "status": "ok",
                 "action": "posted",
-                "comment_id": response.get("id")
+                "comment_id": response.get("id"),
+                "in_reply_to": target_id
             })
         return 0
     except RuntimeError as e:
