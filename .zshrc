@@ -12,6 +12,12 @@ alias dt='d task'
 
 alias cat='bat'
 
+# Inc
+alias kbd='cd ~/knowledge-base'
+alias tsed='cd ~/tse'
+alias pbd='cd ~/personal-brand'
+alias pd='cd ~/projects'
+
 # Git
 alias gl='git pull'
 alias gp='git push'

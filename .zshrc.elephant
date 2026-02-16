@@ -2,7 +2,7 @@ ELEPHANT_DIR="~/work/elephant"
 
 #export USE_ACCESS_TOKEN=true
 
-alias e="cd $ELEPHANT_DIR"
+alias ed="cd $ELEPHANT_DIR"
 alias eaa="cd $ELEPHANT_DIR/api-admin"
 alias eab="cd $ELEPHANT_DIR/api-billing"
 alias eac="cd $ELEPHANT_DIR/api-consultation"
