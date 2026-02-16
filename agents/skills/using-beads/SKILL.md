@@ -100,11 +100,11 @@ Otherwise                        → related
 # Create + link in one command (preferred)
 bd create "Issue title" -t bug -p 1 --deps discovered-from:<parent-id> --json
 
-# Or link separately — direction: bd dep add <prerequisite> <dependent>
-bd dep add A B --type blocks              # A must complete before B
+# Or link separately — direction: bd dep add <dependent> <depends-on>
+bd dep add B A --type blocks              # B is blocked by A (A must complete before B)
 bd dep add B A --type parent-child        # B is subtask of epic A
-bd dep add A B --type discovered-from     # B found while working on A
-bd dep add A B --type related             # Informational link
+bd dep add B A --type discovered-from     # B was discovered while working on A
+bd dep add A B --type related             # Informational link (direction doesn't matter)
 
 # Labels (supports multiple IDs)
 bd label add <id> [<id>...] <label> --json
