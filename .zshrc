@@ -13,7 +13,13 @@ alias dt='d task'
 alias cat='bat'
 
 # Claude
-alias cla='claude --system-prompt "$(cat AGENTS.md)"'
+cla() {
+    if [[ -f AGENTS.md ]]; then
+        claude --system-prompt "$(cat AGENTS.md)" "$@"
+    else
+        claude "$@"
+    fi
+}
 
 # Directories
 alias kbd='cd ~/knowledge-base'
