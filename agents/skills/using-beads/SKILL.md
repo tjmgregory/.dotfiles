@@ -151,10 +151,21 @@ bd create "Migrate consumers" --parent bd-c4d2e1 --json          # → bd-c4d2e1
 bd create "Remove legacy API" --parent bd-c4d2e1 --json          # → bd-c4d2e1.4
 ```
 
+Nesting works to any depth — children of children get `parent.X.Y`:
+
+```bash
+# Decompose a subtask further
+bd create "Migrate users service" --parent bd-c4d2e1.3 --json   # → bd-c4d2e1.3.1
+bd create "Migrate billing service" --parent bd-c4d2e1.3 --json # → bd-c4d2e1.3.2
+```
+
+The ID `bd-c4d2e1.3.2` reads naturally: epic `c4d2e1`, phase 3, sub-part 2.
+
 Benefits:
 - **Visual ordering**: `.1`, `.2`, `.3` shows the natural sequence of work
 - **Grouping**: all children sort together under their parent
-- **Context at a glance**: `bd-c4d2e1.3` immediately tells you it's part 3 of `bd-c4d2e1`
+- **Context at a glance**: `bd-c4d2e1.3.2` immediately tells you epic → phase 3 → part 2
+- **Arbitrary depth**: decompose as finely as the work demands
 
 Use `bd children <parent-id> --json` to list children, or `bd dep tree <parent-id>` for the full hierarchy.
 
