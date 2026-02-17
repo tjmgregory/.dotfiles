@@ -34,24 +34,27 @@ Go through the diff **file by file**. For each changed file:
 Build up a list of inline comments as you go. Each comment needs:
 - `path`: the file path
 - `line`: the line number in the **new version** of the file (the `+` lines in the diff)
-- `body`: your comment, prefixed with `[Claude]:`
+- `body`: your comment (the script auto-prefixes with `[🤖 Reviewer - <model>]:`)
+
+**Do NOT manually add a prefix** — the `post_review.py` script injects `[🤖 {role} - {model}]:` automatically.
 
 ### 3. Post Inline Comments
 
-Submit all inline comments in a single review:
+Submit all inline comments in a single review via JSON stdin. Pass `role` and `model` so the script auto-prefixes each comment:
 
 ```bash
-scripts/post_review.py <pr_url_or_number> \
-  --event COMMENT \
-  --comments-file /tmp/comments.json
-```
-
-The comments file format:
-```json
-[
-  {"path": "src/auth.ts", "line": 42, "body": "[Claude]: This null check won't catch undefined"},
-  {"path": "src/api.ts", "line": 18, "body": "[Claude]: SQL injection risk—use parameterized query"}
-]
+scripts/post_review.py <<'EOF'
+{
+  "pr": "<pr_url_or_number>",
+  "event": "COMMENT",
+  "role": "Reviewer",
+  "model": "<your model name>",
+  "comments": [
+    {"path": "src/auth.ts", "line": 42, "body": "This null check won't catch undefined"},
+    {"path": "src/api.ts", "line": 18, "body": "SQL injection risk—use parameterized query"}
+  ]
+}
+EOF
 ```
 
 **Review events:**
@@ -66,28 +69,33 @@ The comments file format:
 ### 4. Reply to Existing Threads
 
 **First, check for threads awaiting your input.** Look for:
-- Threads where the last comment mentions Claude or asks a question
-- Threads where someone replied to a previous `[Claude]:` comment
+- Threads where the last comment mentions the reviewer or asks a question
+- Threads where someone replied to a previous `[🤖` prefixed comment
 - Unresolved discussions that could benefit from technical input
 
 **Then, avoid double-replying.** Before replying to any thread:
-1. Check if any comment in that thread starts with `[Claude]:`
-2. If Claude already replied AND no one asked a follow-up → skip
-3. If someone replied after Claude's comment → consider responding
+1. Check if any comment in that thread starts with `[🤖`
+2. If an agent already replied AND no one asked a follow-up → skip
+3. If someone replied after the agent's comment → consider responding
 
 | Thread state | Action |
 |--------------|--------|
-| Question directed at Claude | Reply |
-| Follow-up after Claude's comment | Reply if asked or helpful |
-| Claude already replied, no follow-up | Skip |
+| Question directed at agent | Reply |
+| Follow-up after agent's comment | Reply if asked or helpful |
+| Agent already replied, no follow-up | Skip |
 | Resolved/agreed | Skip |
 
-Reply to each thread individually:
+Reply to each thread individually (the script auto-prefixes the body):
 ```bash
-scripts/post_review.py <pr_url_or_number> \
-  --reply-to <comment_id> \
-  --body "[Claude]: Your reply here" \
-  --event COMMENT
+scripts/post_review.py <<'EOF'
+{
+  "pr": "<pr_url_or_number>",
+  "reply_to": <comment_id>,
+  "role": "Reviewer",
+  "model": "<your model name>",
+  "body": "Your reply here"
+}
+EOF
 ```
 
 ### 5. Verify
@@ -99,11 +107,11 @@ gh pr view <pr_number> --comments
 
 ## Writing Inline Comments
 
-**Prefix with `[Claude]:`** — identifies automated feedback.
+The `post_review.py` script **automatically prefixes** each comment with `[🤖 Reviewer - <model>]:`. Write comment bodies without any prefix.
 
 **Be specific** — reference the exact issue and suggest a fix:
 ```
-[Claude]: This could throw if `user` is null. Consider:
+This could throw if `user` is null. Consider:
 ```suggestion
 if (user?.email) {
 ```
@@ -111,15 +119,15 @@ if (user?.email) {
 
 **Prioritize** — distinguish blockers from suggestions:
 ```
-[Claude]: Blocker: This exposes the API key in logs.
+Blocker: This exposes the API key in logs.
 ```
 ```
-[Claude]: Nit: Could rename to `fetchUserData` for clarity.
+Nit: Could rename to `fetchUserData` for clarity.
 ```
 
 **Ask questions** when intent is unclear:
 ```
-[Claude]: What happens if this returns an empty array? Should we handle that case?
+What happens if this returns an empty array? Should we handle that case?
 ```
 
 See [references/comment-templates.md](references/comment-templates.md) for more templates.
@@ -137,7 +145,7 @@ See [references/comment-templates.md](references/comment-templates.md) for more 
 - **Inline comments are primary** — put feedback on specific lines, not in summary
 - **One review submission** — batch all new comments together
 - **Reply individually** — each thread reply is a separate call
-- **Never double-comment** — before posting, check existing comments for `[Claude]:` on the same path/line
-- **Never double-reply** — before replying, check if Claude already replied to that thread
-- **Prioritize awaiting threads** — respond to threads where someone asked Claude a question or replied to Claude
+- **Never double-comment** — before posting, check existing comments for `[🤖` prefix on the same path/line
+- **Never double-reply** — before replying, check if an agent already replied to that thread (look for `[🤖` prefix)
+- **Prioritize awaiting threads** — respond to threads where someone asked a question or replied to an agent comment
 - **Read before commenting** — understand context before critiquing

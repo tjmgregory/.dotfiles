@@ -22,16 +22,18 @@ JSON input fields:
     comment_id: Review comment ID for inline comments
     issue_comment_id: Issue comment ID for general discussion
     review_id: Review ID for review body comments (reply posted as issue comment)
-    name: Agent name prefix (default: "Claude")
+    role: Agent role prefix (default: "Author")
+    model: Model name for prefix (default: "Claude")
+    name: Deprecated — used as fallback if role/model not provided
     body: Reply message
     check_only: Boolean, just check if already replied
     force: Boolean, post even if already replied
 
-For inline review comments, replies are formatted as: [🤖 {name}]: {body}
+For inline review comments, replies are formatted as: [🤖 {role} - {model}]: {body}
 For issue comments and review bodies, replies include a hidden marker and quote:
     <!-- reply-to: issue_comment:789 -->
     > first line of original comment...
-    [🤖 {name}]: {body}
+    [🤖 {role} - {model}]: {body}
 
 Outputs JSON to stdout:
     Success: {"status": "ok", "comment_id": 123, "action": "posted|already_replied|no_reply_found"}
@@ -96,14 +98,18 @@ def quote_snippet(text: str, max_len: int = 100) -> str:
     return f"> {first_line}"
 
 
-def format_reply(name: str, body: str, marker: str = "", quote: str = "") -> str:
-    """Format reply with optional marker, quote, and agent name prefix."""
+def format_reply(role: str, model: str | None, body: str, marker: str = "", quote: str = "") -> str:
+    """Format reply with optional marker, quote, and agent prefix."""
     parts = []
     if marker:
         parts.append(marker)
     if quote:
         parts.append(quote)
-    parts.append(f"[🤖 {name}]: {body}")
+    if model:
+        parts.append(f"[🤖 {role} - {model}]: {body}")
+    else:
+        # Legacy fallback: role is the full name (e.g. "Claude")
+        parts.append(f"[🤖 {role}]: {body}")
     return "\n\n".join(parts)
 
 
@@ -254,7 +260,15 @@ def parse_args():
         args.comment_id = data.get("comment_id")
         args.issue_comment_id = data.get("issue_comment_id")
         args.review_id = data.get("review_id")
-        args.name = data.get("name", "Claude")
+        # role/model preferred; fall back to legacy "name" field
+        legacy_name = data.get("name")
+        if legacy_name and not data.get("role") and not data.get("model"):
+            # Backward compat: use name as-is in the old format
+            args.role = legacy_name
+            args.model = None
+        else:
+            args.role = data.get("role", "Author")
+            args.model = data.get("model", "Claude")
         args.body = data.get("body")
         args.check_only = data.get("check_only", False)
         args.force = data.get("force", False)
@@ -331,7 +345,7 @@ def main():
     # Build the reply body
     if comment_type == "comment":
         # Inline review comments — simple prefix, threading handles context
-        formatted_body = format_reply(args.name, args.body)
+        formatted_body = format_reply(args.role, args.model, args.body)
     else:
         # Non-threaded types — add marker + short quote for context
         marker = reply_to_marker(comment_type, target_id)
@@ -340,7 +354,7 @@ def main():
         else:
             original_body = get_review_body(owner, repo, pr_num, args.review_id)
         quote = quote_snippet(original_body)
-        formatted_body = format_reply(args.name, args.body, marker=marker, quote=quote)
+        formatted_body = format_reply(args.role, args.model, args.body, marker=marker, quote=quote)
 
     # Post the reply
     try:

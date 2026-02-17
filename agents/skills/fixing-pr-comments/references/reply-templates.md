@@ -1,6 +1,6 @@
 # Reply Templates
 
-The `post_reply.py` script automatically adds `[🤖 {name}]:` prefix. These templates show only the message body to pass via `--body`.
+The `post_reply.py` script automatically adds `[🤖 {role} - {model}]:` prefix (e.g. `[🤖 Author - Opus 4.6]:`). These templates show only the message body to pass via `body`.
 
 ## Assessment Categories
 

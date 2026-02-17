@@ -2,28 +2,16 @@
 """
 Post a GitHub PR review with inline comments. Summary body is optional.
 
-Usage (CLI args):
-    # Inline comments only (preferred)
-    post_review.py <pr> --event COMMENT --comments-file comments.json
-
-    # With optional summary
-    post_review.py <pr> --event COMMENT --comments-file comments.json --body "Optional summary"
-
-    # Reply to existing thread
-    post_review.py <pr> --reply-to 123456 --body "Your reply"
-
-    # Approve/request changes
-    post_review.py <pr> --event APPROVE
-    post_review.py <pr> --event REQUEST_CHANGES --body "Blocking issues" --comments-file comments.json
-
-Usage (JSON stdin - preferred for AI agents):
+Usage (JSON via stdin):
     post_review.py <<'EOF'
     {
         "pr": "123",
         "event": "COMMENT",
+        "role": "Reviewer",
+        "model": "Opus 4.6",
         "body": "Optional summary",
         "comments": [
-            {"path": "src/file.ts", "line": 42, "body": "[Claude]: Your comment"}
+            {"path": "src/file.ts", "line": 42, "body": "Your comment"}
         ]
     }
     EOF
@@ -34,6 +22,8 @@ JSON input fields:
     body: Review summary body (optional)
     comments: Array of inline comments (optional)
     reply_to: Comment ID to reply to (alternative to posting review)
+    role: Agent role prefix (default: "Reviewer")
+    model: Model name for prefix (default: "Claude")
 
 Outputs JSON to stdout:
     Success: {"status": "ok", "review_id": 123, "action": "posted|replied"}
@@ -46,17 +36,22 @@ Exit codes:
     3 - JSON parsing error
 """
 
-import argparse
 import json
 import subprocess
 import sys
 import re
-from pathlib import Path
 
 
 def output_json(data: dict) -> None:
     """Output structured JSON to stdout."""
     print(json.dumps(data))
+
+
+def add_prefix(body: str, role: str, model: str) -> str:
+    """Add [🤖 {role} - {model}]: prefix to body if not already prefixed."""
+    if body.strip().startswith("[🤖"):
+        return body
+    return f"[🤖 {role} - {model}]: {body}"
 
 
 def parse_pr_reference(pr_ref: str) -> tuple[str, str, str]:
@@ -219,55 +214,39 @@ def reply_to_comment(owner: str, repo: str, pr_num: str,
 
 
 def parse_args():
-    """Parse arguments from stdin JSON or CLI args."""
-    # Check for JSON input via stdin (AI-friendly mode)
-    if not sys.stdin.isatty():
-        try:
-            data = json.load(sys.stdin)
-            pr_ref = data.get("pr") or data.get("pr_ref")
+    """Parse arguments from stdin JSON."""
+    if sys.stdin.isatty():
+        print("Error: This script requires JSON input via stdin", file=sys.stderr)
+        print("Usage: post_review.py <<'EOF'", file=sys.stderr)
+        print('{"pr": "123", "event": "COMMENT", "comments": [...]}', file=sys.stderr)
+        print("EOF", file=sys.stderr)
+        output_json({"error": "This script requires JSON input via stdin"})
+        sys.exit(1)
 
-            # Validate required fields
-            if not pr_ref:
-                print("Error: Missing required field 'pr' or 'pr_ref'", file=sys.stderr)
-                output_json({"error": "Missing required field 'pr' or 'pr_ref'"})
-                sys.exit(1)
+    try:
+        data = json.load(sys.stdin)
+        pr_ref = data.get("pr") or data.get("pr_ref")
 
-            # Create a namespace object to match argparse interface
-            class Args:
-                pass
-            args = Args()
-            args.pr_ref = pr_ref
-            args.body = data.get("body", "")
-            args.event = data.get("event")
-            args.comments = data.get("comments")  # Direct array, not file path
-            args.comments_file = None  # Not used in stdin mode
-            args.reply_to = data.get("reply_to")
-            return args
-        except json.JSONDecodeError as e:
-            print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
-            output_json({"error": f"Invalid JSON input: {e}"})
+        if not pr_ref:
+            print("Error: Missing required field 'pr' or 'pr_ref'", file=sys.stderr)
+            output_json({"error": "Missing required field 'pr' or 'pr_ref'"})
             sys.exit(1)
 
-    # Fallback to CLI args (human-friendly mode)
-    parser = argparse.ArgumentParser(
-        description='Post a GitHub PR review with proper error handling.',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
-    )
-
-    parser.add_argument('pr_ref', help='PR number or full GitHub PR URL')
-    parser.add_argument('--body', default='', help='Review summary body (optional for inline-only reviews)')
-    parser.add_argument('--event',
-                        choices=['APPROVE', 'REQUEST_CHANGES', 'COMMENT'],
-                        help='Review event type')
-    parser.add_argument('--comments-file', type=Path,
-                        help='JSON file containing inline comments')
-    parser.add_argument('--reply-to', type=int,
-                        help='Comment ID to reply to (instead of posting review)')
-
-    args = parser.parse_args()
-    args.comments = None  # Will be loaded from file if provided
-    return args
+        class Args:
+            pass
+        args = Args()
+        args.pr_ref = pr_ref
+        args.body = data.get("body", "")
+        args.event = data.get("event")
+        args.comments = data.get("comments")
+        args.reply_to = data.get("reply_to")
+        args.role = data.get("role", "Reviewer")
+        args.model = data.get("model", "Claude")
+        return args
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+        output_json({"error": f"Invalid JSON input: {e}"})
+        sys.exit(1)
 
 
 def main():
@@ -284,11 +263,12 @@ def main():
     # Handle reply mode
     if args.reply_to:
         if not args.body:
-            print("Error: --body is required when using --reply-to", file=sys.stderr)
-            output_json({"error": "--body is required when using --reply-to"})
+            print("Error: 'body' is required when using reply_to", file=sys.stderr)
+            output_json({"error": "'body' is required when using reply_to"})
             return 1
         try:
-            response = reply_to_comment(owner, repo, pr_num, args.reply_to, args.body)
+            body = add_prefix(args.body, args.role, args.model)
+            response = reply_to_comment(owner, repo, pr_num, args.reply_to, body)
             output_json({
                 "status": "ok",
                 "action": "replied",
@@ -302,32 +282,21 @@ def main():
 
     # Validate event is provided for non-reply mode
     if not args.event:
-        print("Error: --event is required (unless using --reply-to)", file=sys.stderr)
-        output_json({"error": "--event is required (unless using --reply-to)"})
+        print("Error: 'event' is required (unless using reply_to)", file=sys.stderr)
+        output_json({"error": "'event' is required (unless using reply_to)"})
         return 1
 
-    # Load comments from file if provided (CLI mode only)
     comments = args.comments
-    if args.comments_file:
-        if not args.comments_file.exists():
-            print(f"Error: Comments file not found: {args.comments_file}", file=sys.stderr)
-            output_json({"error": f"Comments file not found: {args.comments_file}"})
-            return 1
 
-        try:
-            comments = json.loads(args.comments_file.read_text())
-            if not isinstance(comments, list):
-                print("Error: Comments file must contain a JSON array", file=sys.stderr)
-                output_json({"error": "Comments file must contain a JSON array"})
-                return 3
-        except json.JSONDecodeError as e:
-            print(f"Error parsing comments file: {e}", file=sys.stderr)
-            output_json({"error": f"Error parsing comments file: {e}"})
-            return 3
+    # Auto-prefix comment bodies and review body
+    if comments:
+        for comment in comments:
+            comment['body'] = add_prefix(comment['body'], args.role, args.model)
+    body = add_prefix(args.body, args.role, args.model) if args.body else args.body
 
     # Post the review
     try:
-        response = post_review(owner, repo, pr_num, args.body, args.event, comments)
+        response = post_review(owner, repo, pr_num, body, args.event, comments)
         output_json({
             "status": "ok",
             "action": "posted",

@@ -82,27 +82,27 @@ Keep summary brief — one line per change made.
 For review comments (inline on code):
 ```bash
 scripts/post_reply.py <<'EOF'
-{"pr": "123", "comment_id": 456, "name": "Claude", "body": "Your reply"}
+{"pr": "123", "comment_id": 456, "role": "Author", "model": "<your model name>", "body": "Your reply"}
 EOF
 ```
 
 For issue comments (general discussion):
 ```bash
 scripts/post_reply.py <<'EOF'
-{"pr": "123", "issue_comment_id": 789, "name": "Claude", "body": "Your reply"}
+{"pr": "123", "issue_comment_id": 789, "role": "Author", "model": "<your model name>", "body": "Your reply"}
 EOF
 ```
 
 For review bodies (submitted with approve/request changes/comment):
 ```bash
 scripts/post_reply.py <<'EOF'
-{"pr": "123", "review_id": 101, "name": "Claude", "body": "Your reply"}
+{"pr": "123", "review_id": 101, "role": "Author", "model": "<your model name>", "body": "Your reply"}
 EOF
 ```
 Posts as an issue comment (no "reply to review" API). Duplicate detection compares the review's `submitted_at` against issue comments to avoid double-replying.
 
 The script:
-- Adds `[🤖 {name}]:` prefix automatically
+- Adds `[🤖 {role} - {model}]:` prefix automatically
 - Prevents double-replies (add `"force": true` to override)
 
 ## Rules

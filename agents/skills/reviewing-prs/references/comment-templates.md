@@ -1,12 +1,12 @@
 # Comment Templates
 
-Use these templates for consistent, well-structured review comments. Always prefix with `[Claude]:`.
+Templates for consistent, well-structured review comments. The `post_review.py` script **automatically adds** `[🤖 Reviewer - <model>]:` prefix — write comment bodies without it. These templates show the final rendered format for reference.
 
 ## Reporting Issues
 
 **Bug or logic error:**
 ```
-[Claude]: This could cause [problem] when [condition]. Consider:
+[🤖 Reviewer - <model>]: This could cause [problem] when [condition]. Consider:
 ```suggestion
 [fixed code]
 ```
@@ -14,7 +14,7 @@ Use these templates for consistent, well-structured review comments. Always pref
 
 **Security concern:**
 ```
-[Claude]: Security: [vulnerability type] risk here. [Explanation of attack vector]. Fix:
+[🤖 Reviewer - <model>]: Security: [vulnerability type] risk here. [Explanation of attack vector]. Fix:
 ```suggestion
 [secure code]
 ```
@@ -22,63 +22,63 @@ Use these templates for consistent, well-structured review comments. Always pref
 
 **Performance issue:**
 ```
-[Claude]: Performance: [operation] is O(n^2) due to [reason]. Consider [alternative approach].
+[🤖 Reviewer - <model>]: Performance: [operation] is O(n^2) due to [reason]. Consider [alternative approach].
 ```
 
 ## Asking Questions
 
 **Clarifying intent:**
 ```
-[Claude]: What happens if [edge case]? Should this handle [scenario]?
+[🤖 Reviewer - <model>]: What happens if [edge case]? Should this handle [scenario]?
 ```
 
 **Understanding design:**
 ```
-[Claude]: Is [pattern] intentional here? It differs from [other_file] which uses [other_pattern].
+[🤖 Reviewer - <model>]: Is [pattern] intentional here? It differs from [other_file] which uses [other_pattern].
 ```
 
 ## Suggestions
 
 **Optional improvement:**
 ```
-[Claude]: Optional: [improvement] would [benefit].
+[🤖 Reviewer - <model>]: Optional: [improvement] would [benefit].
 ```
 
 **Refactoring suggestion:**
 ```
-[Claude]: Consider extracting [logic] into a helper—it's duplicated in [other_location].
+[🤖 Reviewer - <model>]: Consider extracting [logic] into a helper—it's duplicated in [other_location].
 ```
 
 ## Minor Feedback
 
 **Style nit:**
 ```
-[Claude]: Nit: [observation]
+[🤖 Reviewer - <model>]: Nit: [observation]
 ```
 
 **Naming suggestion:**
 ```
-[Claude]: Nit: `[current_name]` might be clearer as `[suggested_name]` since it [reason].
+[🤖 Reviewer - <model>]: Nit: `[current_name]` might be clearer as `[suggested_name]` since it [reason].
 ```
 
 ## Thread Replies
 
 **Agreeing with a point:**
 ```
-[Claude]: +1 — [brief reason why this is a good point]
+[🤖 Reviewer - <model>]: +1 — [brief reason why this is a good point]
 ```
 
 **Adding context:**
 ```
-[Claude]: To add context: [relevant information about the code/pattern]
+[🤖 Reviewer - <model>]: To add context: [relevant information about the code/pattern]
 ```
 
 **Answering a question:**
 ```
-[Claude]: [Direct answer]. This is because [explanation]. See [reference] for more details.
+[🤖 Reviewer - <model>]: [Direct answer]. This is because [explanation]. See [reference] for more details.
 ```
 
 **Respectful disagreement:**
 ```
-[Claude]: I see it differently — [alternative perspective]. [Supporting reasoning]. What do you think?
+[🤖 Reviewer - <model>]: I see it differently — [alternative perspective]. [Supporting reasoning]. What do you think?
 ```
