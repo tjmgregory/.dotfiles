@@ -26,6 +26,98 @@ Graph-based issue tracker that survives conversation compaction. Use `bd <comman
 
 Sync is handled automatically by the daemon — never run `bd sync` manually.
 
+## Planning & Decomposition
+
+**Think before creating.** Survey the landscape to avoid overlap and understand context:
+
+```bash
+# 1. Check what already exists
+bd list --status open --json                         # All open work
+bd search "<topic>" --status open --json             # Existing work in this area
+bd list --label-any <relevant-labels> --json         # Related by label
+
+# 2. Build an external-ref map to detect overlap
+bd list --status open --json | jq -r '.[] | select(.external_ref != null) | "\(.id)\t\(.external_ref)\t\(.title)"'
+```
+
+**Before creating a ticket, verify**:
+- No open bead already covers this work (`bd search`)
+- No existing bead shares the same `--external-ref` (same requirement = same ticket)
+- The scope is right — not so broad it should be an epic, not so narrow it should be a comment
+
+**Splitting heuristics**:
+- Can it be completed in one session? → single ticket
+- Does it have 2+ independent deliverables? → epic with children
+- Does step N block step N+1? → separate tickets with `blocks` deps
+- Is it a different concern discovered mid-work? → `discovered-from`, not a child
+
+### Decomposing Epics
+
+1. Create the epic with clear acceptance criteria for the *whole* outcome
+2. Split into children using `--parent` — they get `parent.X` IDs ordered by sequence
+3. Add `blocks` deps between children where order is enforced, not just preferred
+4. Set `--external-ref` on each child that traces to a specific requirement or use case
+5. Verify: no two children share an external ref (overlap signal), every external ref from the parent's scope is covered (completeness signal)
+
+```bash
+# Epic with ordered subtasks (parent.X naming)
+bd create "API Migration" -t epic -p 1 --json                    # → bd-c4d2e1
+bd create "Audit existing endpoints" --parent bd-c4d2e1 --json   # → bd-c4d2e1.1
+bd create "Write adapter layer" --parent bd-c4d2e1 --json        # → bd-c4d2e1.2
+bd create "Migrate consumers" --parent bd-c4d2e1 --json          # → bd-c4d2e1.3
+bd create "Remove legacy API" --parent bd-c4d2e1 --json          # → bd-c4d2e1.4
+```
+
+Nesting works to any depth — children of children get `parent.X.Y`:
+
+```bash
+# Decompose a subtask further
+bd create "Migrate users service" --parent bd-c4d2e1.3 --json   # → bd-c4d2e1.3.1
+bd create "Migrate billing service" --parent bd-c4d2e1.3 --json # → bd-c4d2e1.3.2
+```
+
+The ID `bd-c4d2e1.3.2` reads naturally: epic `c4d2e1`, phase 3, sub-part 2.
+
+Benefits:
+- **Visual ordering**: `.1`, `.2`, `.3` shows the natural sequence of work
+- **Grouping**: all children sort together under their parent
+- **Context at a glance**: `bd-c4d2e1.3.2` immediately tells you epic → phase 3 → part 2
+- **Arbitrary depth**: decompose as finely as the work demands
+
+Use `bd children <parent-id> --json` to list children, or `bd dep tree <parent-id>` for the full hierarchy.
+
+### Issue Content & Traceability
+
+| Field | Purpose | Example |
+|-------|---------|---------|
+| Title | Clear, specific, action-oriented | "Fix: auth token expires before refresh" |
+| Description (`-d`) | Problem + impact + context | "Token expires mid-session causing data loss for users on slow connections" |
+| Design (`--design`) | Implementation approach (HOW) | "Use JWT with 1hr expiry, RS256 for rotation" |
+| Acceptance (`--acceptance`) | Success criteria (WHAT) | "Tokens persist across sessions; refresh triggers before expiry" |
+| Notes (`--notes`) | Supplementary context, research findings | "See RFC 7519 §4.1 for registered claims" |
+| External ref (`--external-ref`) | Traceability to external systems | `gh-42`, `jira-AUTH-123`, `linear-ENG-456` |
+| Comments | Progress notes, session handoffs | "Found root cause in validate()" |
+
+**Writing good descriptions**: State the problem, its impact, and enough context to act on it. Bad: "Auth is broken". Good: "Token expires before refresh window, causing 401s for users mid-session. Affects ~12% of requests over 45min."
+
+**Design vs acceptance**: Design can change; acceptance should stay stable. If you rewrote the solution differently, would the criteria still apply? If not, it's a design note.
+
+**Traceability**: Link every issue to its origin. Use `--external-ref` for requirements, use cases, or tickets from external systems. Use `--deps discovered-from:<id>` for issues found while working on another bead. The goal: any issue can be traced back to *why* it exists.
+
+```bash
+# Full example with traceability
+bd create "Fix token refresh race condition" \
+  -t bug -p 1 \
+  -d "Token expires before refresh window, causing 401s mid-session" \
+  --acceptance "No 401s during active sessions; refresh triggers 5min before expiry" \
+  --design "Add refresh buffer to token lifecycle; use sliding window" \
+  --external-ref "gh-87" \
+  --deps discovered-from:bd-a3f8e9.2 \
+  --json
+```
+
+For complex multi-session work, add comments with enough context for a fresh Claude to resume — working code, API response samples, desired output format, research context.
+
 ## Find Work
 
 ```bash
@@ -115,6 +207,8 @@ bd label remove <id> [<id>...] <label> --json
 
 **Don't use blocks for preferences** ("should do X first"). Use `related` or note it in the description. Closing a blocking issue automatically unblocks dependents.
 
+**Traceability through deps**: `discovered-from` creates a provenance chain — trace any bug back to the work that uncovered it. Combine with `--external-ref` for full traceability from external requirement → bead → child beads → discovered work.
+
 ## Filtering & Search
 
 ```bash
@@ -136,52 +230,7 @@ Types: `bug`, `feature`, `task`, `epic`, `chore`
 
 Priorities: `0` critical, `1` high, `2` medium, `3` low, `4` backlog
 
-## Patterns
-
-### Child Ticket Naming (`parent.X`)
-
-When breaking work into subtasks, **always** use the `parent.X` naming convention. Children of `bd-a3f8e9` become `bd-a3f8e9.1`, `bd-a3f8e9.2`, etc. This keeps related work visually grouped and ordered when listing tickets.
-
-```bash
-# Break an epic into ordered subtasks
-bd create "API Migration" -t epic -p 1 --json                    # → bd-c4d2e1
-bd create "Audit existing endpoints" --parent bd-c4d2e1 --json   # → bd-c4d2e1.1
-bd create "Write adapter layer" --parent bd-c4d2e1 --json        # → bd-c4d2e1.2
-bd create "Migrate consumers" --parent bd-c4d2e1 --json          # → bd-c4d2e1.3
-bd create "Remove legacy API" --parent bd-c4d2e1 --json          # → bd-c4d2e1.4
-```
-
-Nesting works to any depth — children of children get `parent.X.Y`:
-
-```bash
-# Decompose a subtask further
-bd create "Migrate users service" --parent bd-c4d2e1.3 --json   # → bd-c4d2e1.3.1
-bd create "Migrate billing service" --parent bd-c4d2e1.3 --json # → bd-c4d2e1.3.2
-```
-
-The ID `bd-c4d2e1.3.2` reads naturally: epic `c4d2e1`, phase 3, sub-part 2.
-
-Benefits:
-- **Visual ordering**: `.1`, `.2`, `.3` shows the natural sequence of work
-- **Grouping**: all children sort together under their parent
-- **Context at a glance**: `bd-c4d2e1.3.2` immediately tells you epic → phase 3 → part 2
-- **Arbitrary depth**: decompose as finely as the work demands
-
-Use `bd children <parent-id> --json` to list children, or `bd dep tree <parent-id>` for the full hierarchy.
-
-### Issue Creation Fields
-
-| Field | Purpose | Example |
-|-------|---------|---------|
-| Title | Clear, specific, action-oriented | "Fix: auth token expires before refresh" |
-| Description (`-d`) | Problem statement and context | Why this matters, what's broken |
-| Design (`--design`) | Implementation approach (HOW) | "Use JWT with 1hr expiry, RS256 for rotation" |
-| Acceptance (`--acceptance`) | Success criteria (WHAT) | "Tokens persist across sessions" |
-| Comments | Progress notes, session handoffs | "Found root cause in validate()" |
-
-**Design vs acceptance**: Design can change; acceptance should stay stable. If you rewrote the solution differently, would the criteria still apply? If not, it's a design note.
-
-For complex multi-session work, add comments with enough context for a fresh Claude to resume — working code, API response samples, desired output format, research context.
+## Workflow Patterns
 
 ### Status Transitions
 
@@ -226,8 +275,8 @@ bd close bd-41 bd-42 bd-43 --reason "Batch completion" --json
 bd label add bd-41 bd-42 bd-43 urgent --json
 ```
 
-## Resources
+## References
 
 | Resource | When to read |
 |----------|-------------|
-| [TROUBLESHOOTING.md](resources/TROUBLESHOOTING.md) | Dependencies or status updates not working |
+| [TROUBLESHOOTING.md](references/TROUBLESHOOTING.md) | Dependencies or status updates not working |
