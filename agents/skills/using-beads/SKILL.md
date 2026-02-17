@@ -41,9 +41,11 @@ bd stale --days 30 --json                                 # Not updated recently
 bd create "Issue title" -t bug|feature|task -p 0-4 -d "Description" --json
 bd create "Issue title" -t bug -p 1 -l bug,critical --json    # With labels
 
-# Epics with hierarchical children
+# Epics with hierarchical children (parent.X naming)
 bd create "Auth System" -t epic -p 1 --json         # Returns: bd-a3f8e9
-bd create "Login UI" -p 1 --json                     # Auto-assigned: bd-a3f8e9.1
+bd create "Login UI" -p 1 --parent bd-a3f8e9 --json              # → bd-a3f8e9.1
+bd create "Session Management" -p 1 --parent bd-a3f8e9 --json    # → bd-a3f8e9.2
+bd create "Password Reset" -p 1 --parent bd-a3f8e9 --json        # → bd-a3f8e9.3
 
 # Create and link discovered work (one command)
 bd create "Found bug" -t bug -p 1 --deps discovered-from:<parent-id> --json
@@ -135,6 +137,26 @@ Types: `bug`, `feature`, `task`, `epic`, `chore`
 Priorities: `0` critical, `1` high, `2` medium, `3` low, `4` backlog
 
 ## Patterns
+
+### Child Ticket Naming (`parent.X`)
+
+When breaking work into subtasks, **always** use the `parent.X` naming convention. Children of `bd-a3f8e9` become `bd-a3f8e9.1`, `bd-a3f8e9.2`, etc. This keeps related work visually grouped and ordered when listing tickets.
+
+```bash
+# Break an epic into ordered subtasks
+bd create "API Migration" -t epic -p 1 --json                    # → bd-c4d2e1
+bd create "Audit existing endpoints" --parent bd-c4d2e1 --json   # → bd-c4d2e1.1
+bd create "Write adapter layer" --parent bd-c4d2e1 --json        # → bd-c4d2e1.2
+bd create "Migrate consumers" --parent bd-c4d2e1 --json          # → bd-c4d2e1.3
+bd create "Remove legacy API" --parent bd-c4d2e1 --json          # → bd-c4d2e1.4
+```
+
+Benefits:
+- **Visual ordering**: `.1`, `.2`, `.3` shows the natural sequence of work
+- **Grouping**: all children sort together under their parent
+- **Context at a glance**: `bd-c4d2e1.3` immediately tells you it's part 3 of `bd-c4d2e1`
+
+Use `bd children <parent-id> --json` to list children, or `bd dep tree <parent-id>` for the full hierarchy.
 
 ### Issue Creation Fields
 
