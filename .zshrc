@@ -12,7 +12,10 @@ alias dt='d task'
 
 alias cat='bat'
 
-# Inc
+# Claude
+alias cla='claude --system-prompt "$(cat AGENTS.md)"'
+
+# Directories
 alias kbd='cd ~/knowledge-base'
 alias tsed='cd ~/tse'
 alias pbd='cd ~/personal-brand'
