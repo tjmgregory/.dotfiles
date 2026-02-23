@@ -7,7 +7,7 @@ description: Addresses GitHub PR review comments by assessing each one, making c
 
 Address PR review comments: assess validity, make changes, reply to each thread.
 
-**Process**: Fetch comments → Assess each → Plan edits → Edit code → Commit → Push → Update PR → Reply to all
+**Process**: Fetch comments → Assess each → Plan edits → Edit code → Commit → Push → Reply to all
 
 ## Workflow
 
@@ -67,17 +67,7 @@ git commit -m "Address PR review comments"
 git push
 ```
 
-### 6. Update PR Description
-
-```bash
-scripts/update_pr_description.py <<'EOF'
-{"pr": "123", "summary": "- Fixed X\n- Added Y"}
-EOF
-```
-
-Keep summary brief — one line per change made.
-
-### 7. Reply to Each Thread
+### 6. Reply to Each Thread
 
 For review comments (inline on code):
 ```bash
