@@ -100,6 +100,8 @@ Use `bd children <parent-id> --json` to list children, or `bd dep tree <parent-i
 
 **Writing good descriptions**: State the problem, its impact, and enough context to act on it. Bad: "Auth is broken". Good: "Token expires before refresh window, causing 401s for users mid-session. Affects ~12% of requests over 45min."
 
+**Formatting**: Use fenced code blocks for directory trees, file structures, or any indented content in descriptions — plain indentation does not render correctly in most viewers.
+
 **Design vs acceptance**: Design can change; acceptance should stay stable. If you rewrote the solution differently, would the criteria still apply? If not, it's a design note.
 
 **Traceability**: Link every issue to its origin. Use `--external-ref` for requirements, use cases, or tickets from external systems. Use `--deps discovered-from:<id>` for issues found while working on another bead. The goal: any issue can be traced back to *why* it exists.
