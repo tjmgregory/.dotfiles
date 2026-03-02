@@ -102,5 +102,6 @@
       ]
     }
   },
-  "effortLevel": "medium"
+  "effortLevel": "medium",
+  "skipDangerousModePermissionPrompt": true
 }

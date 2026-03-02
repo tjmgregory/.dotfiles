@@ -1,5 +1,6 @@
 .specstory/
 .zshrc.secret
 .worktrees/
+worktrees/
 
 settings.local.json
