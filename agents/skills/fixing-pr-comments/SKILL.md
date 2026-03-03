@@ -95,6 +95,13 @@ The script:
 - Adds `[🤖 {role} - {model}]:` prefix automatically
 - Prevents double-replies (add `"force": true` to override)
 
+## Re-runs
+
+If invoked again on the same PR (e.g. to check for new comments after addressing previous ones):
+1. Re-run `scripts/fetch_comments.sh` to get the full fresh data
+2. Read the JSON output directly to identify any new/unaddressed comments
+3. **Do NOT pipe the output through inline python3 or jq filters** — just use the fetch script and read the result
+
 ## Rules
 
 - **Reply to ALL comments** — every inline thread and top-level comment gets a response
@@ -102,3 +109,4 @@ The script:
 - **Push before replying** — ensures code changes are visible when reviewer reads reply
 - **Plan before editing** — avoids line number drift issues
 - **Never skip unclear comments** — ask for clarification instead
+- **Never use `!=` in inline Bash commands** — zsh escapes `!` to `\!` inside double-quoted strings, breaking python3 -c, jq, and similar inline scripts. Use the provided scripts or heredocs with single-quoted delimiters instead
