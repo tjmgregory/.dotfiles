@@ -66,6 +66,22 @@ Comments: `%% comment text` on own line.
 
 Accessibility: `accTitle: ...` and `accDescr: ...` after declaration.
 
+## Validation
+
+**Every diagram MUST be validated before presenting to the user.** Run `scripts/validate.sh` to check syntax via mmdc.
+
+```bash
+scripts/validate.sh <<'EOF'
+{"diagram": "flowchart TD\n    A[Start] --> B[End]"}
+EOF
+```
+
+- Pass the raw diagram source (no ` ```mermaid ` fences) as the `diagram` field. Use `\n` for newlines.
+- Returns `{"valid": true}` on success.
+- Returns `{"valid": false, "error": "..."}` on failure, with the parse error extracted from mmdc output. The error includes line number and caret position — fix at that location and re-validate.
+- If validation fails 3 times on the same error, consult the relevant reference file for correct syntax.
+- Only present the diagram in a ` ```mermaid ` block AFTER successful validation.
+
 ## Generation Guidelines
 
 1. **Read the reference first** -- Consult the relevant reference file before writing any non-trivial diagram to get exact syntax right.
