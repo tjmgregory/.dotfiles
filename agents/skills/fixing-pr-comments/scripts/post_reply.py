@@ -132,13 +132,28 @@ def get_thread_replies(owner: str, repo: str, pr_num: str, comment_id: int) -> l
 
 
 def has_agent_replied(thread: list[dict]) -> bool:
-    """Check if any comment in thread has the robot agent prefix."""
-    for comment in thread:
+    """Check if an agent replied and no human followed up after.
+
+    Returns True only if the last bot reply has no subsequent non-bot replies,
+    meaning the thread is resolved. If someone followed up after the bot,
+    returns False so the thread gets re-assessed.
+    """
+    last_bot_index = -1
+    for i, comment in enumerate(thread):
         body = comment.get('body', '')
-        # Match [🤖 anything]: pattern
         if body.strip().startswith('[🤖'):
-            return True
-    return False
+            last_bot_index = i
+
+    if last_bot_index == -1:
+        return False
+
+    # Check if any non-bot reply came after the last bot reply
+    for comment in thread[last_bot_index + 1:]:
+        body = comment.get('body', '')
+        if not body.strip().startswith('[🤖'):
+            return False
+
+    return True
 
 
 def post_review_comment_reply(owner: str, repo: str, pr_num: str,
