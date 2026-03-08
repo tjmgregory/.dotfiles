@@ -81,7 +81,16 @@ if command -v jq &>/dev/null; then
             owner: $owner,
             repo: $repo,
             info: $info,
-            review_comments: $review_comments,
+            review_comments: (
+                # Group replies under their parent comments using in_reply_to_id
+                ($review_comments | map(select(.in_reply_to_id != null)) | group_by(.in_reply_to_id)
+                    | map({ (.[0].in_reply_to_id | tostring): . }) | add // {}) as $replies_map
+                | [
+                    $review_comments[]
+                    | select(.in_reply_to_id == null)
+                    | . + { replies: ($replies_map[(.id | tostring)] // []) }
+                ]
+            ),
             issue_comments: $issue_comments,
             reviews: [$reviews[] | select(.body != null and .body != "")]
         }'
