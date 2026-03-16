@@ -77,7 +77,14 @@ scripts/watch_ci.sh <pr_url_or_number>
 
 - Runs `gh pr checks --watch --interval 15` until all checks complete. Outputs JSON with each check's `conclusion` and `failed_runs` (GitHub run IDs).
 - **Exit 0 (all passed)** → proceed to step 7
-- **Exit 1 (failures)** → the JSON output shows which checks failed and their `run_id`s. Fix the code based on the check names — only fetch logs (`gh run view <run_id> --log-failed`) if the failure isn't obvious from the check name alone. Then:
+- **Exit 1 (failures)** → the JSON output shows which checks failed and their `run_id`s. Fix the code based on the check names — only fetch logs (`gh run view <run_id> --log-failed`) if the failure isn't obvious from the check name alone.
+
+  **If the failure is a lint error**: always attempt automated fixes first before editing manually:
+  1. Run the project's auto-fix command (e.g. `eslint --fix`, `prettier --write`, `ruff --fix`, `gofmt -w`, etc.)
+  2. Check what remains unfixed, then manually fix only those residual errors
+  3. Never manually edit lint errors that a tool can fix automatically
+
+  Then:
   1. `git add <files>` and `git commit -m "Fix CI: <description>"`
   2. `git push`
   3. Re-run `scripts/watch_ci.sh` and repeat until passing
