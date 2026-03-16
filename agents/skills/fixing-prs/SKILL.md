@@ -1,5 +1,5 @@
 ---
-name: fixing-pr-comments
+name: fixing-prs
 description: Addresses GitHub PR review comments by assessing each one, making code changes where valid, and replying to every thread. Use when asked to "fix PR comments", "address review feedback", "respond to PR review", "handle PR comments", or given a PR with unaddressed reviewer comments.
 ---
 

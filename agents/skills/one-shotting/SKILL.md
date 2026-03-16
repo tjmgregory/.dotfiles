@@ -6,7 +6,7 @@ description: >
   automated sub-agent review/fix loop, and squash merge. Use when user says
   "one-shot", "one-shotting", provides a ticket ID to implement end-to-end,
   or wants fully autonomous ticket completion. Requires: using-beads,
-  cascading-specs, reviewing-prs, fixing-pr-comments, commit, squash-merge.
+  cascading-specs, reviewing-prs, fixing-prs, commit, squash-merge.
 ---
 
 # One-Shotting: Ticket to Merged Code
@@ -33,7 +33,7 @@ Autonomous end-to-end delivery. Takes a ticket ID, delivers merged code on main.
    - "Phase 2: Enter plan mode, design implementation, get user approval"
    - "Phase 3: TDD — write failing tests, implement, verify all pass"
    - "Phase 4: Create PR via gh pr create"
-   - "Phase 5: Sub-agent review/fix loop (reviewing-prs → fixing-pr-comments → repeat until clean)"
+   - "Phase 5: Sub-agent review/fix loop (reviewing-prs → fixing-prs → repeat until clean)"
    - "Phase 6: Resolve conflicts, fix CI, squash-merge, close ticket"
 
    Include the full phase description (from this skill doc) in each task's `description` field so the instructions persist even after compaction. Mark Phase 0 as `in_progress` immediately. As you complete each phase, mark it `completed` and mark the next `in_progress`. **Check `TaskList` at every phase boundary** to confirm what comes next — never rely on memory alone.
@@ -74,7 +74,7 @@ This is the critical quality gate. Reviews always happen in a **sub-agent with f
 
 12. **Check TaskList.** Confirm Phase 5 is your current task. Mark it `in_progress`. Read the task description to remind yourself of the full procedure.
 13. **Launch a sub-agent** (using the `Task` tool) to invoke `/reviewing-prs` against the PR. Pass the original ticket description to the sub-agent so it can evaluate whether the implementation matches the requirements — but give it no implementation context. It reviews the diff cold, like an external reviewer who read the spec. It posts inline comments on the diff.
-14. **Fix the review comments** by invoking `/fixing-pr-comments`. This fetches all posted comments, assesses each, makes code changes, commits, pushes, and replies to every thread.
+14. **Fix the review comments** by invoking `/fixing-prs`. This fetches all posted comments, assesses each, makes code changes, commits, pushes, and replies to every thread.
 15. **Launch another sub-agent** (using the `Task` tool) to invoke `/reviewing-prs` again. Pass the original ticket description again. Fresh context — it reads the ticket, PR, diff, and comment threads from scratch to verify all issues were addressed and no new issues were introduced.
 16. **Repeat steps 14-15** if the verification review finds new issues. Stop when the review pass is clean.
 
