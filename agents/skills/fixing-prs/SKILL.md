@@ -80,7 +80,7 @@ scripts/watch_ci.sh <pr_url_or_number>
 - **Exit 1 (failures)** → the JSON output shows which checks failed and their `run_id`s. Fix the code based on the check names — only fetch logs (`gh run view <run_id> --log-failed`) if the failure isn't obvious from the check name alone.
 
   **If the failure is a lint error**: always attempt automated fixes first before editing manually:
-  1. Run the project's auto-fix command (e.g. `eslint --fix`, `prettier --write`, `ruff --fix`, `gofmt -w`, etc.)
+  1. Run the project's auto-fix command (e.g. `pnpm lint:fix`, `eslint --fix`, `prettier --write`, `ruff --fix`, `gofmt -w`, etc.)
   2. Check what remains unfixed, then manually fix only those residual errors
   3. Never manually edit lint errors that a tool can fix automatically
 
