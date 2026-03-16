@@ -36,7 +36,7 @@ Categorize before acting. See [references/reply-templates.md](references/reply-t
 | Invalid / N/A | No change | Explain why |
 | Unclear | No change | Ask clarifying question |
 
-**Skip threads where an agent already replied** (look for `[🤖` prefix) unless someone followed up after.
+**Skip threads where an agent already replied** — for `review_comments`, check the `replies` array on each comment for a `[🤖` prefix; for `issue_comments` and `reviews`, check the `body` field directly. Skip unless a human followed up after the last bot reply.
 
 ### 3. Plan All Changes
 
