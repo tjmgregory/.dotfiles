@@ -133,6 +133,7 @@
       "~/knowledge-base/"
     ]
   },
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -140,6 +141,17 @@
           {
             "type": "command",
             "command": "afplay /System/Library/Sounds/Glass.aiff"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/knowledge-base/scripts/hooks/claude-stop-adapter.sh",
+            "timeout": 10
           }
         ]
       }
@@ -151,8 +163,10 @@
   },
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
   },
+  "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1753956027187
