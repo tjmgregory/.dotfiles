@@ -305,6 +305,52 @@ stateDiagram-v2
     Delivered --> [*]
 ```
 
+## State vs Transition: The Branching Rule
+
+When modelling workflows or orchestration loops, the temptation is to give every step its own state box (activity-diagram style). This reads like a procedure but bloats the diagram with boxes that aren't really states. Apply this rule to decide:
+
+**A step is a state if it blocks or branches. Otherwise it's a transition action on an arrow.**
+
+| Question | Yes → | No → |
+|----------|-------|------|
+| Does the system block here waiting for a result? | State | Check next |
+| Can this step produce multiple outcomes? | State | Transition action |
+
+- **One outcome, instant** → label it on the arrow with `/ action` syntax: `StateA --> StateB : trigger / action`
+- **Multiple outcomes OR blocking** → it needs a state box so you can attach outgoing arrows for each outcome
+
+### Examples
+
+```
+%% BAD: "Committing docs" is a box, but it always succeeds and is instant
+state "Committing doc changes" as s_docs
+a_pm_lint --> s_docs
+s_docs --> a_dev
+
+%% GOOD: collapse to a transition action label
+a_pm_lint --> a_dev : / commit docs
+```
+
+```
+%% GOOD: git merge genuinely branches 3 ways — it deserves a state
+state "Merging origin/main" as s_merge
+state merge_ok <<choice>>
+s_merge --> merge_ok
+merge_ok --> s_done : clean
+merge_ok --> a_dev : dirty tree
+merge_ok --> a_conflicts : conflict
+```
+
+### Audit checklist for workflow state diagrams
+
+After drafting, walk every state and ask:
+
+1. **Does the system wait here?** (agent running, polling, subprocess) → keep as state.
+2. **Can it fail or branch?** (pre-commit hook rejects, merge conflicts, test pass/fail) → keep as state.
+3. **Is it single-outcome glue?** (`git add --all`, increment counter, close ticket) → collapse onto the arrow as `/ action`.
+
+Duration is a red herring — a 10ms step that can fail needs a state; a 5-second step that always succeeds doesn't.
+
 ---
 
 # Entity Relationship Diagram
