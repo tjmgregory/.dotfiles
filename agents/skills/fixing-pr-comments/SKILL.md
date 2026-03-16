@@ -7,7 +7,7 @@ description: Addresses GitHub PR review comments by assessing each one, making c
 
 Address PR review comments: assess validity, make changes, reply to each thread.
 
-**Process**: Fetch comments → Assess each → Plan edits → Edit code → Commit → Push → Reply to all
+**Process**: Fetch comments → Assess each → Plan edits → Edit code → Commit → Push → Watch CI → Reply to all
 
 ## Workflow
 
@@ -67,33 +67,40 @@ git commit -m "Address PR review comments"
 git push
 ```
 
-### 6. Reply to Each Thread
+### 6. Watch CI and Fix Failures
 
-For review comments (inline on code):
+After pushing, watch for check results:
+
 ```bash
-scripts/post_reply.py <<'EOF'
-{"pr": "123", "comment_id": 456, "role": "Author", "model": "<your model name>", "body": "Your reply"}
+scripts/watch_ci.sh <pr_url_or_number>
+```
+
+- Runs `gh pr checks --watch --interval 15` until all checks complete. Outputs JSON with each check's `conclusion` and `failed_runs` (GitHub run IDs).
+- **Exit 0 (all passed)** → proceed to step 7
+- **Exit 1 (failures)** → the JSON output shows which checks failed and their `run_id`s. Fix the code based on the check names — only fetch logs (`gh run view <run_id> --log-failed`) if the failure isn't obvious from the check name alone. Then:
+  1. `git add <files>` and `git commit -m "Fix CI: <description>"`
+  2. `git push`
+  3. Re-run `scripts/watch_ci.sh` and repeat until passing
+- **Exit 2 (timeout)** → proceed to step 7 anyway
+
+### 7. Reply to All Threads
+
+Collect all replies into a single JSON array and post them in parallel:
+
+```bash
+scripts/post_replies_batch.py <<'EOF'
+[
+  {"pr": "123", "comment_id": 456, "role": "Author", "model": "<your model name>", "body": "Your reply"},
+  {"pr": "123", "issue_comment_id": 789, "role": "Author", "model": "<your model name>", "body": "Your reply"},
+  {"pr": "123", "review_id": 101, "role": "Author", "model": "<your model name>", "body": "Your reply"}
+]
 EOF
 ```
 
-For issue comments (general discussion):
-```bash
-scripts/post_reply.py <<'EOF'
-{"pr": "123", "issue_comment_id": 789, "role": "Author", "model": "<your model name>", "body": "Your reply"}
-EOF
-```
-
-For review bodies (submitted with approve/request changes/comment):
-```bash
-scripts/post_reply.py <<'EOF'
-{"pr": "123", "review_id": 101, "role": "Author", "model": "<your model name>", "body": "Your reply"}
-EOF
-```
-Posts as an issue comment (no "reply to review" API). Duplicate detection compares the review's `submitted_at` against issue comments to avoid double-replying.
-
-The script:
+Outputs a JSON array of results in input order. The script:
 - Adds `[🤖 {role} - {model}]:` prefix automatically
 - Prevents double-replies (add `"force": true` to override)
+- Review body replies (`review_id`) post as issue comments (no "reply to review" API); duplicate detection uses a hidden marker
 
 ## Re-runs
 
@@ -106,7 +113,9 @@ If invoked again on the same PR (e.g. to check for new comments after addressing
 
 - **Reply to ALL comments** — every inline thread and top-level comment gets a response
 - **Inline first, then root** — prioritize inline review comments, then address top-level PR comments
+- **Push before watching CI** — `watch_ci.sh` tracks the head SHA at push time
 - **Push before replying** — ensures code changes are visible when reviewer reads reply
+- **Batch replies** — collect all replies into one array and use `post_replies_batch.py` for parallel posting
 - **Plan before editing** — avoids line number drift issues
 - **Never skip unclear comments** — ask for clarification instead
 - **Never use `!=` in inline Bash commands** — zsh escapes `!` to `\!` inside double-quoted strings, breaking python3 -c, jq, and similar inline scripts. Use the provided scripts or heredocs with single-quoted delimiters instead
