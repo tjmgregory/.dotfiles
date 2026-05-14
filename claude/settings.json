@@ -131,9 +131,9 @@
     "additionalDirectories": [
       "/tmp/",
       "~/knowledge-base/"
-    ]
+    ],
+    "defaultMode": "bypassPermissions"
   },
-  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -171,6 +171,7 @@
   "feedbackSurveyState": {
     "lastShownTime": 1753956027187
   },
+  "skillListingBudgetFraction": 0.03,
   "mcpServers": {
     "qmd": {
       "command": "qmd",
@@ -178,5 +179,6 @@
         "mcp"
       ]
     }
-  }
+  },
+  "preferredNotifChannel": "terminal_bell"
 }
