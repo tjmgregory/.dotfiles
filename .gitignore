@@ -1,5 +1,6 @@
 Brewfile.lock.json
 .zshrc.secret
 .claude/settings.local.json
+.DS_Store
 
 __pycache__
