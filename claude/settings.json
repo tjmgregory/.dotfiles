@@ -1,4 +1,5 @@
 {
+  "skillListingBudgetFraction": 0.03,
   "permissions": {
     "allow": [
       "Bash(aws eks:*)",
@@ -128,11 +129,11 @@
       "Bash(docker rmi:*)",
       "Bash(docker system prune:*)"
     ],
+    "defaultMode": "auto",
     "additionalDirectories": [
       "/tmp/",
       "~/knowledge-base/"
-    ],
-    "defaultMode": "bypassPermissions"
+    ]
   },
   "hooks": {
     "Notification": [
@@ -168,10 +169,10 @@
   },
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
+  "preferredNotifChannel": "terminal_bell",
   "feedbackSurveyState": {
     "lastShownTime": 1753956027187
   },
-  "skillListingBudgetFraction": 0.03,
   "mcpServers": {
     "qmd": {
       "command": "qmd",
@@ -180,5 +181,5 @@
       ]
     }
   },
-  "preferredNotifChannel": "terminal_bell"
+  "skipAutoPermissionPrompt": true
 }
