@@ -25,6 +25,50 @@ npx @schpet/linear-cli --version
 All subsequent commands can be prefixed with `npx @schpet/linear-cli` in place of `linear`. Otherwise, follow the install instructions at:\
 https://github.com/schpet/linear-cli?tab=readme-ov-file#install
 
+## Agent Authoring Conventions
+
+When an agent writes **any** content into Linear — issue descriptions, comments, project updates, document bodies, initiative updates — these rules are non-negotiable.
+
+### 1. Always label authored content with an agent prefix
+
+Every piece of writing must start with a `[🤖 <Role> - <Model>]:` line as the first line of the body, matching the pattern used by the `reviewing-prs` and `fixing-prs` skills. Examples:
+
+- `[🤖 Author - Opus 4.7]:` for issues/comments you are creating
+- `[🤖 Reviewer - Opus 4.7]:` for review-style feedback
+- `[🤖 Triage - Opus 4.7]:` for triage / scoping notes
+
+Place the prefix on its own line, then a blank line, then the content. This makes agent-written content trivially greppable and prevents double-posting (re-check existing comments for `[🤖` before adding new ones — same rule as PR review threads).
+
+### 2. Keep issues in the correct project and milestone
+
+If an issue is part of a larger piece of work, it **must** be attached to:
+
+- the relevant **project** (and, where applicable, the parent **initiative**), and
+- the appropriate **milestone** within that project.
+
+Before creating or updating an issue, confirm the right project/milestone:
+
+```bash
+linear project list
+linear milestone list --project <project-id-or-slug>
+```
+
+Pass `--project` and `--milestone` on `linear issue create` / `linear issue update`. When status, scope, or sequencing changes (e.g. an issue moves phases), re-check the milestone and move the issue rather than leaving it orphaned. Orphaned issues distort project progress and roadmap views — treat that as a bug.
+
+### 3. Reference other work by Linear ticket ID first
+
+When mentioning related work in any Linear content, **Linear ticket IDs are the primary reference** (e.g. `ENG-1234`, `OPS-42`). Other identifiers — GitHub PR/issue numbers, Jira keys, Notion links, Slack permalinks — go after as secondary references.
+
+Good:
+
+> Blocked by ENG-1234 (see also PR #987, Notion: Auth rewrite plan).
+
+Not:
+
+> Blocked by PR #987 (linear: ENG-1234).
+
+Rationale: Linear auto-links ticket IDs into rich previews and relation graphs; demoting them to parentheticals breaks that. If a relationship is structural (blocks, blocked-by, duplicates, related), prefer `linear issue relation add` over a prose reference so it shows up in the issue graph.
+
 ## Best Practices for Markdown Content
 
 When working with issue descriptions or comment bodies that contain markdown, **always prefer using file-based flags** instead of passing content as command-line arguments:
