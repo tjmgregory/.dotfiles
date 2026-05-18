@@ -1,84 +1,76 @@
-export EDITOR='hx'
-export VISUAL='hx'
+# Custom function dirs go on fpath BEFORE compinit
+fpath+=~/.zfunc
 
-alias h='hx'
-alias g='lazygit'
-alias y='yarn'
-alias n='npm'
-alias v='vim'
-alias p='pnpm'
-alias d='deno'
-alias dt='d task'
+# compinit: full run only once per day; otherwise use cached dump.
+# Saves ~70-100ms vs running full compinit on every shell.
+# https://stackoverflow.com/a/74323525 - stops compdef message on new session
+autoload -Uz compinit
+if [[ -n ~/.zcompdump(#qNmh-24) ]]; then
+  compinit -C
+else
+  compinit
+fi
 
-alias cat='bat'
+source ~/.dotfiles/.zshrc.aliases
+source ~/.dotfiles/.zshrc.elephant
+source ~/.dotfiles/.zshrc.secret
 
-# Claude
-cla() {
-    if [[ -f AGENTS.md ]]; then
-        claude --system-prompt "$(cat AGENTS.md)" "$@"
-    else
-        claude "$@"
-    fi
+# Lazy-load nvm — saves ~400ms on every shell startup.
+# nvm/node/npm/npx stubs source nvm.sh on first invocation, then re-call themselves.
+export NVM_DIR="$HOME/.nvm"
+_nvm_lazy_load() {
+  unset -f nvm node npm npx 2>/dev/null
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 }
+nvm()  { _nvm_lazy_load; nvm "$@"; }
+node() { _nvm_lazy_load; node "$@"; }
+npm()  { _nvm_lazy_load; npm "$@"; }
+npx()  { _nvm_lazy_load; npx "$@"; }
 
-# Directories
-alias kbd='cd ~/knowledge-base'
-alias tsed='cd ~/tse'
-alias pbd='cd ~/personal-brand'
-alias pd='cd ~/projects'
+# Force reload completions for w function in Warp
+if [[ "$TERM_PROGRAM" == "WarpTerminal" ]]; then
+  autoload -U +X _w
+fi
+bindkey '^I' complete-word
 
-# Git
-alias gl='git pull'
-alias gp='git push'
-alias gco='git checkout'
-alias gst='git status'
-alias gd='git diff'
+# Created by `pipx` on 2025-08-16 08:30:41
+export PATH="$PATH:/Users/theo/.local/bin"
 
-# Edit commands in vim with v in normal mode
-autoload edit-command-line; zle -N edit-command-line
-bindkey -M vicmd v edit-command-line
+# bun completions
+[ -s "/Users/theo/.bun/_bun" ] && source "/Users/theo/.bun/_bun"
 
-# Useful scripts
-alias formatjson='pbpaste | python3 -m json.tool | pbcopy'
-alias isodate='date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d '\n' | tee >(pbcopy)'
-alias ll='ls -la'
-alias text="pbpaste | pbcopy"
-alias uuid='python3 -c "import uuid; import sys; sys.stdout.write(\"{}\".format(uuid.uuid4()))" | tee >(pbcopy)'
-function sha1 { echo -n "$1" | openssl sha1 | tee >(pbcopy) }
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
 
-# React testing library print limit
-export DEBUG_PRINT_LIMIT=100000000
+# antidote — hardcoded brew prefix to skip the ~20ms `brew --prefix` fork
+source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
+# initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
+antidote load
 
-alias k='kubectl'
-[[ "$TERM_PROGRAM" == "vscode" ]] && source <(kubectl completion zsh)
-
-# helix-gpt https://github.com/leona/helix-gpt
-export HANDLER=copilot
-
-# Kraft Cloud
-export UKC_METRO=fra0
+# Starship - must be at the end
+eval "$(starship init zsh)"
 
 
-# Worktree management
-export PATH="$HOME/.dotfiles/bin:$PATH"
+# Android
+export JAVA_HOME=$HOMEBREW_PREFIX/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$HOME/Library/Android/sdk/platform-tools
 
-# Shell function wrapper for wt that handles cd properly
-unalias wt 2>/dev/null  # Remove any existing alias
-wt() {
-    if [[ "$1" == "cd" ]]; then
-        # Handle cd command specially to actually change directory
-        local target_dir
-        target_dir=$(~/.dotfiles/bin/wt cd "$2" "$3" --print-path 2>/dev/null)
-        
-        if [[ $? -eq 0 && -n "$target_dir" && -d "$target_dir" ]]; then
-            cd "$target_dir"
-            echo "Switched to worktree: $target_dir"
-        else
-            # Fallback to regular wt cd behavior (will show output but not change dir)
-            ~/.dotfiles/bin/wt cd "$2" "$3"
-        fi
-    else
-        # For all other commands, just pass through to the script
-        ~/.dotfiles/bin/wt "$@"
-    fi
-}
+# go
+export PATH=$PATH:/Users/theo/go/bin
+
+# User bin directory (after bun so ~/bin/qmd shadows ~/.bun/bin/qmd)
+export PATH="$HOME/bin:$PATH"
+
+zstyle ':completion:*' menu select
+
+# Vim terminal
+# set -o vi
+
+# omnara
+export OMNARA_INSTALL="$HOME/.omnara"
+export PATH="$OMNARA_INSTALL/bin:$PATH"
+
+source /Users/theo/.zsh_kraft_completion;
