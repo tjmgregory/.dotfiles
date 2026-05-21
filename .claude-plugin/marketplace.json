@@ -1,0 +1,23 @@
+{
+  "name": "tjmgregory",
+  "owner": {
+    "name": "Theo Gregory",
+    "url": "https://github.com/tjmgregory"
+  },
+  "metadata": {
+    "description": "Personal collection of Claude Code skills.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "human-friendly",
+      "source": "./agents/skills/human-friendly",
+      "description": "Renders structured responses (plans, designs, architecture notes) as editable HTML artifacts on the user's Desktop instead of as chat markdown. The HTML has designMode editing, ⌘S file-save via the File System Access API, structural ⌘Z undo, hover add-row/col on tables, markdown-style block shortcuts (# / - / 1. / > / ``` / /table), inline backtick code wrapping, Backspace-to-escape-format, Tab/Shift+Tab list indent, and live-reload on external file changes.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Theo Gregory"
+      },
+      "keywords": ["plans", "html", "editable", "design-mode", "live-reload"]
+    }
+  ]
+}

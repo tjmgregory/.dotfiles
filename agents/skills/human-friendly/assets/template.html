@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Everything is editable</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --accent: #c1440e;
+    --rule: #e5e1d8;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    padding: 40px 20px 80px;
+  }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 2rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.15rem; margin: 28px 0 8px; }
+  .subtitle { color: var(--muted); margin: 0 0 24px; }
+  .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin: 0 0 24px; }
+  .meta b { color: var(--ink); font-weight: 600; margin-right: 4px; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 24px 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.95rem; }
+  th, td { border: 1px solid var(--rule); padding: 8px 10px; text-align: left; }
+  th { background: #f1ede4; font-weight: 600; }
+  .pill {
+    display: inline-block; padding: 2px 8px; border-radius: 999px;
+    background: #f1ede4; color: var(--ink); font-size: 0.8rem;
+  }
+  .banner {
+    position: fixed; top: 12px; right: 12px;
+    background: var(--ink); color: #fff; padding: 6px 10px;
+    border-radius: 6px; font-size: 0.8rem; opacity: 0.85;
+    pointer-events: none;
+    transition: background 0.2s;
+  }
+  .banner.saved { background: #2e7d32; }
+  .banner.dirty { background: var(--accent); }
+  /* Visual cue that the page is a giant text field. */
+  [contenteditable], body { outline: none; }
+  body:focus-within ::selection { background: #ffe9a8; }
+  /* Caret feedback when hovering over text */
+  p, h1, h2, h3, li, td, th, .pill, .subtitle { cursor: text; }
+
+  /* Table add-row / add-col affordances */
+  .table-wrap { position: relative; display: block; }
+  .tbl-add {
+    position: absolute;
+    padding: 2px 10px;
+    font: 0.75rem -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fff;
+    border: 1px dashed var(--rule);
+    color: var(--muted);
+    border-radius: 999px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
+    user-select: none;
+    line-height: 1.4;
+  }
+  .table-wrap:hover .tbl-add,
+  .table-wrap:focus-within .tbl-add { opacity: 1; }
+  .tbl-add:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .tbl-add-row { left: 50%; transform: translateX(-50%); bottom: -14px; }
+  .tbl-add-col { top: 50%; transform: translateY(-50%); right: -36px; }
+
+  /* Elements created by markdown shortcuts */
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    background: #f1ede4;
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: #f1ede4;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.88rem;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  blockquote {
+    margin: 16px 0;
+    padding: 4px 16px;
+    border-left: 3px solid var(--rule);
+    color: var(--muted);
+  }
+  blockquote p { margin: 8px 0; }
+  h3 { font-size: 1.05rem; margin: 20px 0 6px; }
+  h4 { font-size: 0.95rem; margin: 16px 0 4px; }
+  h5 { font-size: 0.85rem; margin: 14px 0 4px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+</style>
+</head>
+<body>
+  <div class="banner dirty" id="banner">Unsaved · save to see live updates</div>
+
+  <main>
+    <h1>Plan: ship the editable-doc experiment</h1>
+    <p class="subtitle">Draft v0.3 — replacing markdown chat with structured, mutable HTML.</p>
+
+    <div class="meta">
+      <span><b>Owner</b>Theo</span>
+      <span><b>Status</b><span class="pill">In review</span></span>
+      <span><b>Target</b>This week</span>
+    </div>
+
+    <hr>
+
+    <h2>Goal</h2>
+    <p>
+      Let the human edit any part of the assistant's response in-place — titles,
+      bullets, table cells, even this sentence — without round-tripping a new
+      prompt for everyasdf tiny correction.
+    </p>
+
+    <h2>Why HTML beats markdown here</h2>
+    <ul>
+      <li>Rich structure (tables, nested lists, pills) renders natively.</li>
+      <li>Every node is addressable, so the human can mutate it direct</li>
+      <li>One line of JS — <code>document.designMode = "on"</code> — makes the whole document a text field.</li>
+    </ul>
+
+    <h2>Open questions</h2>
+    <ol>
+      <li>How do we send the user's edits back to the model as the next turn?</li>
+      <li>Do we diff against the original, or just resend the full edited HTML?</li>
+      <li>What about images and embedded widgets — are those editable too?</li>
+    </ol>
+
+    <h2>Rough plan</h2>
+    <table>
+      <thead>
+        <tr><th>Step</th><th>What</th><th>Who</th><th>When</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Prototype editable canvas</td><td>Theo</td><td>Today</td></tr>
+        <tr><td>2</td><td>Wire edits back into the prompt</td><td>Theo</td><td>Tomorrow</td></tr>
+        <tr><td>3</td><td>Try on three real conversations</td><td>Theo</td><td>Fri</td></tr>
+        <tr><td>4</td><td>Decide: keep, kill, or fold into chat</td><td>Theo</td><td>Mon</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Try it</h2>
+    <p>
+      Click any word above. Retype it. Delete a row from the table. Add a new
+      bullet. Change the title. Nothing on this page is read-only — that's the
+      whole trick, and it's exactly one line of code.
+    </p>
+  </main>
+
+<script>
+  // The whole demo. One line.
+  document.designMode = "on";
+
+  // Make Enter create <p> instead of Chrome's default <div>. Deprecated API
+  // but still respected in every Chromium browser, ignored elsewhere.
+  try { document.execCommand("defaultParagraphSeparator", false, "p"); } catch {}
+
+  // --- Live reload on external file changes ---------------------------------
+  // After the first save, we hold a writable FileSystemFileHandle. We can also
+  // read the file through it, so every couple of seconds we check the file's
+  // lastModified. If it's newer than our last save AND the local DOM is clean,
+  // hard-reload. If the local DOM is dirty, do nothing — saving would clobber
+  // the external change, and we don't want to surprise-overwrite the user.
+  setInterval(async () => {
+    if (!window.__fileHandle || window.__dirty) return;
+    try {
+      const f = await window.__fileHandle.getFile();
+      if (f.lastModified > window.__lastSavedAt + 100) {
+        location.reload();
+      }
+    } catch {}
+  }, 2000);
+
+  // --- Save-to-disk with ⌘S / Ctrl+S -----------------------------------------
+  // Uses the File System Access API. First save prompts for the file; after
+  // that, the handle is cached and saves are silent. Chromium-only (Chrome,
+  // Edge, Arc, Brave). Safari/Firefox fall back to a download.
+  const banner = document.getElementById("banner");
+  let fileHandle = null;
+  let dirty = false;
+  let lastSavedAt = 0;
+  window.__fileHandle = null;
+  window.__dirty = false;
+  window.__lastSavedAt = 0;
+
+  function setBanner(text, cls) {
+    banner.textContent = text;
+    banner.className = "banner" + (cls ? " " + cls : "");
+  }
+
+  function markDirty() {
+    if (dirty) return;
+    dirty = true;
+    window.__dirty = true;
+    setBanner("Unsaved · save to see live updates", "dirty");
+  }
+
+  // --- Structural undo stack -------------------------------------------------
+  // The browser's native undo only covers text edits inside contenteditable.
+  // Programmatic DOM changes (like adding a row) never reach its stack. So we
+  // keep a tiny stack of our own, and intercept Cmd/Ctrl+Z when it's
+  // non-empty. Any real text edit clears it — after that, Cmd+Z reverts to
+  // normal native text-undo. Simple, predictable, no fighting the browser.
+  const structuralUndo = [];
+  function pushStructuralUndo(fn) { structuralUndo.push(fn); }
+
+  // Any edit flips us to dirty AND invalidates the structural undo stack.
+  document.addEventListener("input", () => {
+    markDirty();
+    structuralUndo.length = 0;
+  }, true);
+
+  // --- Table add-row / add-col buttons ---------------------------------------
+  // designMode gives us no built-in way to add rows or columns, so we inject
+  // a couple of hover-revealed buttons next to each table. The buttons are
+  // contenteditable="false" so designMode treats them as non-editable islands
+  // and clicks work normally. We strip them from the saved HTML so the file
+  // on disk stays clean — they get re-injected on the next load.
+  function decorateTables(root = document) {
+    root.querySelectorAll("table").forEach((table) => {
+      if (table.parentElement && table.parentElement.classList.contains("table-wrap")) return;
+      const wrap = document.createElement("div");
+      wrap.className = "table-wrap";
+      wrap.dataset.ui = "table-wrap";
+      table.parentNode.insertBefore(wrap, table);
+      wrap.appendChild(table);
+
+      const addRow = document.createElement("button");
+      addRow.className = "tbl-add tbl-add-row";
+      addRow.textContent = "+ row";
+      addRow.contentEditable = "false";
+      addRow.dataset.ui = "add-row";
+      addRow.title = "Add a row";
+
+      const addCol = document.createElement("button");
+      addCol.className = "tbl-add tbl-add-col";
+      addCol.textContent = "+ col";
+      addCol.contentEditable = "false";
+      addCol.dataset.ui = "add-col";
+      addCol.title = "Add a column";
+
+      wrap.appendChild(addRow);
+      wrap.appendChild(addCol);
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    if (target.matches(".tbl-add-row")) {
+      e.preventDefault();
+      const table = target.closest(".table-wrap").querySelector("table");
+      const body = table.querySelector("tbody") || table;
+      const rows = body.querySelectorAll("tr");
+      const template = rows[rows.length - 1] || table.querySelector("thead tr");
+      if (!template) return;
+      const newRow = document.createElement("tr");
+      [...template.children].forEach(() => {
+        newRow.appendChild(document.createElement("td"));
+      });
+      body.appendChild(newRow);
+      pushStructuralUndo(() => newRow.remove());
+      dirty = true;
+      setBanner("Unsaved · ⌘Z to undo, save to see live updates", "dirty");
+    } else if (target.matches(".tbl-add-col")) {
+      e.preventDefault();
+      const table = target.closest(".table-wrap").querySelector("table");
+      const added = [];
+      table.querySelectorAll("tr").forEach((row) => {
+        const inHead = row.parentElement && row.parentElement.tagName === "THEAD";
+        const cell = document.createElement(inHead ? "th" : "td");
+        row.appendChild(cell);
+        added.push(cell);
+      });
+      pushStructuralUndo(() => added.forEach((c) => c.remove()));
+      dirty = true;
+      setBanner("Unsaved · ⌘Z to undo, save to see live updates", "dirty");
+    }
+  });
+
+  decorateTables();
+
+  // --- Markdown-style shortcuts ---------------------------------------------
+  // When the user finishes typing a recognised opener at the start of a block
+  // (e.g. `# `, `- `, `> `, ```` ``` ````, `/table`), swap the block for the
+  // appropriate element. Also wrap text in <code> when a second backtick on
+  // the same line is typed. Each transform pushes onto the structural-undo
+  // stack so ⌘Z reverts it (until a text edit follows).
+
+  // Patterns match a PREFIX of the block. The block's remaining content
+  // (after the trigger characters) is kept as the new element's body.
+  // `pre` is the exception — it only fires when the block is just ```.
+  const BLOCK_PATTERNS = [
+    { re: /^# /,      kind: "tag",  tag: "h1" },
+    { re: /^## /,     kind: "tag",  tag: "h2" },
+    { re: /^### /,    kind: "tag",  tag: "h3" },
+    { re: /^#### /,   kind: "tag",  tag: "h4" },
+    { re: /^##### /,  kind: "tag",  tag: "h5" },
+    { re: /^- /,      kind: "list", tag: "ul" },
+    { re: /^\* /,     kind: "list", tag: "ul" },
+    { re: /^1\. /,    kind: "list", tag: "ol" },
+    { re: /^> /,      kind: "blockquote" },
+    { re: /^```$/,    kind: "pre" },
+  ];
+
+  function buildFromBlock(block, pattern) {
+    if (pattern.kind === "tag") {
+      const el = document.createElement(pattern.tag);
+      while (block.firstChild) el.appendChild(block.firstChild);
+      if (!el.firstChild) el.appendChild(document.createElement("br"));
+      return { el, cursor: el };
+    }
+    if (pattern.kind === "list") {
+      const list = document.createElement(pattern.tag);
+      const li = document.createElement("li");
+      while (block.firstChild) li.appendChild(block.firstChild);
+      if (!li.firstChild) li.appendChild(document.createElement("br"));
+      list.appendChild(li);
+      return { el: list, cursor: li };
+    }
+    if (pattern.kind === "blockquote") {
+      const bq = document.createElement("blockquote");
+      const p = document.createElement("p");
+      while (block.firstChild) p.appendChild(block.firstChild);
+      if (!p.firstChild) p.appendChild(document.createElement("br"));
+      bq.appendChild(p);
+      return { el: bq, cursor: p };
+    }
+    if (pattern.kind === "pre") {
+      const pre = document.createElement("pre");
+      const code = document.createElement("code");
+      code.appendChild(document.createElement("br"));
+      pre.appendChild(code);
+      return { el: pre, cursor: code };
+    }
+    return null;
+  }
+  function makeTable(rows, cols) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    for (let c = 0; c < cols; c++) {
+      const th = document.createElement("th");
+      th.appendChild(document.createElement("br"));
+      headRow.appendChild(th);
+    }
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+    const tbody = document.createElement("tbody");
+    for (let r = 0; r < rows - 1; r++) {
+      const tr = document.createElement("tr");
+      for (let c = 0; c < cols; c++) {
+        const td = document.createElement("td");
+        td.appendChild(document.createElement("br"));
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    return { el: table, cursor: headRow.firstChild };
+  }
+
+  function findBlock(node) {
+    while (node && node.nodeType !== 1) node = node.parentNode;
+    while (node && node !== document.body) {
+      if (/^(P|DIV|H[1-6])$/.test(node.tagName)) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+  function isInsideContainer(node, tagRe) {
+    let p = node.parentNode;
+    while (p && p !== document.body) {
+      if (tagRe.test(p.tagName)) return true;
+      p = p.parentNode;
+    }
+    return false;
+  }
+  function placeCursor(el, atEnd = false) {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(!atEnd);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  function offsetToPosition(block, target) {
+    let count = 0;
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      if (count + node.length >= target) return { node, offset: target - count };
+      count += node.length;
+    }
+    return null;
+  }
+
+  // Remove `count` leading characters (plus any leading whitespace) from the
+  // start of `block`, preserving any inline formatting in the rest.
+  function removeLeadingTrigger(block, count) {
+    const tc = block.textContent;
+    const leadingWs = tc.match(/^\s*/)[0].length;
+    const endPos = offsetToPosition(block, leadingWs + count);
+    if (!endPos) { while (block.firstChild) block.removeChild(block.firstChild); return; }
+    const range = document.createRange();
+    range.setStart(block, 0);
+    range.setEnd(endPos.node, endPos.offset);
+    range.deleteContents();
+  }
+
+  // Remove everything from `offset` (in block.textContent) to end of block.
+  function removeFromOffset(block, offset) {
+    const startPos = offsetToPosition(block, offset);
+    if (!startPos) return;
+    const range = document.createRange();
+    range.setStart(startPos.node, startPos.offset);
+    range.setEnd(block, block.childNodes.length);
+    range.deleteContents();
+  }
+
+  function insertTableNear(block, position) {
+    // position: "replace" | "before" | "after"
+    const originalClone = block.cloneNode(true);
+    const parent = block.parentNode;
+    const { el: table, cursor } = makeTable(2, 2);
+    if (position === "replace") {
+      parent.replaceChild(table, block);
+    } else if (position === "before") {
+      parent.insertBefore(table, block);
+    } else {
+      parent.insertBefore(table, block.nextSibling);
+    }
+    decorateTables(parent);
+    placeCursor(cursor);
+    pushStructuralUndo(() => {
+      const inserted = table.parentElement && table.parentElement.dataset.ui === "table-wrap" ? table.parentElement : table;
+      if (position === "replace") {
+        parent.insertBefore(originalClone, inserted);
+      } else {
+        parent.replaceChild(originalClone, block);
+      }
+      inserted.parentNode.removeChild(inserted);
+      placeCursor(originalClone, true);
+    });
+  }
+
+  document.addEventListener("input", (e) => {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const block = findBlock(sel.anchorNode);
+    if (!block) return;
+    if (isInsideContainer(block, /^(UL|OL|LI|TABLE|PRE)$/)) return;
+
+    // Normalize NBSPs and strip leading whitespace before matching.
+    const text = block.textContent.replace(/ /g, " ").replace(/^\s+/, "");
+    const rawLeadingWs = block.textContent.length - text.length;
+
+    for (const pattern of BLOCK_PATTERNS) {
+      if (!pattern.re.test(text)) continue;
+      if (pattern.kind === "pre" && text.trim() !== "```") continue;
+
+      const originalClone = block.cloneNode(true);
+      const parent = block.parentNode;
+
+      // Strip the trigger characters in-place (preserves inline formatting).
+      if (pattern.kind === "pre") {
+        while (block.firstChild) block.removeChild(block.firstChild);
+      } else {
+        const m = text.match(pattern.re);
+        removeLeadingTrigger(block, m[0].length);
+      }
+
+      const { el, cursor } = buildFromBlock(block, pattern);
+      parent.replaceChild(el, block);
+      placeCursor(cursor, true);
+      pushStructuralUndo(() => {
+        const inserted = el.parentElement && el.parentElement.dataset.ui === "table-wrap" ? el.parentElement : el;
+        inserted.parentNode.replaceChild(originalClone, inserted);
+        placeCursor(originalClone, true);
+      });
+      return;
+    }
+
+    // /table — positional. Insert relative to the line's existing content.
+    const tableMatch = text.match(/(^|\s)\/table(\s|$)/);
+    if (tableMatch) {
+      const start = tableMatch.index + tableMatch[1].length;
+      const before = text.slice(0, start).replace(/\s+$/, "");
+      const after = text.slice(start + 6).replace(/^\s+/, "");
+
+      if (!before && !after) {
+        insertTableNear(block, "replace");
+        return;
+      }
+      if (!before) {
+        const stripLen = 6 + (text[start + 6] === " " ? 1 : 0);
+        removeLeadingTrigger(block, stripLen + start);
+        insertTableNear(block, "before");
+        return;
+      }
+      if (!after) {
+        const trigStart = start + rawLeadingWs;
+        const cutFrom = block.textContent[trigStart - 1] === " " ? trigStart - 1 : trigStart;
+        removeFromOffset(block, cutFrom);
+        insertTableNear(block, "after");
+        return;
+      }
+    }
+
+    // Inline `code` — fired when the user just typed a closing backtick.
+    if (e.inputType === "insertText" && e.data === "`") {
+      handleInlineBacktick(block, sel);
+    }
+  });
+
+  function handleInlineBacktick(block, sel) {
+    const cursorRange = sel.getRangeAt(0);
+    const blockRange = document.createRange();
+    blockRange.selectNodeContents(block);
+    blockRange.setEnd(cursorRange.endContainer, cursorRange.endOffset);
+    const textBefore = blockRange.toString();
+
+    const lastIdx = textBefore.length - 1;
+    if (textBefore[lastIdx] !== "`") return;
+    const prevIdx = textBefore.lastIndexOf("`", lastIdx - 1);
+    if (prevIdx === -1) return;
+    const between = textBefore.slice(prevIdx + 1, lastIdx);
+    if (!between || between.includes("\n")) return;
+
+    const startPos = offsetToPosition(block, prevIdx);
+    const endPos = offsetToPosition(block, lastIdx + 1);
+    if (!startPos || !endPos) return;
+
+    const snapshot = block.cloneNode(true);
+    const parent = block.parentNode;
+
+    const replaceRange = document.createRange();
+    replaceRange.setStart(startPos.node, startPos.offset);
+    replaceRange.setEnd(endPos.node, endPos.offset);
+    const code = document.createElement("code");
+    code.textContent = between;
+    replaceRange.deleteContents();
+    replaceRange.insertNode(code);
+
+    // Cursor sits just after the new <code>. A trailing zero-width space lets
+    // the user keep typing as plain text without re-entering the code element.
+    const tail = document.createTextNode("​");
+    code.parentNode.insertBefore(tail, code.nextSibling);
+    const after = document.createRange();
+    after.setStart(tail, 1);
+    after.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(after);
+
+    pushStructuralUndo(() => {
+      parent.replaceChild(snapshot, block);
+      placeCursor(snapshot, true);
+    });
+  }
+
+  // --- Backspace-to-escape and Tab indent/outdent for lists ------------------
+  // Notion-style: pressing Backspace at the start of a non-paragraph block
+  // (heading, blockquote, list item, code block) converts that block back to
+  // a plain <p>. Pressing Tab at the start of a list item indents it into a
+  // nested list inside the previous item; Shift+Tab outdents it.
+
+  function findAncestor(node, tagRe) {
+    while (node && node.nodeType !== 1) node = node.parentNode;
+    while (node && node !== document.body) {
+      if (tagRe.test(node.tagName)) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  function isAtBlockStart(range, block) {
+    const r = document.createRange();
+    r.selectNodeContents(block);
+    r.setEnd(range.startContainer, range.startOffset);
+    return r.toString().replace(/\s+/g, "") === "";
+  }
+
+  function indentLi(li) {
+    const prev = li.previousElementSibling;
+    if (!prev || prev.tagName !== "LI") return false; // first item can't indent
+    const list = li.parentNode;
+    const last = prev.lastElementChild;
+    let nested;
+    if (last && last.tagName === list.tagName) {
+      nested = last;
+    } else {
+      nested = document.createElement(list.tagName.toLowerCase());
+      prev.appendChild(nested);
+    }
+    nested.appendChild(li);
+    return true;
+  }
+
+  function outdentLi(li) {
+    const innerList = li.parentNode;
+    if (!innerList || !/^(UL|OL)$/.test(innerList.tagName)) return false;
+    const outerLi = innerList.parentNode;
+    if (!outerLi || outerLi.tagName !== "LI") return false; // not nested
+    const outerList = outerLi.parentNode;
+    if (!outerList || !/^(UL|OL)$/.test(outerList.tagName)) return false;
+
+    // Items that came after this one in the nested list become a child list
+    // of the outdented item, so the visual order is preserved.
+    const siblings = Array.from(innerList.children);
+    const after = siblings.slice(siblings.indexOf(li) + 1);
+    innerList.removeChild(li);
+    if (after.length > 0) {
+      const tail = document.createElement(innerList.tagName.toLowerCase());
+      after.forEach((it) => { innerList.removeChild(it); tail.appendChild(it); });
+      li.appendChild(tail);
+    }
+    outerList.insertBefore(li, outerLi.nextSibling);
+    if (innerList.children.length === 0) innerList.parentNode.removeChild(innerList);
+    return true;
+  }
+
+  function escapeFormat(block) {
+    const tag = block.tagName;
+
+    if (/^H[1-6]$/.test(tag)) {
+      const p = document.createElement("p");
+      while (block.firstChild) p.appendChild(block.firstChild);
+      if (!p.firstChild) p.appendChild(document.createElement("br"));
+      block.parentNode.replaceChild(p, block);
+      placeCursor(p, false);
+      return;
+    }
+
+    if (tag === "BLOCKQUOTE") {
+      const parent = block.parentNode;
+      const first = block.firstChild;
+      while (block.firstChild) parent.insertBefore(block.firstChild, block);
+      parent.removeChild(block);
+      if (first) placeCursor(first, false);
+      return;
+    }
+
+    if (tag === "PRE") {
+      const text = block.textContent || "";
+      const p = document.createElement("p");
+      if (text) p.textContent = text;
+      else p.appendChild(document.createElement("br"));
+      block.parentNode.replaceChild(p, block);
+      placeCursor(p, false);
+      return;
+    }
+
+    if (tag === "LI") {
+      // Nested list item: outdent one level instead of converting to <p>.
+      if (outdentLi(block)) { placeCursor(block, false); return; }
+
+      // Top-level list item: split the list, convert this item to <p>.
+      const list = block.parentNode;
+      const listTag = list.tagName.toLowerCase();
+      const siblings = Array.from(list.children);
+      const after = siblings.slice(siblings.indexOf(block) + 1);
+
+      const p = document.createElement("p");
+      while (block.firstChild) p.appendChild(block.firstChild);
+      if (!p.firstChild) p.appendChild(document.createElement("br"));
+
+      const parent = list.parentNode;
+      list.removeChild(block);
+      parent.insertBefore(p, list.nextSibling);
+
+      if (after.length > 0) {
+        const tail = document.createElement(listTag);
+        after.forEach((it) => { list.removeChild(it); tail.appendChild(it); });
+        parent.insertBefore(tail, p.nextSibling);
+      }
+      if (list.children.length === 0) parent.removeChild(list);
+
+      placeCursor(p, false);
+    }
+  }
+
+  function escapeBlockquoteChild(bq, child) {
+    // Split the blockquote: anything before `child` stays in the original,
+    // `child` becomes a sibling <p> after it, anything after goes into a new
+    // blockquote. Empty halves get removed.
+    const kids = Array.from(bq.children);
+    const idx = kids.indexOf(child);
+    const after = kids.slice(idx + 1);
+    const parent = bq.parentNode;
+
+    bq.removeChild(child);
+    let p;
+    if (child.tagName === "P") {
+      p = child;
+    } else {
+      p = document.createElement("p");
+      while (child.firstChild) p.appendChild(child.firstChild);
+    }
+    if (!p.firstChild) p.appendChild(document.createElement("br"));
+
+    parent.insertBefore(p, bq.nextSibling);
+
+    if (after.length > 0) {
+      const tail = document.createElement("blockquote");
+      after.forEach((c) => { bq.removeChild(c); tail.appendChild(c); });
+      parent.insertBefore(tail, p.nextSibling);
+    }
+    if (bq.children.length === 0) parent.removeChild(bq);
+
+    placeCursor(p, false);
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || !sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+
+    if (e.key === "Backspace") {
+      const block = findAncestor(range.startContainer, /^(LI|H[1-6]|BLOCKQUOTE|PRE)$/);
+      if (!block) return;
+      if (block.tagName === "BLOCKQUOTE") {
+        // Escape the immediate child of the blockquote that the cursor sits
+        // in, not the whole blockquote — splits the quote around the line.
+        let target = range.startContainer;
+        while (target && target.parentNode !== block) target = target.parentNode;
+        if (!target) return;
+        if (!isAtBlockStart(range, target)) return;
+        e.preventDefault();
+        escapeBlockquoteChild(block, target);
+        dirty = true;
+        setBanner("Unsaved · save to see live updates", "dirty");
+        return;
+      }
+      if (!isAtBlockStart(range, block)) return;
+      e.preventDefault();
+      escapeFormat(block);
+      dirty = true;
+      setBanner("Unsaved · save to see live updates", "dirty");
+      return;
+    }
+
+    if (e.key === "Enter" && !e.shiftKey) {
+      // Enter on an empty line inside a blockquote exits the blockquote
+      // (same way Enter-on-empty-line exits a list natively).
+      const bq = findAncestor(range.startContainer, /^BLOCKQUOTE$/);
+      if (!bq) return;
+      let target = range.startContainer;
+      while (target && target.parentNode !== bq) target = target.parentNode;
+      if (!target) return;
+      if (target.textContent.replace(/\s/g, "") !== "") return;
+      e.preventDefault();
+      escapeBlockquoteChild(bq, target);
+      dirty = true;
+      setBanner("Unsaved · save to see live updates", "dirty");
+    }
+
+    if (e.key === "Tab") {
+      const li = findAncestor(range.startContainer, /^LI$/);
+      if (!li) return;
+      if (!isAtBlockStart(range, li)) return;
+      e.preventDefault();
+      const ok = e.shiftKey ? outdentLi(li) : indentLi(li);
+      if (ok) {
+        placeCursor(li, false);
+        dirty = true;
+        setBanner("Unsaved · save to see live updates", "dirty");
+      }
+    }
+  });
+
+  function currentHTML() {
+    // Snapshot the live DOM, then strip the UI we injected so the file on disk
+    // stays clean — table wrappers get unwrapped, buttons removed, banner reset.
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelectorAll('[data-ui="add-row"], [data-ui="add-col"]').forEach((el) => el.remove());
+    clone.querySelectorAll('[data-ui="table-wrap"]').forEach((wrap) => {
+      const parent = wrap.parentNode;
+      while (wrap.firstChild) parent.insertBefore(wrap.firstChild, wrap);
+      parent.removeChild(wrap);
+    });
+    const b = clone.querySelector("#banner");
+    if (b) {
+      b.textContent = "Click anywhere — everything is editable · ⌘S to save";
+      b.className = "banner";
+    }
+    return "<!doctype html>\n" + clone.outerHTML;
+  }
+
+  async function save() {
+    const html = currentHTML();
+
+    if (window.showSaveFilePicker) {
+      try {
+        if (!fileHandle) {
+          // Suggest the current filename so "Save" overwrites in place.
+          const suggested = location.pathname.split("/").pop() || "document.html";
+          // `id` makes the browser remember the directory across sessions, so
+          // subsequent saves default to wherever you saved last time. We seed
+          // it from the filename so different files don't fight over the slot.
+          const dirId = ("editable-doc-" + suggested.replace(/[^a-z0-9]/gi, "_")).slice(0, 32);
+          fileHandle = window.__fileHandle = await window.showSaveFilePicker({
+            suggestedName: suggested,
+            id: dirId,
+            startIn: "desktop",
+            types: [{ description: "HTML", accept: { "text/html": [".html"] } }],
+          });
+        }
+        const writable = await fileHandle.createWritable();
+        await writable.write(html);
+        await writable.close();
+        dirty = false;
+        window.__dirty = false;
+        try {
+          const f = await fileHandle.getFile();
+          lastSavedAt = window.__lastSavedAt = f.lastModified;
+        } catch {}
+        setBanner("Saved · " + new Date().toLocaleTimeString(), "saved");
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setBanner("Save failed: " + err.message, "dirty");
+        }
+      }
+      return;
+    }
+
+    // Fallback for Safari/Firefox: trigger a download.
+    const blob = new Blob([html], { type: "text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = location.pathname.split("/").pop() || "document.html";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    dirty = false;
+    setBanner("Downloaded (browser can't overwrite in place)", "saved");
+  }
+
+  document.addEventListener("keydown", (e) => {
+    const mod = e.metaKey || e.ctrlKey;
+    const key = e.key.toLowerCase();
+    if (mod && key === "s") {
+      e.preventDefault();
+      save();
+    } else if (mod && key === "z" && !e.shiftKey && structuralUndo.length > 0) {
+      // Only intercept if we have a pending structural undo. Otherwise let
+      // the browser's native text undo run.
+      e.preventDefault();
+      const undo = structuralUndo.pop();
+      undo();
+    }
+  });
+
+  window.addEventListener("beforeunload", (e) => {
+    if (dirty) { e.preventDefault(); e.returnValue = ""; }
+  });
+</script>
+
+
+</body></html>
