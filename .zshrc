@@ -73,4 +73,6 @@ zstyle ':completion:*' menu select
 export OMNARA_INSTALL="$HOME/.omnara"
 export PATH="$OMNARA_INSTALL/bin:$PATH"
 
+export HOMEBREW_NO_ENV_HINTS=1
+
 source /Users/theo/.zsh_kraft_completion;
