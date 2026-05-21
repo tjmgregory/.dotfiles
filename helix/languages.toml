@@ -98,6 +98,37 @@ language-servers = ["typescript-language-server", "gpt"]
 formatter = { command = 'node_modules/.bin/biome', args = ["format", "--stdin-file-path", "test.tsx"] }
 # formatter = { command = 'prettier', args = ["--parser", "typescript"] }
 
+[[language]]
+name = "go"
+auto-format = true
+language-servers = ["gopls"]
+formatter = { command = "goimports" }
+
+[[language]]
+name = "python"
+auto-format = true
+language-servers = ["pyright"]
+
+[language-server.gopls]
+command = "gopls"
+
+[language-server.gopls.config.hints]
+assignVariableTypes = true
+compositeLiteralFields = true
+constantValues = true
+functionTypeParameters = true
+parameterNames = true
+rangeVariableTypes = true
+
+[language-server.pyright]
+command = "pyright-langserver"
+args = ["--stdio"]
+
+[language-server.pyright.config.python.analysis]
+typeCheckingMode = "basic"
+autoSearchPaths = true
+useLibraryCodeForTypes = true
+
 [language-server.gpt]
 command = "helix-gpt"
 
