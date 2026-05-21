@@ -18,6 +18,23 @@ ln -s ~/.dotfiles/agents/skills ~/.cursor/skills
 
 Skills are consolidated in `agents/skills/` following the [agentskills.io](https://agentskills.io/) standard and shared between Claude and Cursor.
 
+## Claude Code marketplace
+
+This repo is also published as a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-code/plugins) so individual skills can be installed by anyone:
+
+```
+/plugin marketplace add tjmgregory/.dotfiles
+/plugin install <name>@tjmgregory
+```
+
+### Installable skills
+
+| Name | What it does |
+|---|---|
+| [`human-friendly`](agents/skills/human-friendly) | Renders the next plan/design as an editable HTML doc on your Desktop instead of chat markdown — `designMode` editing, ⌘S file-save, markdown shortcuts, hover add-row/col on tables, live reload. |
+
+See [`.claude-plugin/README.md`](.claude-plugin/README.md) for publication conventions.
+
 ## Worktree Management
 
 This dotfiles setup includes a comprehensive worktree management system using Git worktrees for parallel development.
