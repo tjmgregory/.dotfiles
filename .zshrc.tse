@@ -1,0 +1,4 @@
+# TSE (The Software Engineer) shell setup
+
+# SSH into the always-on M1 home server (Tailscale, host defined in ~/.ssh/config)
+alias m1='ssh m1srv'

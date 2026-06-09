@@ -13,6 +13,7 @@ fi
 
 source ~/.dotfiles/.zshrc.aliases
 source ~/.dotfiles/.zshrc.elephant
+source ~/.dotfiles/.zshrc.tse
 source ~/.dotfiles/.zshrc.secret
 
 # Lazy-load nvm — saves ~400ms on every shell startup.
