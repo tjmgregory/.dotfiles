@@ -1,5 +1,8 @@
 {
   "skillListingBudgetFraction": 0.03,
+  "env": {
+    "UNIKRAFT_METRO": "fra"
+  },
   "permissions": {
     "allow": [
       "Bash(aws eks:*)",
@@ -64,6 +67,7 @@
       "Bash(kubectl cluster-info:*)",
       "Bash(kubectl get:*)",
       "Bash(kubectl version:*)",
+      "Bash(linear:*)",
       "Bash(ln:*)",
       "Bash(ls:*)",
       "Bash(make:*)",
@@ -102,6 +106,7 @@
       "Bash(tsc:*)",
       "Bash(type:*)",
       "Bash(uniq:*)",
+      "Bash(unikraft:*)",
       "Bash(wc:*)",
       "Bash(which:*)",
       "Bash(xargs:*)",
@@ -129,7 +134,7 @@
       "Bash(docker rmi:*)",
       "Bash(docker system prune:*)"
     ],
-    "defaultMode": "auto",
+    "defaultMode": "bypassPermissions",
     "additionalDirectories": [
       "/tmp/",
       "~/knowledge-base/"
@@ -167,19 +172,33 @@
     "gopls-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {
+    "tjmgregory": {
+      "source": {
+        "source": "github",
+        "repo": "tjmgregory/.dotfiles"
+      },
+      "autoUpdate": true
+    },
+    "agricidaniel-claude-seo": {
+      "source": {
+        "source": "github",
+        "repo": "the-software-engineer/claude-seo"
+      },
+      "autoUpdate": true
+    },
+    "gsap-skills": {
+      "source": {
+        "source": "github",
+        "repo": "greensock/gsap-skills"
+      }
+    }
+  },
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
   "preferredNotifChannel": "terminal_bell",
+  "skipAutoPermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1753956027187
-  },
-  "mcpServers": {
-    "qmd": {
-      "command": "qmd",
-      "args": [
-        "mcp"
-      ]
-    }
-  },
-  "skipAutoPermissionPrompt": true
+  }
 }
