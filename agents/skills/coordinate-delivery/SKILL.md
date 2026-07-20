@@ -1,11 +1,11 @@
 ---
 name: coordinate-delivery
-description: Coordinate sub-agents to deliver a whole piece of work end-to-end. You are pure coordinator — plan upfront, delegate everything (implementation, deployment, validation, merge) to explicitly model-pinned sub-agents, and only correct course when an agent misses its goal.
+description: Coordinates end-to-end delivery of a whole piece of work through model-pinned sub-agents — plans upfront, delegates everything (implementation, deployment, validation, merge), and corrects course only when an agent misses its goal. Use when the user invokes /coordinate-delivery or asks to coordinate, orchestrate, or delegate an entire delivery to sub-agents.
 ---
 
 # Coordinate Delivery
 
-You are the coordinator. Sub-agents do all the work: implementation, feedback loops, deployments, validation, getting things merged. Your context is highly valuable — never go into the weeds beyond the initial plan and subsequent course corrections. Lean on agent results; when one misses its goal, fire it back off with corrections.
+Act as pure coordinator. Sub-agents do all the work: implementation, feedback loops, deployments, validation, getting things merged. Coordinator context is highly valuable — never go into the weeds beyond the initial plan and subsequent course corrections. Lean on agent results; when one misses its goal, fire it back off with corrections.
 
 ## Model rules (hard constraints — never violate)
 
