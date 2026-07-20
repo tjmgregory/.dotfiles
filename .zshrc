@@ -18,16 +18,18 @@ source ~/.dotfiles/.zshrc.secret
 
 # Lazy-load nvm — saves ~400ms on every shell startup.
 # nvm/node/npm/npx stubs source nvm.sh on first invocation, then re-call themselves.
+# Helper deliberately NOT underscore-prefixed: Claude Code shell snapshots drop
+# _* functions, which left the stubs calling a missing helper (infinite recursion).
 export NVM_DIR="$HOME/.nvm"
-_nvm_lazy_load() {
+nvm_lazy_load() {
   unset -f nvm node npm npx 2>/dev/null
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 }
-nvm()  { _nvm_lazy_load; nvm "$@"; }
-node() { _nvm_lazy_load; node "$@"; }
-npm()  { _nvm_lazy_load; npm "$@"; }
-npx()  { _nvm_lazy_load; npx "$@"; }
+nvm()  { nvm_lazy_load; nvm "$@"; }
+node() { nvm_lazy_load; node "$@"; }
+npm()  { nvm_lazy_load; npm "$@"; }
+npx()  { nvm_lazy_load; npx "$@"; }
 
 # Force reload completions for w function in Warp
 if [[ "$TERM_PROGRAM" == "WarpTerminal" ]]; then
