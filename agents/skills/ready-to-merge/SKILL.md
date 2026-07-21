@@ -52,7 +52,7 @@ If the branch is behind base, rebase (preferred) or merge in. After resolving an
 Note the *current* HEAD SHA — this is the SHA AI reviewers will comment against this round. Use the `fixing-prs` skill's fetcher to capture the comment set:
 
 ```bash
-~/.claude/skills/fixing-prs/scripts/fetch_comments.sh <pr_number> > /tmp/rtm-before.json
+~/.claude/skills/fixing-prs/scripts/fetch_comments.py <pr_number> > /tmp/rtm-before.txt
 ```
 
 #### 2c. Wait for AI reviewers to weigh in
@@ -77,9 +77,9 @@ When `fixing-prs` finishes, control returns here.
 After `fixing-prs` returns, re-fetch the PR state and evaluate all four criteria:
 
 ```bash
-# Comment freshness
-~/.claude/skills/fixing-prs/scripts/fetch_comments.sh <pr_number> > /tmp/rtm-after.json
-# Compare: any comment created_at > push-time of current HEAD that lacks an agent reply?
+# Comment freshness — header line reports actionable counts directly
+~/.claude/skills/fixing-prs/scripts/fetch_comments.py <pr_number> > /tmp/rtm-after.txt
+# Stable when the digest shows 0 actionable threads and 0 reviews/issue comments needing reply
 
 # CI status
 gh pr checks <pr_number> --json name,state,conclusion

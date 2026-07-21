@@ -113,6 +113,23 @@ def format_reply(role: str, model: str | None, body: str, marker: str = "", quot
     return "\n\n".join(parts)
 
 
+def parse_paginated_json(text: str) -> list:
+    """Parse `gh api --paginate` output, which is one JSON array PER PAGE
+    concatenated (`[...][...]`), into a single flat list. A plain json.loads
+    raises on multi-page output, silently losing everything past page one."""
+    decoder = json.JSONDecoder()
+    items: list = []
+    idx = 0
+    while idx < len(text):
+        while idx < len(text) and text[idx].isspace():
+            idx += 1
+        if idx >= len(text):
+            break
+        value, idx = decoder.raw_decode(text, idx)
+        items.extend(value if isinstance(value, list) else [value])
+    return items
+
+
 def get_thread_replies(owner: str, repo: str, pr_num: str, comment_id: int) -> list[dict]:
     """Fetch all replies in a review comment thread."""
     cmd = [
@@ -121,7 +138,7 @@ def get_thread_replies(owner: str, repo: str, pr_num: str, comment_id: int) -> l
     ]
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        all_comments = json.loads(result.stdout) if result.stdout else []
+        all_comments = parse_paginated_json(result.stdout)
 
         # Find replies to this comment (in_reply_to_id matches)
         thread = [c for c in all_comments
@@ -189,7 +206,7 @@ def has_reply_marker(owner: str, repo: str, pr_num: str, marker: str) -> bool:
     ]
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        all_comments = json.loads(result.stdout) if result.stdout else []
+        all_comments = parse_paginated_json(result.stdout)
     except subprocess.CalledProcessError:
         return False
 
