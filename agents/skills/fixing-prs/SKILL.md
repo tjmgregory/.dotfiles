@@ -14,18 +14,31 @@ Address PR review comments: assess validity, make changes, reply to each thread.
 ### 1. Fetch PR and Comments
 
 ```bash
-scripts/fetch_comments.sh <pr_url_or_number>
+scripts/fetch_comments.py <pr_url_or_number>
 ```
 
-Returns JSON with:
-- `info` — PR metadata (title, branch, head SHA)
-- `review_comments` — Inline comments on code (have file path + line)
-- `issue_comments` — General PR discussion
-- `reviews` — Review body comments (the top-level message submitted with approve/request changes/comment, filtered to non-empty bodies)
+Uses the GraphQL reviewThreads API, so every thread arrives as a complete conversation (all replies, resolved/outdated state) with full pagination. Outputs a compact digest:
+
+- Header: PR title, branch, head SHA, counts of actionable vs hidden items
+- `=== REVIEW THREADS ===` — inline code threads, each starting with a `--- reply: {"comment_id": N} | path:line | STATUS` line followed by the full conversation (`@author:` then body)
+- `=== REVIEW BODIES ===` — top-level review messages, keyed by `{"review_id": N}`
+- `=== ISSUE COMMENTS ===` — general PR discussion, keyed by `{"issue_comment_id": N}`
+
+Each item's `reply:` JSON fragment is the exact field to use in `post_replies_batch.py` — no id lookup needed.
+
+Statuses:
+- `NEEDS REPLY` — no agent reply yet; must be assessed and replied to
+- `FOLLOW-UP` — someone (human or reviewer bot) replied after our last reply; re-assess the whole conversation
+- `HANDLED` / `(resolved)` — already dealt with; hidden by default (shown with `--all`), skip these
+- `INFO` — housekeeping bot comments (ticket sync, rate-limit notices, walkthroughs); hidden by default, never need replies
+
+Long bot boilerplate in `<details>` blocks is collapsed to `▸ summary [collapsed]` lines; the substance of a review always lives in its inline threads.
+
+`--json` dumps the full structured data if the digest is ever insufficient.
 
 ### 2. Assess Each Comment
 
-Process all three comment types: `review_comments` (inline on code), `issue_comments` (general discussion), and `reviews` (review body comments). Prioritize inline comments first, then review bodies, then general discussion.
+Every displayed item needs a response — the script already filtered out handled and resolved conversations. Prioritize review threads first, then review bodies, then issue comments.
 
 Categorize before acting. See [references/reply-templates.md](references/reply-templates.md) for examples.
 
@@ -36,14 +49,12 @@ Categorize before acting. See [references/reply-templates.md](references/reply-t
 | Invalid / N/A | No change | Explain why |
 | Unclear | No change | Ask clarifying question |
 
-**Skip threads where an agent already replied** — for `review_comments`, check the `replies` array on each comment for a `[🤖` prefix; for `issue_comments` and `reviews`, check the `body` field directly. Skip unless a human followed up after the last bot reply.
-
 ### 3. Plan All Changes
 
 List changes BEFORE editing — line numbers shift after edits.
 
 For inline review comments requiring code changes:
-1. Note file path and line number (`line` field = line in PR head branch)
+1. Note file path and line number from the thread header (line = line in PR head branch; `(outdated)` threads reference an older diff — search for the code)
 2. Read the file to understand context
 3. Plan the specific edit
 
@@ -112,9 +123,8 @@ Outputs a JSON array of results in input order. The script:
 ## Re-runs
 
 If invoked again on the same PR (e.g. to check for new comments after addressing previous ones):
-1. Re-run `scripts/fetch_comments.sh` to get the full fresh data
-2. Read the JSON output directly to identify any new/unaddressed comments
-3. **Do NOT pipe the output through inline python3 or jq filters** — just use the fetch script and read the result
+1. Re-run `scripts/fetch_comments.py` — anything displayed is new or reopened (`NEEDS REPLY` / `FOLLOW-UP`); handled conversations are hidden automatically
+2. **Do NOT pipe the output through inline python3 or jq filters** — just run the fetch script and read the result
 
 ## Rules
 

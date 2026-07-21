@@ -43,7 +43,7 @@ echo "- item3"
 gh api /repos/owner/repo/issues  # Raw API response, AI pipes through jq
 ```
 
-For a complete example, see `fixing-prs/scripts/fetch_comments.sh` which outputs structured JSON with progress messages to stderr.
+For a complete example, see `fixing-prs/scripts/fetch_comments.py` which outputs a compact digest (or `--json`) with progress messages to stderr.
 
 ## Structured Input for AI Permissioning
 
