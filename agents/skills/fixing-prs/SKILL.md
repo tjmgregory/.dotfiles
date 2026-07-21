@@ -137,4 +137,5 @@ If invoked again on the same PR (e.g. to check for new comments after addressing
 - **Batch replies** — collect all replies into one array and use `post_replies_batch.py` for parallel posting
 - **Plan before editing** — avoids line number drift issues
 - **Never skip unclear comments** — ask for clarification instead
+- **Never mirror PR activity to Linear (or any ticket tracker)** — do not post ticket comments announcing that GitHub comments were replied to or addressed. GitHub is the record of the PR conversation and code changes; duplicating it elsewhere is noise. Track all changes on the PR itself. Sole exception: when closing the ticket, one summary comment covering any pertinent design changes that emerged from the PR conversation relative to the original ticket description — nothing else
 - **Never use `!=` in inline Bash commands** — zsh escapes `!` to `\!` inside double-quoted strings, breaking python3 -c, jq, and similar inline scripts. Use the provided scripts or heredocs with single-quoted delimiters instead
