@@ -19,16 +19,18 @@ scripts/fetch_comments.py <pr_url_or_number>
 
 Uses the GraphQL reviewThreads API, so every thread arrives as a complete conversation (all replies, resolved/outdated state) with full pagination. Outputs a compact digest:
 
-- Header: PR title, branch, head SHA, counts of actionable vs hidden items
-- `=== REVIEW THREADS ===` — inline code threads, each starting with a `--- reply: {"comment_id": N} | path:line | STATUS` line followed by the full conversation (`@author:` then body)
-- `=== REVIEW BODIES ===` — top-level review messages, keyed by `{"review_id": N}`
-- `=== ISSUE COMMENTS ===` — general PR discussion, keyed by `{"issue_comment_id": N}`
+- Header: PR title, branch, head SHA, then `actionable:` and `hidden:` count lines
+- `=== REVIEW THREADS ===` — inline code threads: `[comment:N] path:line | STATUS` header, then the conversation (root comment first, replies marked `↳`, comments newer than our last reply marked `● NEW`)
+- `=== REVIEW BODIES ===` — top-level review messages: `[review:N] @author STATE | STATUS`
+- `=== ISSUE COMMENTS ===` — general PR discussion: `[issue_comment:N] @author | STATUS`
 
-Each item's `reply:` JSON fragment is the exact field to use in `post_replies_batch.py` — no id lookup needed.
+**The `[kind:N]` label is the reply target**: reply to `[comment:N]` with `{"comment_id": N}` in `post_replies_batch.py`, `[review:N]` with `{"review_id": N}`, `[issue_comment:N]` with `{"issue_comment_id": N}` — no id lookup needed.
+
+Cross-links: a thread header ends with `from review:N` when its root comment was submitted with a shown review body; review headers show `X threads (Y actionable)` so "actionable comments posted" claims reconcile against the thread list. Agent-authored comments have their `[🤖 Role - Model]` prefix lifted into the author line, e.g. `↳ @login (🤖 Author - Opus 4.6):`.
 
 Statuses:
 - `NEEDS REPLY` — no agent reply yet; must be assessed and replied to
-- `FOLLOW-UP` — someone (human or reviewer bot) replied after our last reply; re-assess the whole conversation
+- `FOLLOW-UP` — someone (human or reviewer bot) replied after our last reply; the `● NEW` comments are what needs re-assessing
 - `HANDLED` / `(resolved)` — already dealt with; hidden by default (shown with `--all`), skip these
 - `INFO` — housekeeping bot comments (ticket sync, rate-limit notices, walkthroughs); hidden by default, never need replies
 

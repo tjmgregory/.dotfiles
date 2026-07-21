@@ -10,8 +10,13 @@ conversation (all replies, resolved/outdated state) with cursor pagination at
 every level — nothing is missed, regardless of comment count.
 
 Default output is a compact text digest designed for LLM consumption:
-  - Each item leads with the exact reply target for post_replies_batch.py,
-    e.g. `reply: {"comment_id": 123}`.
+  - Each item's header label doubles as its reply target: reply to
+    `[comment:N]` with {"comment_id": N} in post_replies_batch.py (same
+    pattern for [review:N] and [issue_comment:N]).
+  - Replies are marked `↳`; comments that arrived after our last reply get
+    `● NEW`. Agent prefixes are lifted into the author line.
+  - Thread headers carry `from review:N` when the root came from a shown
+    review; review headers count their threads.
   - Threads/comments already handled by an agent (and resolved threads) are
     collapsed into counts. Pass --all to show them in full.
   - HTML comments (hidden bot markers) are stripped from bodies.
@@ -114,6 +119,7 @@ query($owner: String!, $repo: String!, $num: Int!, $threadCursor: String) {
             nodes {
               databaseId author { login } body createdAt
               isMinimized minimizedReason
+              pullRequestReview { databaseId }
             }
           }
         }
@@ -231,17 +237,29 @@ def fetch_all(owner: str, repo: str, num: int) -> dict:
     }
 
 
+def reply_core(body: str) -> str:
+    """Body minus hidden markers and any leading blockquote — marker-based
+    replies to issue comments/reviews open with `<!-- reply-to -->` and a
+    `> quote` line before the agent prefix."""
+    body = HTML_COMMENT_RE.sub("", body or "").lstrip()
+    lines = body.split("\n")
+    i = 0
+    while i < len(lines) and (lines[i].startswith(">") or not lines[i].strip()):
+        i += 1
+    return "\n".join(lines[i:]).lstrip()
+
+
 def is_agent(body: str) -> bool:
     """Any agent-authored comment (author replies AND agent reviewer feedback)."""
-    return body.lstrip().startswith(AGENT_PREFIX)
+    return reply_core(body).startswith(AGENT_PREFIX)
 
 
 def is_our_reply(body: str) -> bool:
     """An agent reply that HANDLES feedback. `[🤖 Reviewer - ...]` comments are
     incoming review feedback (posted by the reviewing-prs skill), not handling —
     a thread containing only one still needs a reply."""
-    stripped = body.lstrip()
-    return stripped.startswith(AGENT_PREFIX) and not stripped.startswith("[🤖 Reviewer")
+    core = reply_core(body)
+    return core.startswith(AGENT_PREFIX) and not core.startswith("[🤖 Reviewer")
 
 
 def collapse_details(body: str) -> str:
@@ -333,10 +351,67 @@ def login(comment: dict) -> str:
     return author["login"] if author else "ghost"
 
 
-def render_comment(comment: dict, out: list[str]) -> None:
-    tag = " (minimized)" if comment.get("isMinimized") else ""
-    out.append(f"@{login(comment)}{tag}:")
-    out.append(clean_body(comment["body"]))
+AGENT_LIFT_RE = re.compile(r"^\[🤖 ([^\]]+)\]:[ \t]*\n?")
+BODY_INDENT = "      "
+
+
+def indent_body(text: str) -> str:
+    return "\n".join(
+        BODY_INDENT + line if line.strip() else "" for line in text.split("\n")
+    )
+
+
+def render_comment(comment: dict, out: list[str],
+                   is_reply: bool = False, is_new: bool = False) -> None:
+    """One comment: author line (with agent prefix lifted out of the body),
+    then the body indented beneath it. Replies get a `↳` marker."""
+    body = clean_body(comment["body"])
+    author = f"@{login(comment)}"
+
+    core = reply_core(body)
+    m = AGENT_LIFT_RE.match(core)
+    if m:
+        author += f" (🤖 {m.group(1)})"
+        body = core[m.end():].strip()
+
+    tags = ""
+    if comment.get("isMinimized"):
+        tags += " (minimized)"
+    if is_new:
+        tags += "  ● NEW"
+    prefix = "  ↳ " if is_reply else "  "
+    out.append(f"{prefix}{author}{tags}:")
+    out.append(indent_body(body) if body else BODY_INDENT + "(empty)")
+
+
+def new_reply_indices(bodies: list[str]) -> set[int]:
+    """Indices of comments that arrived after our last reply — what makes a
+    FOLLOW-UP conversation need re-assessment."""
+    last_ours = -1
+    for i, body in enumerate(bodies):
+        if is_our_reply(body):
+            last_ours = i
+    if last_ours == -1:
+        return set()
+    return {
+        i for i in range(last_ours + 1, len(bodies))
+        if not is_our_reply(bodies[i])
+    }
+
+
+def status_label(status: str, new_count: int) -> str:
+    if status == "FOLLOW-UP" and new_count:
+        plural = "replies" if new_count > 1 else "reply"
+        return f"FOLLOW-UP ({new_count} new {plural} since ours)"
+    return status
+
+
+def thread_review_id(thread: dict) -> int | None:
+    """databaseId of the review the thread's root comment was submitted with."""
+    if not thread["comments"]:
+        return None
+    review = thread["comments"][0].get("pullRequestReview")
+    return review["databaseId"] if review else None
 
 
 def render(data: dict, show_all: bool) -> str:
@@ -370,8 +445,12 @@ def render(data: dict, show_all: bool) -> str:
     info_comments = [c for c in comments if c["status"] == "INFO"]
     comment_action = [c for c in comments if c["status"] not in ("HANDLED", "INFO")]
 
-    hidden_bits = []
+    out.append(
+        f"actionable: {len(actionable)} threads, {len(review_action)} reviews, "
+        f"{len(comment_action)} issue comments"
+    )
     if not show_all:
+        hidden_bits = []
         if handled:
             hidden_bits.append(f"{len(handled)} handled threads")
         if resolved:
@@ -381,19 +460,18 @@ def render(data: dict, show_all: bool) -> str:
                 f"{len(info_comments)} info bot comments "
                 f"({', '.join(sorted({'@' + login(c) for c in info_comments}))})"
             )
-    hidden = f' | hidden: {", ".join(hidden_bits)} (--all to show)' if hidden_bits else ""
-    out.append(
-        f"threads: {len(actionable)} actionable of {len(threads)}{hidden} | "
-        f"reviews needing reply: {len(review_action)} | "
-        f"issue comments needing reply: {len(comment_action)}"
-    )
+        if hidden_bits:
+            out.append(f'hidden: {", ".join(hidden_bits)} — --all to show')
 
-    shown_threads = threads if show_all else actionable
+    shown_threads = [t for t in (threads if show_all else actionable) if t["comments"]]
+    shown_reviews = reviews if show_all else review_action
+    shown_review_ids = {r["databaseId"] for r in shown_reviews}
+
     if shown_threads:
         out.append("")
         out.append("=== REVIEW THREADS ===")
         for thread in shown_threads:
-            root_id = thread["comments"][0]["databaseId"] if thread["comments"] else None
+            root_id = thread["comments"][0]["databaseId"]
             line = thread["line"] or thread["originalLine"]
             loc = f'{thread["path"]}:{line}' if line else thread["path"]
             tags = []
@@ -402,41 +480,64 @@ def render(data: dict, show_all: bool) -> str:
             if thread["isResolved"]:
                 tags.append("resolved")
             tag_str = f' ({", ".join(tags)})' if tags else ""
+            bodies = [c["body"] or "" for c in thread["comments"]]
+            new = new_reply_indices(bodies) if thread["status"] == "FOLLOW-UP" else set()
+            review_ref = thread_review_id(thread)
+            from_ref = (
+                f" | from review:{review_ref}"
+                if review_ref in shown_review_ids else ""
+            )
             out.append("")
             out.append(
-                f'--- reply: {{"comment_id": {root_id}}} | {loc}{tag_str} | '
-                f'{thread["status"]}'
+                f"[comment:{root_id}] {loc}{tag_str} | "
+                f'{status_label(thread["status"], len(new))}{from_ref}'
             )
-            for comment in thread["comments"]:
-                render_comment(comment, out)
+            for i, comment in enumerate(thread["comments"]):
+                render_comment(comment, out, is_reply=(i > 0), is_new=(i in new))
 
-    shown_reviews = reviews if show_all else review_action
     if shown_reviews:
+        # Reconcile "Actionable comments posted: N" bodies with the thread list
+        threads_by_review: dict[int, list[dict]] = {}
+        for thread in threads:
+            rid = thread_review_id(thread)
+            if rid is not None:
+                threads_by_review.setdefault(rid, []).append(thread)
+        actionable_set = {id(t) for t in actionable}
+
         out.append("")
         out.append("=== REVIEW BODIES ===")
         for review in shown_reviews:
+            own = threads_by_review.get(review["databaseId"], [])
+            own_actionable = sum(1 for t in own if id(t) in actionable_set)
+            thread_ref = (
+                f" | {len(own)} threads ({own_actionable} actionable)" if own else ""
+            )
+            bodies = [review["body"] or ""] + [r["body"] or "" for r in review["replies"]]
+            new = new_reply_indices(bodies) if review["status"] == "FOLLOW-UP" else set()
             out.append("")
             out.append(
-                f'--- reply: {{"review_id": {review["databaseId"]}}} | '
-                f'@{login(review)} {review["state"]} | {review["status"]}'
+                f'[review:{review["databaseId"]}] @{login(review)} {review["state"]} | '
+                f'{status_label(review["status"], len(new))}{thread_ref}'
             )
-            out.append(clean_body(review["body"]))
-            for reply in review["replies"]:
-                render_comment(reply, out)
+            out.append(indent_body(clean_body(review["body"])))
+            for i, reply in enumerate(review["replies"], start=1):
+                render_comment(reply, out, is_reply=True, is_new=(i in new))
 
     shown_comments = comments if show_all else comment_action
     if shown_comments:
         out.append("")
         out.append("=== ISSUE COMMENTS ===")
         for comment in shown_comments:
+            bodies = [comment["body"] or ""] + [r["body"] or "" for r in comment["replies"]]
+            new = new_reply_indices(bodies) if comment["status"] == "FOLLOW-UP" else set()
             out.append("")
             out.append(
-                f'--- reply: {{"issue_comment_id": {comment["databaseId"]}}} | '
-                f'@{login(comment)} | {comment["status"]}'
+                f'[issue_comment:{comment["databaseId"]}] @{login(comment)} | '
+                f'{status_label(comment["status"], len(new))}'
             )
-            out.append(clean_body(comment["body"]))
-            for reply in comment["replies"]:
-                render_comment(reply, out)
+            out.append(indent_body(clean_body(comment["body"])))
+            for i, reply in enumerate(comment["replies"], start=1):
+                render_comment(reply, out, is_reply=True, is_new=(i in new))
 
     if not shown_threads and not shown_reviews and not shown_comments:
         out.append("")
