@@ -69,4 +69,4 @@ A. Cambiar 'conmigo' por 'con mí'. · B. Cambiar 'vas' por 'ir'. · C. Cambiar 
 ## Cierre
 
 Ejes cubiertos: ser/estar, modo tras negación y voluntad, preposiciones, aspecto pasado, concordancia de colectivos, relativos posesivos, calcos del inglés.
-Si fallan 2, 6 y 10 → todo es el mismo problema: **disparadores de subjuntivo**. Pasar a `references/ejemplo-subjuntivo-completar.md`.
+Si fallan 2, 6 y 10 → todo es el mismo problema: **disparadores de subjuntivo**. Pasar a `../../references/ejemplo-subjuntivo-completar.md`.

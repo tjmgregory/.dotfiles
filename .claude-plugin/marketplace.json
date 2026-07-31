@@ -18,6 +18,16 @@
         "name": "Theo Gregory"
       },
       "keywords": ["plans", "html", "editable", "design-mode", "live-reload"]
+    },
+    {
+      "name": "spanish-practice",
+      "source": "./agents/plugins/spanish-practice",
+      "description": "Práctica interactiva de español: ejercicios por tema y nivel (B1/B2), registro de lo aprendido y repaso espaciado.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Theo Gregory"
+      },
+      "keywords": ["spanish", "language-learning", "spaced-repetition", "cefr"]
     }
   ]
 }

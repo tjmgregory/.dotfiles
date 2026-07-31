@@ -1,6 +1,6 @@
 # Repaso espaciado — selección de ítems
 
-Cómo se decide **si** hay repaso y **qué** se repasa. Todo el estado vive en `data/aprendido.jsonl`, una línea JSON por ítem aprendido.
+Cómo se decide **si** hay repaso y **qué** se repasa. Todo el estado vive en `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl`, una línea JSON por ítem aprendido — ruta absoluta a propósito: el plugin instalado se ejecuta desde una copia en caché versionada, y el registro tiene que vivir (y commitearse) en la copia de trabajo.
 
 La fecha de hoy se obtiene siempre con `date +%F`. No la deduzcas.
 
@@ -43,7 +43,7 @@ Solo si hay al menos un ítem no fresco. Elige un número al azar del 1 al 10:
 
 No anuncies el sorteo ni lo comentes. Si sale que no, empieza el tema sin mencionar que había repaso pendiente.
 
-En `/spanish-practice repaso` **no hay sorteo**: el usuario lo ha pedido, se hace siempre y con más ítems.
+En la skill `spanish-practice:repaso` **no hay sorteo**: el usuario lo ha pedido, se hace siempre y con más ítems.
 
 ## Elección de los ítems
 
@@ -64,7 +64,7 @@ Apertura corta — dos o tres ítems, feedback breve, y al tema del día. El aba
 
 ## Después de corregir
 
-Reescribe la línea de ese ítem en `data/aprendido.jsonl`:
+Reescribe la línea de ese ítem en `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl`:
 
 - Añade la fecha de hoy a `repasos`, acierte o falle. Refleja cuándo se tocó por última vez.
 - **Acierta** → `aciertos` + 1.

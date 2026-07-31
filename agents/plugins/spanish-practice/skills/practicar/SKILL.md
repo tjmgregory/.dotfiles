@@ -1,6 +1,6 @@
 ---
-name: spanish-practice
-description: Genera ejercicios interactivos de español (opciones, texto libre, completar, identificar el error) sobre un tema dado, con feedback razonado, y lleva un registro de lo aprendido con repaso espaciado. Use when the user says "spanish practice", "ejercicios de español", "practicar español", "repaso", "spaced repetition", "apúntalo", "recuerda esto", asks to be quizzed on a Spanish topic (subjuntivo, ser/estar, español de México, B1…), or invokes /spanish-practice, /spanish-practice recordar, /spanish-practice repaso.
+name: practicar
+description: Genera ejercicios interactivos de español (opciones, texto libre, completar, identificar el error) sobre un tema dado, con feedback razonado, y abre la sesión con repaso espaciado cuando toca. Use when the user says "spanish practice", "ejercicios de español", "practicar español", asks to be quizzed on a Spanish topic (subjuntivo, ser/estar, español de México, B1…), or invokes /spanish-practice:practicar.
 ---
 
 # Práctica de español — ejercicios interactivos
@@ -15,7 +15,7 @@ Las partes personalizables van entre corchetes y en mayúscula, con opciones sep
 
 | Parámetro | Cómo resolverlo |
 |---|---|
-| **TEMA** | Lo dice el usuario (`/spanish-practice subjuntivo`). Si no lo dice, sácalo de la frontera B1→B2 (ver "Perfil de nivel") y anúncialo. |
+| **TEMA** | Lo dice el usuario (`/spanish-practice:practicar subjuntivo`). Si no lo dice, sácalo de la frontera B1→B2 (ver "Perfil de nivel") y anúncialo. |
 | **FORMATO** | Lo dice el usuario. Si no, elígelo según la amplitud del tema (ver abajo) y anuncia cuál has elegido. |
 | **NIVEL** | Opcional (A2/B1/B2/C1). Si no se indica, **frontera B1/B2** — ver "Perfil de nivel". |
 | **CANTIDAD** | Por defecto 8–10 ejercicios. |
@@ -28,7 +28,7 @@ El usuario está **en la frontera B1/B2**: B1 lo tiene sólido, B2 lo conoce a t
 - **Sesga hacia la zona floja**: en una tanda de 8–10, que 6–7 ítems caigan en puntos de B2 temprano y el resto sirva de anclaje B1.
 - No subas a B2 pleno ni a C1 por iniciativa propia. Si un ítem se va de nivel, dilo al corregir en vez de disimularlo.
 
-Cuando el usuario no da tema, o pide variedad, o dice "lo que sea": saca el tema de la sección **"Zona fronteriza B1→B2"** de `references/niveles-cefr.md`, que es el inventario de temas. No tires siempre de los clásicos (subjuntivo, ser/estar, por/para) — están ahí, pero son cuatro de una lista larga.
+Cuando el usuario no da tema, o pide variedad, o dice "lo que sea": saca el tema de la sección **"Zona fronteriza B1→B2"** de `../../references/niveles-cefr.md`, que es el inventario de temas. No tires siempre de los clásicos (subjuntivo, ser/estar, por/para) — están ahí, pero son cuatro de una lista larga.
 
 ## Elección de formato — regla importante
 
@@ -39,11 +39,11 @@ Cuando el usuario no da tema, o pide variedad, o dice "lo que sea": saca el tema
 
 Si el usuario pide "identificar el error" sobre un tema cerrado, hazlo igualmente pero avísale en una línea de que las respuestas pueden resultar obvias y ofrécele el formato alternativo.
 
-Detalle de cada formato: `references/formatos.md`.
+Detalle de cada formato: `../../references/formatos.md`.
 
 ## Cómo se ejecuta la sesión
 
-0. **Antes de nada, mira si toca repaso.** Lee `data/aprendido.jsonl`. Si existe y tiene líneas, aplica la selección de `references/repaso.md`: hay ~70 % de probabilidad de abrir con **2–3 ítems ya aprendidos** en forma de ejercicio, antes del tema del día. Si el fichero no existe o está vacío, pasa al paso 1 sin decir nada.
+0. **Antes de nada, mira si toca repaso.** Lee `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl` — ruta absoluta a propósito: el plugin instalado se ejecuta desde una copia en caché versionada, y el registro tiene que vivir (y commitearse) en la copia de trabajo. Si existe y tiene líneas, aplica la selección de `../../references/repaso.md`: hay ~70 % de probabilidad de abrir con **2–3 ítems ya aprendidos** en forma de ejercicio, antes del tema del día. Si el fichero no existe o está vacío, pasa al paso 1 sin decir nada.
 1. Si toca repaso: sirve esos 2–3 ítems, corrige, actualiza sus líneas en el fichero y **transiciona en una frase** al tema pedido. Nada de resúmenes largos — la apertura es un calentamiento, no la sesión. Si el usuario dice "hoy no" o "sin repaso", salta directo al paso 2.
 2. Confirma **tema**, **formato** y **nivel** en una línea. No pidas más datos de los necesarios.
 3. Genera la tanda de ejercicios numerados. **No des las respuestas todavía.**
@@ -53,39 +53,13 @@ Detalle de cada formato: `references/formatos.md`.
    - **Por qué** es correcta — la regla, no solo la etiqueta.
    - **Por qué falla** lo que puso el usuario, si falló.
    - **Todas las demás formas gramaticales**, cada una con la lectura que la hace válida. Obligatorio, no opcional — ver "Regla del abanico completo".
-6. Cierra con un resumen breve: qué domina, qué conviene repasar, y ofrece otra tanda (más difícil, mismo tema; o tema nuevo). Si en la sesión ha caído algún "ah, ahora lo veo", ofrece apuntarlo (ver `recordar`).
+6. Cierra con un resumen breve: qué domina, qué conviene repasar, y ofrece otra tanda (más difícil, mismo tema; o tema nuevo). Si en la sesión ha caído algún "ah, ahora lo veo", ofrece apuntarlo (skill `spanish-practice:recordar`).
 
-## Subcomandos
+## Skills hermanas
 
-### `recordar` — apuntar algo aprendido
-
-`/spanish-practice recordar <cosa>`, o a mitad de sesión cuando el usuario dice **"apúntalo"**, "recuerda esto", "guárdalo" o parecido. En ese caso el `<cosa>` es lo que se acaba de explicar; no preguntes cuál, dedúcelo del contexto inmediato.
-
-Añade **una línea JSON** al final de `data/aprendido.jsonl` (ruta relativa al directorio de la skill):
-
-```json
-{"fecha": "2026-07-31", "item": "aunque + subjuntivo presenta el obstáculo como ya sabido y no discutido", "tema": "aunque, concesivas", "nivel": "B2", "notas": "el modo no dice si es verdad, dice si lo estoy poniendo sobre la mesa o dándolo por hecho", "repasos": [], "aciertos": 0}
-```
-
-| campo | qué va |
-|---|---|
-| `fecha` | Día de hoy, `YYYY-MM-DD`. Sácalo con `date +%F` — **no lo deduzcas**. |
-| `item` | Descripción corta de lo entendido. Una línea. |
-| `tema` | Punto gramatical, para agrupar y no repetir en un mismo repaso. |
-| `nivel` | `B1`, `B2`, … el del punto, no el del usuario. |
-| `notas` | Opcional: la regla **como la formuló el usuario**. |
-| `repasos` | `[]` en ítems nuevos. Fechas de repaso después. |
-| `aciertos` | `0` en ítems nuevos. |
-
-**Lo que se apunta es el clic del usuario, no la regla del manual.** Si dijo "ah, entonces el subjuntivo aquí no es duda, es que no lo estoy afirmando", eso va en `notas` tal cual. Una reformulación de gramática académica no le va a devolver el recuerdo dentro de tres semanas; su propia frase sí. Si no hubo formulación propia, deja `notas` fuera antes que inventarla.
-
-Confirma en una línea qué has apuntado y sigue con lo que estabais haciendo.
-
-### `repaso` — sesión de repaso completa
-
-`/spanish-practice repaso`. Repaso explícito sobre los ítems vencidos de `data/aprendido.jsonl`, sin tema del día detrás. Aquí **no hay sorteo**: se hace siempre, con 5–8 ítems. Si no hay nada vencido, dilo y ofrece repasar lo más antiguo igualmente.
-
-Algoritmo de selección, vencimientos y actualización de las líneas: `references/repaso.md`. Vale para los dos casos — el repaso explícito y la apertura del paso 0.
+- **Apuntar algo aprendido** a mitad de sesión ("apúntalo", "recuerda esto") → skill `spanish-practice:recordar`.
+- **Repaso explícito**, sin tema del día detrás → skill `spanish-practice:repaso`.
+- **Algoritmo del sorteo, vencimientos y actualización de líneas** (el del paso 0) → `../../references/repaso.md`.
 
 ## Regla del abanico completo
 
@@ -119,8 +93,8 @@ Al **diseñar** la tanda, decide para cada ítem si quieres respuesta única o a
 
 Dos sesiones reales, una por extremo del eje "tema amplio / tema cerrado". Los ejercicios están copiados literalmente; sirven de patrón de dificultad, redacción y diseño de distractores:
 
-- `references/ejemplo-b1-identificar-error.md` — español B1, identificar el error (10 ítems de opción múltiple). Fuente: https://share.gemini.google/8kgeRQyU9SRj
-- `references/ejemplo-subjuntivo-completar.md` — subjuntivo, completar frases (6 ítems, respuesta libre). Fuente: https://share.gemini.google/GAGKf0XqcKcn
+- `../../references/ejemplo-b1-identificar-error.md` — español B1, identificar el error (10 ítems de opción múltiple). Fuente: https://share.gemini.google/8kgeRQyU9SRj
+- `../../references/ejemplo-subjuntivo-completar.md` — subjuntivo, completar frases (6 ítems, respuesta libre). Fuente: https://share.gemini.google/GAGKf0XqcKcn
 
 Dos cosas que copiar de ellas:
 
