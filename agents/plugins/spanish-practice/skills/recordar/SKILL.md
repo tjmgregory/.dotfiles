@@ -29,5 +29,5 @@ Confirma en una línea qué has apuntado y sigue con lo que estabais haciendo.
 
 ## Skills hermanas
 
-- **Sesión de ejercicios** → skill `spanish-practice:practicar`.
+- **Sesión de ejercicios** → skill `spanish-practice:spanish-practice`.
 - **Repaso de lo apuntado** → skill `spanish-practice:repaso`. Cómo se seleccionan y actualizan las líneas: `../../references/repaso.md`.

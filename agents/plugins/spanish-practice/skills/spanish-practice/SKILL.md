@@ -1,6 +1,6 @@
 ---
-name: practicar
-description: Genera ejercicios interactivos de español (opciones, texto libre, completar, identificar el error) sobre un tema dado, con feedback razonado, y abre la sesión con repaso espaciado cuando toca. Use when the user says "spanish practice", "ejercicios de español", "practicar español", asks to be quizzed on a Spanish topic (subjuntivo, ser/estar, español de México, B1…), or invokes /spanish-practice:practicar.
+name: spanish-practice
+description: Genera ejercicios interactivos de español (opciones, texto libre, completar, identificar el error) sobre un tema dado, con feedback razonado, y abre la sesión con repaso espaciado cuando toca. Use when the user says "spanish practice", "ejercicios de español", "practicar español", asks to be quizzed on a Spanish topic (subjuntivo, ser/estar, español de México, B1…), or invokes /spanish-practice.
 ---
 
 # Práctica de español — ejercicios interactivos
@@ -15,7 +15,7 @@ Las partes personalizables van entre corchetes y en mayúscula, con opciones sep
 
 | Parámetro | Cómo resolverlo |
 |---|---|
-| **TEMA** | Lo dice el usuario (`/spanish-practice:practicar subjuntivo`). Si no lo dice, sácalo de la frontera B1→B2 (ver "Perfil de nivel") y anúncialo. |
+| **TEMA** | Lo dice el usuario (`/spanish-practice subjuntivo`). Si no lo dice, sácalo de la frontera B1→B2 (ver "Perfil de nivel") y anúncialo. |
 | **FORMATO** | Lo dice el usuario. Si no, elígelo según la amplitud del tema (ver abajo) y anuncia cuál has elegido. |
 | **NIVEL** | Opcional (A2/B1/B2/C1). Si no se indica, **frontera B1/B2** — ver "Perfil de nivel". |
 | **CANTIDAD** | Por defecto 8–10 ejercicios. |
