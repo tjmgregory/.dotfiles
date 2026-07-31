@@ -45,7 +45,7 @@ Detalle de cada formato: `../../references/formatos.md`.
 
 0. **Antes de nada, mira si toca repaso.** Lee `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl` — ruta absoluta a propósito: el plugin instalado se ejecuta desde una copia en caché versionada, y el registro tiene que vivir (y commitearse) en la copia de trabajo. Si existe y tiene líneas, aplica la selección de `../../references/repaso.md`: hay ~70 % de probabilidad de abrir con **2–3 ítems ya aprendidos** en forma de ejercicio, antes del tema del día. Si el fichero no existe o está vacío, pasa al paso 1 sin decir nada.
 1. Si toca repaso: sirve esos 2–3 ítems, corrige, actualiza sus líneas en el fichero y **transiciona en una frase** al tema pedido. Nada de resúmenes largos — la apertura es un calentamiento, no la sesión. Si el usuario dice "hoy no" o "sin repaso", salta directo al paso 2.
-2. Confirma **tema**, **formato** y **nivel** en una línea. No pidas más datos de los necesarios.
+2. Confirma **tema**, **formato** y **nivel** en una línea. No pidas más datos de los necesarios. En cuanto estén confirmados —ni antes— añade la línea de esta sesión a `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/sesiones.jsonl` (ruta absoluta por lo mismo que `aprendido.jsonl`), con `tipo` `"practica"` y `repaso_apertura` según haya habido apertura o no.
 3. Genera la tanda de ejercicios numerados. **No des las respuestas todavía.**
 4. Espera a que el usuario responda. Puede responder a todos de golpe o de uno en uno; si responde de uno en uno, corrige ese ítem al momento y no esperes al resto.
 5. Da feedback **ejercicio por ejercicio**:
@@ -53,7 +53,26 @@ Detalle de cada formato: `../../references/formatos.md`.
    - **Por qué** es correcta — la regla, no solo la etiqueta.
    - **Por qué falla** lo que puso el usuario, si falló.
    - **Todas las demás formas gramaticales**, cada una con la lectura que la hace válida. Obligatorio, no opcional — ver "Regla del abanico completo".
-6. Cierra con un resumen breve: qué domina, qué conviene repasar, y ofrece otra tanda (más difícil, mismo tema; o tema nuevo). Si en la sesión ha caído algún "ah, ahora lo veo", ofrece apuntarlo (skill `spanish-practice:recordar`).
+6. Cierra con un resumen breve: qué domina, qué conviene repasar, y ofrece otra tanda (más difícil, mismo tema; o tema nuevo). Si en la sesión ha caído algún "ah, ahora lo veo", ofrece apuntarlo (skill `spanish-practice:recordar`). Reescribe aquí la línea de la sesión en `sesiones.jsonl` añadiéndole `resultado`; el resto del fichero se queda intacto.
+
+## Registro de sesiones — `sesiones.jsonl`
+
+Una línea JSON por sesión, añadida al confirmar los parámetros (paso 2) y reescrita al cerrar (paso 6):
+
+```json
+{"id": "2026-07-31-2143", "fecha": "2026-07-31", "hora": "21:43", "tipo": "practica", "tema": "subjuntivo", "formato": "completar", "nivel": "B1/B2", "repaso_apertura": true}
+```
+
+| campo | qué va |
+|---|---|
+| `id` | Sácalo con `date +%F-%H%M` — **no lo deduzcas**. Es el identificador de la sesión, el que citan los ítems de `aprendido.jsonl`. |
+| `fecha`, `hora` | De esa misma llamada: `YYYY-MM-DD` y `HH:MM`. |
+| `tipo` | `practica` aquí; `repaso` en la skill `spanish-practice:repaso`. |
+| `tema`, `formato`, `nivel` | Los del paso 2, tal como quedaron confirmados. |
+| `repaso_apertura` | `true` si el paso 1 llegó a servir ítems, `false` si no hubo. |
+| `resultado` | Solo al cerrar: `{"ejercicios": N, "aciertos": N, "temas_flojos": ["..."]}`. |
+
+Si el usuario se va sin cerrar, la línea se queda sin `resultado` y así se queda: una sesión a medias se ve como lo que fue. No la completes a ojo ni la borres.
 
 ## Skills hermanas
 

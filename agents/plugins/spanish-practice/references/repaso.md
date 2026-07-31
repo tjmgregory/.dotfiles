@@ -4,6 +4,8 @@ Cómo se decide **si** hay repaso y **qué** se repasa. Todo el estado vive en `
 
 La fecha de hoy se obtiene siempre con `date +%F`. No la deduzcas.
 
+Al lado, `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/sesiones.jsonl` guarda la cronología de sesiones —una línea por sesión, las de repaso incluidas—; aquí no se toca, los `repasos` de cada ítem siguen siendo fechas sueltas.
+
 ---
 
 ## Intervalo por número de aciertos

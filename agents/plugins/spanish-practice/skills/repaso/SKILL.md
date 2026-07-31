@@ -9,6 +9,10 @@ description: Sesión de repaso espaciado sobre los ítems de español ya aprendi
 
 Algoritmo de selección, vencimientos y actualización de las líneas: `../../references/repaso.md`. Vale para los dos casos — el repaso explícito y la apertura de la skill `spanish-practice:spanish-practice`.
 
+## Registro de la sesión
+
+Antes del primer ítem, añade la línea de esta sesión a `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/sesiones.jsonl` (ruta absoluta por lo mismo) con `tipo` `"repaso"`: `tema` a `null` o fuera —aquí no hay tema del día—, y sin `formato` ni `repaso_apertura`, que no pintan nada en un repaso. Al cerrar, reescribe esa línea añadiéndole `resultado`; si la sesión se queda a medias, se queda sin él. Esquema completo de la línea: skill `spanish-practice:spanish-practice`.
+
 ## Skills hermanas
 
 - **Sesión de ejercicios sobre un tema** → skill `spanish-practice:spanish-practice`.
