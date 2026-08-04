@@ -1,6 +1,6 @@
 ---
 name: spanish-practice
-description: Genera ejercicios interactivos de español (opciones, texto libre, completar, identificar el error) sobre un tema dado, con feedback razonado, y abre la sesión con repaso espaciado cuando toca. Use when the user says "spanish practice", "ejercicios de español", "practicar español", asks to be quizzed on a Spanish topic (subjuntivo, ser/estar, español de México, B1…), or invokes /spanish-practice.
+description: Genera ejercicios interactivos de español (opciones, texto libre, completar, identificar el error) sobre un tema dado, servidos de uno en uno por defecto, con feedback razonado, y abre la sesión con repaso espaciado cuando toca. Use when the user says "spanish practice", "ejercicios de español", "practicar español", asks to be quizzed on a Spanish topic (subjuntivo, ser/estar, español de México, B1…), or invokes /spanish-practice.
 ---
 
 # Práctica de español — ejercicios interactivos
@@ -19,6 +19,7 @@ Las partes personalizables van entre corchetes y en mayúscula, con opciones sep
 | **FORMATO** | Lo dice el usuario. Si no, elígelo según la amplitud del tema (ver abajo) y anuncia cuál has elegido. |
 | **NIVEL** | Opcional (A2/B1/B2/C1). Si no se indica, **frontera B1/B2** — ver "Perfil de nivel". |
 | **CANTIDAD** | Por defecto 8–10 ejercicios. |
+| **RITMO** | `uno a uno` (por defecto) o `tanda`. Se pregunta al abrir la sesión — ver "Ritmo de entrega". |
 
 ## Perfil de nivel
 
@@ -41,14 +42,42 @@ Si el usuario pide "identificar el error" sobre un tema cerrado, hazlo igualment
 
 Detalle de cada formato: `../../references/formatos.md`.
 
+## Ritmo de entrega
+
+Dos maneras de servir la misma tanda. **Por defecto, uno a uno.**
+
+| Ritmo | Cómo va |
+|---|---|
+| **uno a uno** | Un solo ejercicio por mensaje. El usuario responde, corriges ese ítem entero, y solo entonces sale el siguiente. Es el modo por defecto: más conversación, feedback en caliente, y puedes ajustar la dificultad de lo que queda según cómo vaya respondiendo. |
+| **tanda** | Los 8–10 ejercicios numerados de golpe. El usuario responde a su ritmo, de golpe o por partes; corriges cada respuesta según llega. Útil si quiere verlos todos, imprimirlos o resolverlos sin interrupciones. |
+
+**Pregúntalo al abrir**, junto con la confirmación de tema/formato/nivel, en una línea y con el defecto marcado:
+
+> Subjuntivo, completar, B1/B2. ¿Uno a uno (por defecto) o la tanda entera de golpe?
+
+Si el usuario ya lo ha dicho en su mensaje ("de una en una", "dámelos todos", "one at a time") no lo preguntes: dalo por confirmado y anúncialo. Si responde cualquier cosa que no sea una elección de ritmo — por ejemplo, empieza a hablar del tema — tira con **uno a uno** y sigue.
+
+Se puede cambiar a mitad de sesión: "dámelos todos ya", "mejor de una en una". Cámbialo sin ceremonia y sigue por donde ibas.
+
+### En uno a uno
+
+- **Diseña la tanda entera antes de servir el primer ítem.** Sigue habiendo 8–10 ejercicios con su reparto de dificultad y su cobertura del tema (ver "Perfil de nivel"); lo único que cambia es que se sirven de a uno. Sin plan previo, la sesión se convierte en ocho ítems sueltos del mismo subpunto.
+- **Numera siempre: `3/8`.** El usuario tiene que saber por dónde va y cuánto queda.
+- Un mensaje = un ejercicio. Nada de adelantar el siguiente "por si acaso".
+- Corrige con el mismo detalle de siempre —regla, por qué falla lo suyo, abanico completo— y **cierra con el ejercicio siguiente en el mismo mensaje**, sin preámbulo. Feedback y siguiente ítem van juntos; no hagas esperar un turno extra.
+- **Aprovecha lo que ves.** Si falla dos ítems seguidos por lo mismo, mete el siguiente en ese punto en vez de pasar al que tocaba. Si va sobrado, sube al ítem más duro del plan. Anuncia el cambio en media línea al hacerlo.
+- El plan es una guía, no un contrato: puedes cortar en el 6 si el usuario ya lo tiene, o alargar si está enganchado. Dilo al cerrar.
+
 ## Cómo se ejecuta la sesión
 
 0. **Antes de nada, mira si toca repaso.** Lee `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl` — ruta absoluta a propósito: el plugin instalado se ejecuta desde una copia en caché versionada, y el registro tiene que vivir (y commitearse) en la copia de trabajo. Si existe y tiene líneas, aplica la selección de `../../references/repaso.md`: hay ~70 % de probabilidad de abrir con **2–3 ítems ya aprendidos** en forma de ejercicio, antes del tema del día. Si el fichero no existe o está vacío, pasa al paso 1 sin decir nada.
 1. Si toca repaso: sirve esos 2–3 ítems, corrige, actualiza sus líneas en el fichero y **transiciona en una frase** al tema pedido. Nada de resúmenes largos — la apertura es un calentamiento, no la sesión. Si el usuario dice "hoy no" o "sin repaso", salta directo al paso 2.
-2. Confirma **tema**, **formato** y **nivel** en una línea. No pidas más datos de los necesarios. En cuanto estén confirmados —ni antes— añade la línea de esta sesión a `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/sesiones.jsonl` (ruta absoluta por lo mismo que `aprendido.jsonl`), con `tipo` `"practica"` y `repaso_apertura` según haya habido apertura o no.
-3. Genera la tanda de ejercicios numerados. **No des las respuestas todavía.**
-4. Espera a que el usuario responda. Puede responder a todos de golpe o de uno en uno; si responde de uno en uno, corrige ese ítem al momento y no esperes al resto.
-5. Da feedback **ejercicio por ejercicio**:
+2. Confirma **tema**, **formato**, **nivel** y **ritmo** en una línea, con el ritmo por defecto marcado (ver "Ritmo de entrega"). No pidas más datos de los necesarios. En cuanto estén confirmados —ni antes— añade la línea de esta sesión a `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/sesiones.jsonl` (ruta absoluta por lo mismo que `aprendido.jsonl`), con `tipo` `"practica"`, `ritmo`, y `repaso_apertura` según haya habido apertura o no.
+3. Diseña la tanda entera de ejercicios numerados. **No des las respuestas todavía.** Sírvela según el ritmo:
+   - **uno a uno** (defecto) → solo el ejercicio `1/8` en este mensaje; el resto se queda en tu plan, sin enseñarlo.
+   - **tanda** → los 8–10 numerados de golpe.
+4. Espera a que el usuario responda. En tanda puede responder a todos de golpe o por partes; si responde de uno en uno, corrige ese ítem al momento y no esperes al resto.
+5. Da feedback **ejercicio por ejercicio** — y en uno a uno, el ejercicio siguiente va en ese mismo mensaje, detrás del feedback:
    - ✅ / ❌ y la respuesta correcta.
    - **Por qué** es correcta — la regla, no solo la etiqueta.
    - **Por qué falla** lo que puso el usuario, si falló.
@@ -60,7 +89,7 @@ Detalle de cada formato: `../../references/formatos.md`.
 Una línea JSON por sesión, añadida al confirmar los parámetros (paso 2) y reescrita al cerrar (paso 6):
 
 ```json
-{"id": "2026-07-31-2143", "fecha": "2026-07-31", "hora": "21:43", "tipo": "practica", "tema": "subjuntivo", "formato": "completar", "nivel": "B1/B2", "repaso_apertura": true}
+{"id": "2026-07-31-2143", "fecha": "2026-07-31", "hora": "21:43", "tipo": "practica", "tema": "subjuntivo", "formato": "completar", "nivel": "B1/B2", "ritmo": "uno-a-uno", "repaso_apertura": true}
 ```
 
 | campo | qué va |
@@ -69,6 +98,7 @@ Una línea JSON por sesión, añadida al confirmar los parámetros (paso 2) y re
 | `fecha`, `hora` | De esa misma llamada: `YYYY-MM-DD` y `HH:MM`. |
 | `tipo` | `practica` aquí; `repaso` en la skill `spanish-practice:repaso`. |
 | `tema`, `formato`, `nivel` | Los del paso 2, tal como quedaron confirmados. |
+| `ritmo` | `uno-a-uno` o `tanda`. Si cambia a mitad de sesión, deja el que acabó mandando. |
 | `repaso_apertura` | `true` si el paso 1 llegó a servir ítems, `false` si no hubo. |
 | `resultado` | Solo al cerrar: `{"ejercicios": N, "aciertos": N, "temas_flojos": ["..."]}`. |
 

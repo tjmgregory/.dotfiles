@@ -64,6 +64,8 @@ No repitas la frase con la que se apuntó el ítem. Contexto nuevo, misma regla:
 
 Apertura corta — dos o tres ítems, feedback breve, y al tema del día. El abanico completo se aplica igual, pero comprimido; el repaso no es el plato principal.
 
+**Los ítems se sirven al ritmo de la sesión** (ver "Ritmo de entrega" en la skill `spanish-practice:spanish-practice`): por defecto uno a uno, un ítem por mensaje, corrigiendo antes de sacar el siguiente. En la apertura no preguntes el ritmo — es un calentamiento de dos o tres ítems; pregúntalo después, al confirmar el tema del día.
+
 ## Después de corregir
 
 Reescribe la línea de ese ítem en `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl`:
