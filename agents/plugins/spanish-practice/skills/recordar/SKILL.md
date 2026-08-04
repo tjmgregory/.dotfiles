@@ -7,18 +7,19 @@ description: Apunta un ítem de español recién entendido en el registro de lo 
 
 `/spanish-practice:recordar <cosa>`, o a mitad de sesión cuando el usuario dice **"apúntalo"**, "recuerda esto", "guárdalo" o parecido. En ese caso el `<cosa>` es lo que se acaba de explicar; no preguntes cuál, dedúcelo del contexto inmediato.
 
-Añade **una línea JSON** al final de `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl` — ruta absoluta a propósito: el plugin instalado se ejecuta desde una copia en caché versionada, y el registro tiene que vivir (y commitearse) en la copia de trabajo.
+Añade **una línea JSON** al final de `$SPANISH_PRACTICE_DATA/aprendido.jsonl` — la carpeta de datos es `~/.spanish-practice` salvo que `SPANISH_PRACTICE_DATA` la mueva, que es lo que hace `~/.zshenv` en esta máquina para mandarla a iCloud Drive. Los scripts la resuelven solos; vive fuera del repo a propósito.
 
 ```json
-{"fecha": "2026-07-31", "item": "aunque + subjuntivo presenta el obstáculo como ya sabido y no discutido", "tema": "aunque, concesivas", "nivel": "B2", "notas": "el modo no dice si es verdad, dice si lo estoy poniendo sobre la mesa o dándolo por hecho", "repasos": [], "aciertos": 0, "sesion": "2026-07-31-2143"}
+{"fecha": "2026-07-31", "item": "aunque + subjuntivo presenta el obstáculo como ya sabido y no discutido", "tema_id": "FR.aunque-modo", "tema": "Aunque + indicativo / subjuntivo", "nivel": "B1/B2", "notas": "el modo no dice si es verdad, dice si lo estoy poniendo sobre la mesa o dándolo por hecho", "repasos": [], "aciertos": 0, "sesion": "2026-07-31-2143"}
 ```
 
 | campo | qué va |
 |---|---|
 | `fecha` | Día de hoy, `YYYY-MM-DD`. Sácalo con `date +%F` — **no lo deduzcas**. |
 | `item` | Descripción corta de lo entendido. Una línea. |
-| `tema` | Punto gramatical, para agrupar y no repetir en un mismo repaso. |
-| `nivel` | `B1`, `B2`, … el del punto, no el del usuario. |
+| `tema_id` | **Id del catálogo oficial** (`../../references/temas.json`). Resuélvelo con `python3 ../../scripts/temas.py --buscar "aunque"`; no inventes uno. Es lo que enlaza este ítem con las tasas de acierto y con el tema que se practica. |
+| `tema` | El `nombre` que trae ese id en el catálogo. Redundante a propósito: hace legible el fichero. |
+| `nivel` | El `nivel` del id en el catálogo, no el del usuario. |
 | `notas` | Opcional: la regla **como la formuló el usuario**. |
 | `repasos` | `[]` en ítems nuevos. Fechas de repaso después. |
 | `aciertos` | `0` en ítems nuevos. |

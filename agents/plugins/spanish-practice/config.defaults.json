@@ -1,0 +1,9 @@
+{
+  "nivel": "B1/B2",
+  "variedad": "peninsular neutro",
+  "cantidad_ejercicios": [8, 10],
+  "ritmo_por_defecto": "uno-a-uno",
+  "umbral_consolidacion": 0.8,
+  "sesiones_para_consolidar": 2,
+  "minimo_respuestas_sesion_valida": 5
+}
