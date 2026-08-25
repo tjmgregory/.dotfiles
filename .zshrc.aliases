@@ -55,9 +55,6 @@ alias k='kubectl'
 # helix-gpt https://github.com/leona/helix-gpt
 export HANDLER=copilot
 
-# Kraft Cloud
-export UKC_METRO=fra0
-
 
 # Worktree management
 export PATH="$HOME/.dotfiles/bin:$PATH"
