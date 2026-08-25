@@ -4,3 +4,6 @@ Brewfile.lock.json
 .DS_Store
 
 __pycache__
+
+# Datos de práctica: viven en ~/Documents/spanish-practice, sincronizados por iCloud
+agents/plugins/spanish-practice/data/

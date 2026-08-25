@@ -5,7 +5,7 @@ description: Sesión de repaso espaciado sobre los ítems de español ya aprendi
 
 # `repaso` — sesión de repaso completa
 
-`/spanish-practice:repaso`. Repaso explícito sobre los ítems vencidos de `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl` — ruta absoluta a propósito: el plugin instalado se ejecuta desde una copia en caché versionada, y el registro tiene que vivir (y commitearse) en la copia de trabajo. Sin tema del día detrás. Aquí **no hay sorteo**: se hace siempre, con 5–8 ítems. Si no hay nada vencido, dilo y ofrece repasar lo más antiguo igualmente.
+`/spanish-practice:repaso`. Repaso explícito sobre los ítems vencidos de `$SPANISH_PRACTICE_DATA/aprendido.jsonl` — la carpeta de datos es `~/.spanish-practice` salvo que `SPANISH_PRACTICE_DATA` la mueva, que es lo que hace `~/.zshenv` en esta máquina para mandarla a iCloud Drive. Los scripts la resuelven solos; vive fuera del repo a propósito. Sin tema del día detrás. Aquí **no hay sorteo**: se hace siempre, con 5–8 ítems. Si no hay nada vencido, dilo y ofrece repasar lo más antiguo igualmente.
 
 **Ritmo:** por defecto **uno a uno** — un ejercicio por mensaje, corriges, y el siguiente sale en ese mismo mensaje detrás del feedback. Pregúntalo en la línea de apertura ("¿uno a uno o los 6 de golpe?") y respétalo si el usuario ya lo ha dicho. Detalle en "Ritmo de entrega" de la skill `spanish-practice:spanish-practice`.
 
@@ -13,7 +13,21 @@ Algoritmo de selección, vencimientos y actualización de las líneas: `../../re
 
 ## Registro de la sesión
 
-Antes del primer ítem, añade la línea de esta sesión a `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/sesiones.jsonl` (ruta absoluta por lo mismo) con `tipo` `"repaso"`: `tema` a `null` o fuera —aquí no hay tema del día—, `ritmo` como haya quedado, y sin `formato` ni `repaso_apertura`, que no pintan nada en un repaso. Al cerrar, reescribe esa línea añadiéndole `resultado`; si la sesión se queda a medias, se queda sin él. Esquema completo de la línea: skill `spanish-practice:spanish-practice`.
+Antes del primer ítem, abre la sesión con el script — aquí no hay tema del día, así que va sin `--tema-id` ni `--formato`:
+
+```bash
+cd /Users/theo/.dotfiles/agents/plugins/spanish-practice/scripts
+python3 abrir_sesion.py --tipo repaso --ritmo uno-a-uno
+```
+
+**Cada ítem corregido se registra en el momento**, con el `tema_id` que trae el ítem de `aprendido.jsonl` y la marca `--repaso`, que lo deja fuera de las tasas del tema del día:
+
+```bash
+python3 registrar.py --sesion <id> --n 2/6 --tema-id FR.aunque-modo \
+  --formato completar --correcto si --respuesta "…" --esperada "…" --repaso
+```
+
+Al cerrar, `python3 cerrar_sesion.py --sesion <id>`. Si la sesión se queda a medias, se queda sin `resultado` y así se queda. Esquema completo de los ficheros y del catálogo de ids: skill `spanish-practice:spanish-practice`.
 
 ## Skills hermanas
 

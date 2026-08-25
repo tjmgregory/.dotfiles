@@ -1,10 +1,10 @@
 # Repaso espaciado — selección de ítems
 
-Cómo se decide **si** hay repaso y **qué** se repasa. Todo el estado vive en `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl`, una línea JSON por ítem aprendido — ruta absoluta a propósito: el plugin instalado se ejecuta desde una copia en caché versionada, y el registro tiene que vivir (y commitearse) en la copia de trabajo.
+Cómo se decide **si** hay repaso y **qué** se repasa. Todo el estado vive en `$SPANISH_PRACTICE_DATA/aprendido.jsonl`, una línea JSON por ítem aprendido — la carpeta de datos es `~/.spanish-practice` salvo que `SPANISH_PRACTICE_DATA` la mueva, que es lo que hace `~/.zshenv` en esta máquina para mandarla a iCloud Drive. Los scripts la resuelven solos; vive fuera del repo a propósito.
 
 La fecha de hoy se obtiene siempre con `date +%F`. No la deduzcas.
 
-Al lado, `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/sesiones.jsonl` guarda la cronología de sesiones —una línea por sesión, las de repaso incluidas—; aquí no se toca, los `repasos` de cada ítem siguen siendo fechas sueltas.
+Al lado, `$SPANISH_PRACTICE_DATA/sesiones.jsonl` guarda la cronología de sesiones —una línea por sesión, las de repaso incluidas—; aquí no se toca, los `repasos` de cada ítem siguen siendo fechas sueltas.
 
 ---
 
@@ -51,7 +51,7 @@ En la skill `spanish-practice:repaso` **no hay sorteo**: el usuario lo ha pedido
 
 1. Reparte papeletas: cada ítem aporta tantas como su peso (3 / 2 / 1).
 2. Saca 2–3 ítems al azar del montón, sin repetir. En `repaso` explícito, 5–8.
-3. Si dos ítems comparten `tema`, quédate con uno y saca otro — dos huecos del mismo punto gramatical en una apertura de tres es desaprovecharla.
+3. Si dos ítems comparten `tema_id`, quédate con uno y saca otro — dos huecos del mismo punto gramatical en una apertura de tres es desaprovecharla. Los `tema_id` son los del catálogo oficial, `temas.json`.
 4. Prioriza a igualdad de papeletas los de `nivel` B2: son los que más se caen.
 
 ## Forma del repaso
@@ -68,7 +68,7 @@ Apertura corta — dos o tres ítems, feedback breve, y al tema del día. El aba
 
 ## Después de corregir
 
-Reescribe la línea de ese ítem en `/Users/theo/.dotfiles/agents/plugins/spanish-practice/data/aprendido.jsonl`:
+Reescribe la línea de ese ítem en `$SPANISH_PRACTICE_DATA/aprendido.jsonl`:
 
 - Añade la fecha de hoy a `repasos`, acierte o falle. Refleja cuándo se tocó por última vez.
 - **Acierta** → `aciertos` + 1.
