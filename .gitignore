@@ -7,3 +7,6 @@ __pycache__
 
 # Datos de práctica: viven en ~/Documents/spanish-practice, sincronizados por iCloud
 agents/plugins/spanish-practice/data/
+
+# Packaged skills, rebuilt on demand
+agents/skills/*.zip
