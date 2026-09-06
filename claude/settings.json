@@ -113,7 +113,6 @@
       "Edit",
       "MultiEdit",
       "Read",
-      "Skill(beads:*)",
       "WebFetch",
       "WebSearch",
       "Write",
@@ -140,13 +139,26 @@
       "~/knowledge-base/"
     ]
   },
+  "model": "claude-fable-5-1[1m]",
   "hooks": {
     "Notification": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "afplay /System/Library/Sounds/Glass.aiff"
+            "command": "afplay /System/Library/Sounds/Purr.aiff"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theo/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
           }
         ]
       }
@@ -165,21 +177,22 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/statusline-command.sh"
+    "command": "/Users/theo/.nvm/versions/node/v20.10.0/bin/ccstatusline"
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/subagent-statusline.sh"
   },
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "caveman@caveman": true,
+    "lanteon@lanteon": true,
+    "skill-seekers@skill-seekers": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "knowledge-base@knowledge-base": true,
+    "spanish-practice@tjmgregory": true
   },
   "extraKnownMarketplaces": {
-    "tjmgregory": {
-      "source": {
-        "source": "github",
-        "repo": "tjmgregory/.dotfiles"
-      },
-      "autoUpdate": true
-    },
     "agricidaniel-claude-seo": {
       "source": {
         "source": "github",
@@ -187,16 +200,49 @@
       },
       "autoUpdate": true
     },
-    "gsap-skills": {
+    "tjmgregory": {
       "source": {
         "source": "github",
-        "repo": "greensock/gsap-skills"
+        "repo": "tjmgregory/.dotfiles"
+      },
+      "autoUpdate": true
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    },
+    "claude-for-legal": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-for-legal"
+      }
+    },
+    "lanteon": {
+      "source": {
+        "source": "github",
+        "repo": "the-software-engineer/lanteon"
+      }
+    },
+    "skill-seekers": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/theo/.local/share/skill-seekers-plugin"
+      }
+    },
+    "knowledge-base": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/theo/knowledge-base"
       }
     }
   },
   "effortLevel": "high",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "preferredNotifChannel": "terminal_bell",
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1753956027187

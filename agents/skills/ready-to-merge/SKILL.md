@@ -29,7 +29,7 @@ gh pr view --json url,number,headRefName,baseRefName,headRefOid,mergeStateStatus
 ```
 
 If this errors with "no pull requests found":
-- Commit any uncommitted work (invoke the `commit` skill).
+- Commit any uncommitted work, following the commit conventions in the workspace AGENTS.md.
 - `git push -u origin HEAD` to publish the branch.
 - `gh pr create --fill --head <branch>` — `--fill` seeds the PR body from the commit history; the user can refine later. From a worktree, `--head` is mandatory.
 
