@@ -46,6 +46,13 @@ Never respond to "understand the problem" by fanning out several unpinned invest
 4. **Validate.** Check each agent's result against its goal. On a miss, re-fire that agent with specific corrections — don't do the work yourself.
 5. **Final validation** that the overall goals are met, then report.
 
+## Shared scaffolding: plan it upfront, catch it when it slips through
+
+Parallel builders duplicating the same enabling work is a coordination bug with three defences:
+
+1. **Plan it out.** During decomposition, name the work every builder will need (test harness conventions, requirement-id machinery, config/tooling scaffolding, shared types) and make it its own early work item that merges FIRST. Parallel builders then build on the merged base; a plan where two builders each "set up" the same thing is not finished decomposing.
+2. **Spot it at subagent completion.** Subs cannot see their siblings, so overlap detection is the coordinator's job, done at a natural checkpoint: when a sub finishes, run a quick diff-stat of its worktree against the other live worktrees and look for the same files or the same new modules appearing in more than one (observed: several port builders independently rebuilding the requirement-id check). Act only on a substantial clash — a real block of duplicated code, not a shared import or a touched config line. When it clears that bar, pause the affected builders, land the finished sub's version (or extract the shared piece into a minimal PR that merges immediately) and have the rest rebase onto it and drop their local copies. Below the bar, let review and rebase handle it.
+
 ## Verify agent reports against real state
 
 An agent's self-report is a claim, not evidence. Before accepting "done", check the artefact: the PR is merged, the commit is **pushed** (agents commit locally and forget to push), CI is green **against the current head SHA** (a duplicate workflow run pending is not a failure), the file on `origin/main` actually says what the agent said it says.
