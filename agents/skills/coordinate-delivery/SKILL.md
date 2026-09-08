@@ -1,63 +1,45 @@
 ---
 name: coordinate-delivery
-description: Coordinates end-to-end delivery of a whole piece of work through model-pinned sub-agents — plans upfront, delegates everything (implementation, deployment, validation, merge), and corrects course only when an agent misses its goal. Use when the user invokes /coordinate-delivery or asks to coordinate, orchestrate, or delegate an entire delivery to sub-agents.
+description: Coordinate whole deliveries through model-pinned subagents, from planning through implementation, validation, and merge. Use when asked to coordinate or delegate an entire delivery.
 ---
 
 # Coordinate Delivery
 
-Act as pure coordinator. Sub-agents do all the work: implementation, feedback loops, deployments, validation, getting things merged. Coordinator context is highly valuable — never go into the weeds beyond the initial plan and subsequent course corrections. Lean on agent results; when one misses its goal, fire it back off with corrections.
+MUST, MUST NOT, SHOULD, SHOULD NOT, and MAY in this skill and its references follow [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
-## Model rules (hard constraints — never violate)
+## Role and routing
 
-An `Agent` call with no `model` param inherits the session model. If the session runs on fable, every unpinned agent is a fable agent. Therefore:
+The coordinator MUST delegate implementation, deployment, and feedback loops. It MAY inspect key files during initial planning and verify results; it MUST return missed goals to agents with corrections rather than take over their work.
 
-1. **Every fan-out `Agent` call MUST set `model` explicitly.** No exceptions. An unpinned parallel fan-out is a bug.
-2. **Never launch more than one fable-level agent at a time**, and never launch even one without flagging it in the plan first. Parallel fable agents are forbidden.
-3. **Parallel work runs on `opus` or cheaper.** Use `opus` for complex implementation or judgment-heavy work, `sonnet` for routine implementation, `haiku` for mechanical/lookup tasks.
-4. **A fable sub-agent MUST run `/coordinate-delivery` itself** and push all implementation to its own pinned sub-team. This is mandatory, not conditional on the work looking big enough. A fable agent that writes the code itself is a bug.
-5. **Reserve fable for the meaty and critical work**, including serial critical-path pieces. Rule 2 (one fable at a time) constrains *concurrency*, not which work deserves fable. When a critical piece runs alone, it gets fable.
+Before planning or spawning, the coordinator MUST read the active harness reference: [Claude Code](references/claude-code.md) or [Codex](references/codex.md). It MUST pin every new agent's model and use the saved routes. It SHOULD use Balanced unless Theo chooses Conserve or Burn. Explicit model choices and budgets take precedence. Burn MUST NOT automatically select the largest model.
 
-## API and load errors are never a reason to change the plan
+A lookup is read-only with a checkable answer. A scoped change has a known approach and acceptance checks. Unknown causes, cross-module effects, and consequential changes MUST use the complex row. Overlapping tasks MUST use the more demanding row.
 
-`500`, `529 Overloaded`, and "server error mid-response" are transient infrastructure faults. They say nothing about whether the plan or the agent was right.
+Each route MAY make one attempt and one correction, then MUST use a distinct saved escalation or report the blocker. Self-escalation MUST NOT restart the route. Lead and workers MUST share this budget. Escalation MUST NOT exceed Theo's spending cap.
 
-- **Resume the same agent** (`SendMessage` to its id) so it keeps its context and its worktree. Do not relaunch it fresh, do not hand its job to a different agent, and do not absorb its role yourself.
-- **Never restructure the delegation** because an agent died. If a lead keeps dying, resume the lead; do not promote yourself into its position or spawn its children on its behalf.
-- **Waiting is the correct response.** Let the load pass and carry on as planned.
-- Tell the resumed agent plainly that it died to a server-side error, not to a mistake of its own, and where it had got to.
+Plans MUST state mode, model, effort, and reason. Cost/time forecasts MUST remain uncalibrated until comparable task records exist. Estimates MUST include retries and verification, and use the dependency path for elapsed time. API prices MUST NOT be presented as subscription credits or benchmark averages as task quotes.
 
-Course corrections are for agents that **miss their goal**, not for agents the infrastructure interrupted.
+Model refreshes MUST follow [the update process](references/update-model-guidance.md) before changing routes. [Model evidence](references/model-evidence.md) records measurements, gaps, and replay results; delivery agents MAY read it to explain or challenge a route.
 
-## Initial investigation
+## Delivery
 
-Pick exactly one of these, cheapest that fits:
+1. The coordinator MUST define work items, dependencies, ownership, and model choices before delegation. It SHOULD use the cheapest sufficient investigation: its own brief reads, one pinned investigator, or narrowly briefed parallel investigators.
+2. Before spawning, it MUST present the breakdown for confirmation and wait unless Theo has already authorised that plan. Parallel agents MUST have distinct scopes and pinned models.
+3. Agents MUST own their tests, review fixes, CI, and merge within the authorised scope. The coordinator MUST check results against goals and return specific corrections on a miss.
+4. Before reporting completion, the coordinator MUST verify the requested outcome from real state.
 
-- **Do it yourself** — read the key files directly. Fine when scope is discoverable in a handful of reads.
-- **One single agent** — a lone investigator (this one may be unpinned/fable since it's singular).
-- **Multiple directed agents** — parallel is allowed only when each agent has a narrow, explicit brief (specific directories, files, or questions) AND each call sets `model: opus` or cheaper.
+## Shared work
 
-Never respond to "understand the problem" by fanning out several unpinned investigators.
+Shared scaffolding MUST be identified upfront and landed before dependent builders start. At each builder's completion, the coordinator MUST compare its diff-stat with active siblings for substantive duplicate work.
 
-## Workflow
+On substantial overlap, it MUST pause affected builders, land one shared version, and have the others rebase and remove duplicates. Shared imports or incidental config edits SHOULD remain in normal review.
 
-1. **Plan fully upfront.** Decompose the work, identify dependencies, parallelise maximally.
-2. **Present the breakdown for confirmation before spawning anything**: each work item, which agent type, which model, and why that model tier. Wait for the user's go-ahead.
-3. **Delegate.** Fire off agents per the confirmed plan, model-pinned per the rules above. Agents own their feedback loops (tests, CI, review fixes, merge).
-4. **Validate.** Check each agent's result against its goal. On a miss, re-fire that agent with specific corrections — don't do the work yourself.
-5. **Final validation** that the overall goals are met, then report.
+## Infrastructure faults
 
-## Shared scaffolding: plan it upfront, catch it when it slips through
+On a transient 500, 529, or interrupted server response, the coordinator MUST resume the same agent with its context and worktree. It MUST explain the interruption and resume point. It MUST NOT change models, replace the agent, take over its role, or restructure delegation solely because of the fault. It SHOULD wait for load to clear.
 
-Parallel builders duplicating the same enabling work is a coordination bug with three defences:
+## Verification
 
-1. **Plan it out.** During decomposition, name the work every builder will need (test harness conventions, requirement-id machinery, config/tooling scaffolding, shared types) and make it its own early work item that merges FIRST. Parallel builders then build on the merged base; a plan where two builders each "set up" the same thing is not finished decomposing.
-2. **Spot it at subagent completion.** Subs cannot see their siblings, so overlap detection is the coordinator's job, done at a natural checkpoint: when a sub finishes, run a quick diff-stat of its worktree against the other live worktrees and look for the same files or the same new modules appearing in more than one (observed: several port builders independently rebuilding the requirement-id check). Act only on a substantial clash — a real block of duplicated code, not a shared import or a touched config line. When it clears that bar, pause the affected builders, land the finished sub's version (or extract the shared piece into a minimal PR that merges immediately) and have the rest rebase onto it and drop their local copies. Below the bar, let review and rebase handle it.
+Before accepting an agent's completion claim, the coordinator MUST check applicable artefacts: pushed commit, merged PR, CI against the current head, and intended content on origin/main. A duplicate pending workflow MUST NOT count as failure.
 
-## Verify agent reports against real state
-
-An agent's self-report is a claim, not evidence. Before accepting "done", check the artefact: the PR is merged, the commit is **pushed** (agents commit locally and forget to push), CI is green **against the current head SHA** (a duplicate workflow run pending is not a failure), the file on `origin/main` actually says what the agent said it says.
-
-Two recurring agent failure modes to watch for:
-
-- **Parking on a phantom signal.** An agent stops mid-task saying it is "waiting on the background watcher / CI / a monitor" when nothing will ever notify it. Resume it and tell it to poll to a terminal state itself and act.
-- **Unit-green, wiring-absent.** Components pass their own tests while nothing on the live path calls them. Requirement coverage and green CI both look fine. Make every builder prove the wiring with a test that **fails if the wiring is removed**, and make reviewers ask "is this actually invoked on the live request path", not "does the code exist".
+Agents waiting on a watcher with no notification path MUST be resumed to poll the actual operation to a terminal state. Builders MUST prove live-path wiring with a check that fails when the wiring is removed; reviewers MUST verify invocation, not just component existence.
