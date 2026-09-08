@@ -1,6 +1,5 @@
 import copy
 import json
-import random
 import tempfile
 import unittest
 from pathlib import Path
@@ -38,9 +37,9 @@ def parse(p=None, rows=None, version="1.4"):
 class ParserTests(unittest.TestCase):
     def test_real_fixture_shape_and_fallback(self):
         actual_policy = json.loads((Path(__file__).parent.parent / "data/policy.json").read_text())
-        raw = Path("/Users/theo/tse/agent-logs/explore-deterministic-model-routing/aa.html").read_bytes()
+        raw = (Path(__file__).parent / "fixtures/aa-model-variants.html").read_bytes()
         snapshot = mg.parse_html(actual_policy, raw, "2026-09-08T00:00:00Z")
-        self.assertGreater(len(snapshot["records"]), 20)
+        self.assertEqual(len(snapshot["records"]), 4)
         fallback = next(r for r in snapshot["records"] if r["fallback"])
         self.assertTrue(fallback["id"].endswith(":fallback"))
         self.assertEqual(fallback["comparison_group"], "aa-cai-1.4:claude-code")
@@ -108,7 +107,7 @@ class SelectionTests(unittest.TestCase):
         for record in records:
             record["scores"] = {"deepswe": "60", "terminal": "80", "qna": "50"}
         result = mg.select(route, "burn", route["modes"]["burn"], records, {("codex", "sol"): p["models"][0]}, "g")
-        self.assertEqual(result["selected_id"], "codex:sol:low")  # cost applies after time is skipped
+        self.assertEqual(result["selected_id"], "codex:sol:low")
 
     def test_pinned_missing_incumbent_and_group_mismatch_retain(self):
         p = policy(); route = p["routes"][0]; mode = route["modes"]["burn"]

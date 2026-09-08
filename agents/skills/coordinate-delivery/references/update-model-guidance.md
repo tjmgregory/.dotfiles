@@ -14,7 +14,7 @@ The same committed script, policy, and snapshot MUST produce byte-identical tabl
 2. MUST collect configured source URLs, saving raw responses under the task's agent-logs directory. The parser MUST require expected visible version, headers, mapped model labels, row shapes, valid numbers, and unique configurations. Offline generation MUST validate snapshot schema, configured source URL, SHA-256 format, timezone-aware retrieval timestamp, and required source fields before selection. Valid but different comparison groups or index versions MUST retain saved routes. Schema drift MUST fail before replacing evidence. Missing listed models MUST remain explicit gaps.
 3. MUST freeze normalized evidence with retrieval date, URL, and raw SHA-256. Re-parsing the same bytes and metadata MUST reproduce it. Generation MUST work offline.
 4. MUST generate both routing tables and decision records. MUST inspect changes before adopting evidence. New benchmark versions require matching source and floor-origin versions/groups after explicit floor review; MUST NOT compare them with old floors.
-5. MUST run parser/selector tests and generate twice into separate directories. Outputs MUST match byte for byte. MUST check harness references point to generated tables.
+5. MUST run parser/selector tests and generate twice into separate directories. Tests MUST use committed fixtures and run without network access or machine-specific log paths. Outputs MUST match byte for byte. MUST check harness references point to generated tables.
 
 ## Selection
 
