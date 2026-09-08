@@ -1,0 +1,817 @@
+{
+  "schema_version": 1,
+  "source": {
+    "adapter": "aa-agent-comparison-v1",
+    "url": "https://artificialanalysis.ai/agents/coding-agents/comparisons/claude-code-vs-codex",
+    "index_version": "1.4",
+    "comparison_group": "aa-cai-1.4"
+  },
+  "floor_origin": {
+    "commit": "107536c",
+    "file": "references/model-evidence.md",
+    "note": "Per-mode incumbent scores frozen from the previous guidance; zero allowed loss. Not population quality guarantees."
+  },
+  "comparison_limits": {
+    "harness_versions": null,
+    "run_dates": null,
+    "budgets": null,
+    "uncertainty": null,
+    "note": "One published AA suite per harness. Missing run details make all automatic choices provisional."
+  },
+  "models": [
+    {
+      "harness": "claude-code",
+      "id": "fable-5.1",
+      "source_name": "Fable 5.1",
+      "display_name": "Fable 5.1",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": true
+    },
+    {
+      "harness": "claude-code",
+      "id": "opus-5",
+      "source_name": "Opus 5",
+      "display_name": "Opus 5",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": false
+    },
+    {
+      "harness": "claude-code",
+      "id": "sonnet-5",
+      "source_name": "Sonnet 5",
+      "display_name": "Sonnet 5",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": false
+    },
+    {
+      "harness": "claude-code",
+      "id": "haiku-4.5",
+      "source_name": "Haiku 4.5",
+      "display_name": "Haiku 4.5",
+      "efforts": [
+        "none",
+        "thinking",
+        "default"
+      ],
+      "allow_fallback": false
+    },
+    {
+      "harness": "codex",
+      "id": "gpt-6-astra",
+      "source_name": "GPT-6 Astra",
+      "display_name": "Astra",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": false
+    },
+    {
+      "harness": "codex",
+      "id": "gpt-5.6-sol",
+      "source_name": "GPT-5.6 Sol",
+      "display_name": "Sol",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": false
+    },
+    {
+      "harness": "codex",
+      "id": "gpt-5.6-terra",
+      "source_name": "GPT-5.6 Terra",
+      "display_name": "Terra",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": false
+    },
+    {
+      "harness": "codex",
+      "id": "gpt-5.6-luna",
+      "source_name": "GPT-5.6 Luna",
+      "display_name": "Luna",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": false
+    },
+    {
+      "harness": "codex",
+      "id": "gpt-5.5",
+      "source_name": "GPT-5.5",
+      "display_name": "5.5",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": false
+    },
+    {
+      "harness": "codex",
+      "id": "gpt-5.3-codex-spark",
+      "source_name": "GPT-5.3-Codex-Spark",
+      "display_name": "Spark",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "default"
+      ],
+      "allow_fallback": false
+    }
+  ],
+  "routes": [
+    {
+      "harness": "claude-code",
+      "task_id": "lookup",
+      "task_label": "Mechanical lookup",
+      "metrics": [],
+      "allowed_models": [
+        "fable-5.1",
+        "opus-5",
+        "sonnet-5",
+        "haiku-4.5"
+      ],
+      "escalation": "Opus 5 high",
+      "modes": {
+        "conserve": {
+          "incumbent": "claude-code:haiku-4.5:default",
+          "label": "Haiku 4.5 default",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "balanced": {
+          "incumbent": "claude-code:haiku-4.5:default",
+          "label": "Haiku 4.5 default",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "burn": {
+          "incumbent": "claude-code:haiku-4.5:default",
+          "label": "Haiku 4.5 default",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        }
+      }
+    },
+    {
+      "harness": "claude-code",
+      "task_id": "exploration",
+      "task_label": "Repository exploration",
+      "metrics": [
+        "qna"
+      ],
+      "allowed_models": [
+        "fable-5.1",
+        "opus-5",
+        "sonnet-5",
+        "haiku-4.5"
+      ],
+      "escalation": "Fable 5.1 max",
+      "modes": {
+        "conserve": {
+          "incumbent": "claude-code:opus-5:high",
+          "label": "Opus 5 high",
+          "floors": {
+            "qna": "49"
+          },
+          "allowed_loss": {
+            "qna": "0"
+          },
+          "pinned_reason": null
+        },
+        "balanced": {
+          "incumbent": "claude-code:opus-5:xhigh",
+          "label": "Opus 5 xhigh",
+          "floors": {
+            "qna": "55"
+          },
+          "allowed_loss": {
+            "qna": "0"
+          },
+          "pinned_reason": null
+        },
+        "burn": {
+          "incumbent": "claude-code:fable-5.1:max:fallback",
+          "label": "Fable 5.1 max",
+          "floors": {
+            "qna": "56"
+          },
+          "allowed_loss": {
+            "qna": "0"
+          },
+          "pinned_reason": null
+        }
+      }
+    },
+    {
+      "harness": "claude-code",
+      "task_id": "implementation",
+      "task_label": "Scoped implementation",
+      "metrics": [
+        "deepswe"
+      ],
+      "allowed_models": [
+        "opus-5",
+        "sonnet-5",
+        "haiku-4.5"
+      ],
+      "escalation": "Fable lead P",
+      "modes": {
+        "conserve": {
+          "incumbent": "claude-code:sonnet-5:default",
+          "label": "Sonnet 5 default",
+          "floors": {},
+          "allowed_loss": {
+            "deepswe": "0"
+          },
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "balanced": {
+          "incumbent": "claude-code:opus-5:medium",
+          "label": "Opus 5 medium",
+          "floors": {
+            "deepswe": "63"
+          },
+          "allowed_loss": {
+            "deepswe": "0"
+          },
+          "pinned_reason": null
+        },
+        "burn": {
+          "incumbent": "claude-code:opus-5:medium",
+          "label": "Opus 5 medium",
+          "floors": {
+            "deepswe": "63"
+          },
+          "allowed_loss": {
+            "deepswe": "0"
+          },
+          "pinned_reason": null
+        }
+      }
+    },
+    {
+      "harness": "claude-code",
+      "task_id": "complex",
+      "task_label": "Unclear bug / cross-module change",
+      "metrics": [
+        "deepswe",
+        "terminal"
+      ],
+      "allowed_models": [
+        "opus-5",
+        "sonnet-5",
+        "haiku-4.5"
+      ],
+      "escalation": "Fable lead P",
+      "modes": {
+        "conserve": {
+          "incumbent": "claude-code:opus-5:medium",
+          "label": "Opus 5 medium",
+          "floors": {
+            "deepswe": "63",
+            "terminal": "85"
+          },
+          "allowed_loss": {
+            "deepswe": "0",
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        },
+        "balanced": {
+          "incumbent": "claude-code:opus-5:high",
+          "label": "Opus 5 high",
+          "floors": {
+            "deepswe": "61",
+            "terminal": "87"
+          },
+          "allowed_loss": {
+            "deepswe": "0",
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        },
+        "burn": {
+          "incumbent": null,
+          "label": "Fable lead",
+          "floors": {},
+          "allowed_loss": {
+            "deepswe": "0",
+            "terminal": "0"
+          },
+          "pinned_reason": "Lead-only Fable policy; compound route has no matching evaluation."
+        }
+      }
+    },
+    {
+      "harness": "claude-code",
+      "task_id": "terminal",
+      "task_label": "Terminal execution with a known plan",
+      "metrics": [
+        "terminal"
+      ],
+      "allowed_models": [
+        "opus-5",
+        "sonnet-5",
+        "haiku-4.5"
+      ],
+      "escalation": "Fable lead P",
+      "modes": {
+        "conserve": {
+          "incumbent": "claude-code:opus-5:high",
+          "label": "Opus 5 high",
+          "floors": {
+            "terminal": "87"
+          },
+          "allowed_loss": {
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        },
+        "balanced": {
+          "incumbent": "claude-code:opus-5:high",
+          "label": "Opus 5 high",
+          "floors": {
+            "terminal": "87"
+          },
+          "allowed_loss": {
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        },
+        "burn": {
+          "incumbent": "claude-code:opus-5:xhigh",
+          "label": "Opus 5 xhigh",
+          "floors": {
+            "terminal": "89"
+          },
+          "allowed_loss": {
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        }
+      }
+    },
+    {
+      "harness": "claude-code",
+      "task_id": "planning",
+      "task_label": "Planning / architecture",
+      "metrics": [],
+      "allowed_models": [
+        "fable-5.1",
+        "opus-5",
+        "sonnet-5",
+        "haiku-4.5"
+      ],
+      "escalation": "Fable 5.1 max P",
+      "modes": {
+        "conserve": {
+          "incumbent": "claude-code:opus-5:high",
+          "label": "Opus 5 high",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "balanced": {
+          "incumbent": "claude-code:opus-5:high",
+          "label": "Opus 5 high",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "burn": {
+          "incumbent": "claude-code:fable-5.1:max:fallback",
+          "label": "Fable 5.1 max",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        }
+      }
+    },
+    {
+      "harness": "claude-code",
+      "task_id": "review",
+      "task_label": "Review / validation judgment",
+      "metrics": [],
+      "allowed_models": [
+        "fable-5.1",
+        "opus-5",
+        "sonnet-5",
+        "haiku-4.5"
+      ],
+      "escalation": "Fable 5.1 max P",
+      "modes": {
+        "conserve": {
+          "incumbent": "claude-code:opus-5:high",
+          "label": "Opus 5 high",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "balanced": {
+          "incumbent": "claude-code:opus-5:xhigh",
+          "label": "Opus 5 xhigh",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "burn": {
+          "incumbent": "claude-code:fable-5.1:max:fallback",
+          "label": "Fable 5.1 max",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        }
+      }
+    },
+    {
+      "harness": "codex",
+      "task_id": "lookup",
+      "task_label": "Mechanical lookup",
+      "metrics": [],
+      "allowed_models": [
+        "gpt-6-astra",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5",
+        "gpt-5.3-codex-spark"
+      ],
+      "escalation": "Sol high",
+      "modes": {
+        "conserve": {
+          "incumbent": "codex:gpt-5.6-luna:medium",
+          "label": "Luna medium",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "balanced": {
+          "incumbent": "codex:gpt-5.6-luna:medium",
+          "label": "Luna medium",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "burn": {
+          "incumbent": "codex:gpt-5.6-luna:medium",
+          "label": "Luna medium",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        }
+      }
+    },
+    {
+      "harness": "codex",
+      "task_id": "exploration",
+      "task_label": "Repository exploration",
+      "metrics": [
+        "qna"
+      ],
+      "allowed_models": [
+        "gpt-6-astra",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5",
+        "gpt-5.3-codex-spark"
+      ],
+      "escalation": "Astra max",
+      "modes": {
+        "conserve": {
+          "incumbent": "codex:gpt-5.6-luna:max",
+          "label": "Luna max",
+          "floors": {
+            "qna": "33"
+          },
+          "allowed_loss": {
+            "qna": "0"
+          },
+          "pinned_reason": null
+        },
+        "balanced": {
+          "incumbent": "codex:gpt-5.6-sol:high",
+          "label": "Sol high",
+          "floors": {
+            "qna": "45"
+          },
+          "allowed_loss": {
+            "qna": "0"
+          },
+          "pinned_reason": null
+        },
+        "burn": {
+          "incumbent": "codex:gpt-6-astra:max",
+          "label": "Astra max",
+          "floors": {
+            "qna": "51"
+          },
+          "allowed_loss": {
+            "qna": "0"
+          },
+          "pinned_reason": null
+        }
+      }
+    },
+    {
+      "harness": "codex",
+      "task_id": "implementation",
+      "task_label": "Scoped implementation",
+      "metrics": [
+        "deepswe"
+      ],
+      "allowed_models": [
+        "gpt-6-astra",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5",
+        "gpt-5.3-codex-spark"
+      ],
+      "escalation": "Sol max",
+      "modes": {
+        "conserve": {
+          "incumbent": "codex:gpt-5.6-luna:max",
+          "label": "Luna max",
+          "floors": {
+            "deepswe": "63"
+          },
+          "allowed_loss": {
+            "deepswe": "0"
+          },
+          "pinned_reason": null
+        },
+        "balanced": {
+          "incumbent": "codex:gpt-5.6-terra:max",
+          "label": "Terra max",
+          "floors": {
+            "deepswe": "67"
+          },
+          "allowed_loss": {
+            "deepswe": "0"
+          },
+          "pinned_reason": null
+        },
+        "burn": {
+          "incumbent": "codex:gpt-5.6-sol:max",
+          "label": "Sol max",
+          "floors": {
+            "deepswe": "69"
+          },
+          "allowed_loss": {
+            "deepswe": "0"
+          },
+          "pinned_reason": null
+        }
+      }
+    },
+    {
+      "harness": "codex",
+      "task_id": "complex",
+      "task_label": "Unclear bug / cross-module change",
+      "metrics": [
+        "deepswe",
+        "terminal"
+      ],
+      "allowed_models": [
+        "gpt-6-astra",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5",
+        "gpt-5.3-codex-spark"
+      ],
+      "escalation": "Sol max",
+      "modes": {
+        "conserve": {
+          "incumbent": "codex:gpt-5.6-terra:max",
+          "label": "Terra max",
+          "floors": {
+            "deepswe": "67",
+            "terminal": "78"
+          },
+          "allowed_loss": {
+            "deepswe": "0",
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        },
+        "balanced": {
+          "incumbent": "codex:gpt-5.6-sol:high",
+          "label": "Sol high",
+          "floors": {
+            "deepswe": "65",
+            "terminal": "82"
+          },
+          "allowed_loss": {
+            "deepswe": "0",
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        },
+        "burn": {
+          "incumbent": "codex:gpt-5.6-sol:max",
+          "label": "Sol max",
+          "floors": {
+            "deepswe": "69",
+            "terminal": "83"
+          },
+          "allowed_loss": {
+            "deepswe": "0",
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        }
+      }
+    },
+    {
+      "harness": "codex",
+      "task_id": "terminal",
+      "task_label": "Terminal execution with a known plan",
+      "metrics": [
+        "terminal"
+      ],
+      "allowed_models": [
+        "gpt-6-astra",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5",
+        "gpt-5.3-codex-spark"
+      ],
+      "escalation": "Sol max",
+      "modes": {
+        "conserve": {
+          "incumbent": "codex:gpt-5.6-luna:max",
+          "label": "Luna max",
+          "floors": {
+            "terminal": "75"
+          },
+          "allowed_loss": {
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        },
+        "balanced": {
+          "incumbent": "codex:gpt-5.6-sol:high",
+          "label": "Sol high",
+          "floors": {
+            "terminal": "82"
+          },
+          "allowed_loss": {
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        },
+        "burn": {
+          "incumbent": "codex:gpt-5.6-sol:max",
+          "label": "Sol max",
+          "floors": {
+            "terminal": "83"
+          },
+          "allowed_loss": {
+            "terminal": "0"
+          },
+          "pinned_reason": null
+        }
+      }
+    },
+    {
+      "harness": "codex",
+      "task_id": "planning",
+      "task_label": "Planning / architecture",
+      "metrics": [],
+      "allowed_models": [
+        "gpt-6-astra",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5",
+        "gpt-5.3-codex-spark"
+      ],
+      "escalation": "Astra max P",
+      "modes": {
+        "conserve": {
+          "incumbent": "codex:gpt-5.6-sol:medium",
+          "label": "Sol medium",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "balanced": {
+          "incumbent": "codex:gpt-5.6-sol:high",
+          "label": "Sol high",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "burn": {
+          "incumbent": "codex:gpt-6-astra:max",
+          "label": "Astra max",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        }
+      }
+    },
+    {
+      "harness": "codex",
+      "task_id": "review",
+      "task_label": "Review / validation judgment",
+      "metrics": [],
+      "allowed_models": [
+        "gpt-6-astra",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5",
+        "gpt-5.3-codex-spark"
+      ],
+      "escalation": "Astra max P",
+      "modes": {
+        "conserve": {
+          "incumbent": "codex:gpt-5.6-terra:max",
+          "label": "Terra max",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "balanced": {
+          "incumbent": "codex:gpt-5.6-sol:high",
+          "label": "Sol high",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        },
+        "burn": {
+          "incumbent": "codex:gpt-6-astra:max",
+          "label": "Astra max",
+          "floors": {},
+          "allowed_loss": {},
+          "pinned_reason": "Inherited provisional route; no direct task-family evidence at this setting."
+        }
+      }
+    }
+  ]
+}

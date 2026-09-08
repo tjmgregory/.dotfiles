@@ -1,36 +1,37 @@
 # Update model guidance
 
-Use this process when Theo supplies models, requests a refresh, or reports a material harness or price change. Treat his list as available; MUST NOT verify access. Update only affected harness references.
+Same policy and snapshot MUST produce byte-identical tables and decisions. A live refresh MAY change results because evidence changed. Availability comes from Theo; MUST NOT recheck account access.
 
-## Collect
+## Inputs
 
-1. Before edits, MUST preserve current files in Git. Record refresh date and supplied models in `model-evidence.md`.
-2. MUST search each exact model name in the priority sources below and open the source page. Search snippets are leads, not measurements. MUST record missing results. MUST NOT substitute models or translate aliases without evidence.
-3. SHOULD prefer target-harness runs. Other-harness or direct-API results MAY fill gaps only when labelled as mismatches. Each record MUST include source, execution mode, model, effort, harness and benchmark versions, score, sample size, uncertainty, measured cost and duration when reported; unknown fields MUST remain unknown.
-4. SHOULD prefer Terminal-Bench and Artificial Analysis Coding Agent Index components: DeepSWE for implementation, SWE-Atlas-QnA for exploration, Terminal-Bench for terminal work. TUA-Bench MAY support them. SWE-bench common-harness results, AA model evaluations, and vendor evals are fallbacks. Vendor prices and evals MUST be labelled. Internal evals MUST use the same record shape and name execution as Claude Code, Codex, direct API, or other.
+`data/policy.json` MUST hold exact model-name mappings, allowed configurations, task metrics, frozen quality floors, incumbents, and pinned provisional routes. Floors initially come from the previous table's measured incumbent scores, not invented tolerances. A policy edit is a visible judgment change.
 
-For each model, inspect the two priority sources, one relevant fallback, and its official model or release page. Shared pages MAY cover several models. SHOULD use AA agent comparison pages before dated articles when charts hide variants. If values remain hidden, try linked data or one evaluator article, then record the gap. Search another source only to resolve a route-changing conflict.
+`data/evidence.json` MUST hold parsed measurements and source provenance. Scores use percentage points; money uses USD; time uses seconds. Missing values MUST remain null. Comparisons MUST use one explicit comparison group (source, harness, benchmark/scoring/task-set/budget context). Unknown setup details MUST remain marked provisional, never asserted equal to another dataset.
 
-MUST record evaluation and retrieval dates separately. MUST preserve historical index versions. Duration MUST say measured wall time, agent wall time, or estimated decode time. Cost MUST say observed usage repriced at a date, vendor estimate, or unknown. MUST keep single-agent, multi-agent, and fallback-model results distinct.
+## Refresh
 
-## Decide
+1. MUST commit current guidance before edits. Add Theo's models to policy mappings; MUST NOT guess aliases or settings.
+2. MUST collect configured source URLs, saving raw responses under the task's agent-logs directory. The parser MUST require expected headers, version, row shapes, valid numbers, and unique configurations. Schema drift MUST fail before replacing evidence. Missing listed models MUST remain explicit gaps.
+3. MUST freeze normalized evidence with retrieval date, URL, and raw SHA-256. Re-parsing the same bytes and metadata MUST reproduce it. Generation MUST work offline.
+4. MUST generate both routing tables and decision records. MUST inspect changes before adopting evidence. New benchmark versions require comparison-group and floor review; MUST NOT compare them with old floors.
+5. MUST run parser/selector tests and generate twice into separate directories. Outputs MUST match byte for byte. MUST check harness references point to generated tables.
 
-5. MUST compare only matching benchmark version, scoring, task set, and compatible budgets. MUST NOT average unrelated scores or count an index and its components independently. SHOULD prefer relevant same-harness evidence. Missing results mean unknown, not poor.
-6. Map SWE-Atlas to exploration, DeepSWE to scoped implementation, DeepSWE then Terminal-Bench to unclear bugs and cross-module work, and Terminal-Bench to known-plan terminal work. Planning and review transfers MUST remain provisional until direct evidence exists.
-7. Balanced SHOULD be the default. Conserve MUST choose the cheapest qualifying option. Balanced MUST choose the best supported cost to a verified result. Burn MUST prioritise success, then critical-path speed. MUST NOT assume the largest model wins, convert API prices to credits, or omit measured retries and verification from cost.
-8. A candidate qualifies only at the task quality floor. Apply Theo's tolerated loss in that benchmark's units; otherwise, no observed loss is required for cheaper-model comparability. Small differences or overlapping intervals MUST NOT be called equivalent. Conflicting or absent evidence MUST retain the incumbent provisionally. A new harness MUST use a labelled seed, not a claimed winner.
-9. Routes MUST state exact model and effort. When effort is uncontrolled, `default` means omit the override and record the effective setting, or `unknown` when the harness does not expose it. MUST keep every supplied model in inventory and briefly explain exclusions.
+## Selection
 
-For deterministic refreshes, each route's incumbent and cited primary metrics define its floor unless Theo sets another. Candidates MUST meet each primary metric's floor, including Theo's allowed loss. Conserve minimises comparable task cost among qualifiers. Balanced retains the incumbent unless a candidate has no observed loss and lower task cost, or a higher score at no greater cost. Burn maximises relevant score; ties use measured wall time, then task cost, then incumbent. If a tie-break field is missing, MUST skip it and continue to the next. Uncertainty makes the result provisional. Token-price-only cost choices MUST be provisional. First runs MUST use explicit evidence-backed or inherited seeds without invented floors. No model has a route quota.
+For metric j, a candidate qualifies when score_j >= floor_j - allowed_loss_j. Allowed loss defaults to zero. MUST use decimal arithmetic; MUST NOT combine unrelated scores into an invented index.
 
-At runtime, MUST use the saved table. Overlaps use the more demanding row. Unknown cause, cross-module effects, and consequential or hard-to-reverse changes are complex. A mechanical lookup is read-only, named, and objectively checkable. Any edit is scoped implementation or complex work. A scoped implementation has a known approach and clear acceptance checks. A hard spending cap MUST block escalation beyond it.
+- Conserve: lowest comparable task cost among qualifiers.
+- Balanced: incumbent unless a qualifying candidate has no score loss and lower cost, or improves a primary score at no greater cost. Among improvements: lowest cost, then lexicographically highest task scores.
+- Burn: lexicographically highest task scores, then lowest comparable wall time, then cost.
 
-Each route allows one initial attempt and one correction by the same agent. After the correction, MUST escalate. A compound route gets the same two total attempts, not a new retry allowance per worker. If escalation is the same strongest route, MUST stop retrying and narrow the problem or report the blocker.
+Remaining ties MUST prefer the incumbent, then stable configuration ID. A missing tie-break field MUST disable that tie-break for the entire tied set, avoiding pairwise order dependence. A cost-based mode MUST retain its incumbent if its own comparable cost is unknown; candidates with unknown cost cannot prove savings.
 
-## Validate and feed back
+No qualifier, missing incumbent, mismatched comparison group, or pinned task MUST retain the saved route with an explicit reason. A numerical tie is not proof of equivalence. Pooled benchmark costs/times MUST NOT become workspace completion estimates or credit conversions.
 
-10. MUST verify every supplied model has an evidence disposition and every route has evidence or a provisional reason. MUST check links, settings, modes, escalation, and whether the runtime tool can express each selector. This tool check MUST NOT recheck user-supplied access. MUST NOT invent cost or time ranges.
-11. MUST replay each mode and harness, including missing evidence, a cheaper equal candidate, conflicting results, direct-API-only results, strongest-route failure, and compound-route correction. Record route and reason so another reader can reproduce it.
-12. If replay exposes ambiguity, MUST amend this process first, regenerate guidance, and replay. Record the ambiguity and fix in `model-evidence.md`. Runtime tables SHOULD retain only evidence needed for current choices.
+Mechanical, planning, review, and compound Fable routes remain pinned provisional policy until suitable evals exist. MUST NOT force every model into a route. Fable lead-only and concurrency rules remain in the Claude Code reference.
 
-Sources: [Terminal-Bench](https://www.tbench.ai/), [Artificial Analysis agents](https://artificialanalysis.ai/agents/coding-agents), [AA methodology](https://artificialanalysis.ai/methodology/coding-agents-benchmarking/), [TUA-Bench](https://github.com/facebookresearch/TUA-Bench), [SWE-bench](https://www.swebench.com/), [AA models](https://artificialanalysis.ai/).
+## Other evidence
+
+The first adapter targets AA's agent comparison table. Other public sources or internal evals MAY supply the normalized format, but MUST name execution mode and comparison group. Direct API/other-harness evidence MUST NOT silently replace target-harness records. New adapters need fixtures and tests; no fuzzy matching or LLM extraction.
+
+If replay finds a gap, MUST change this process first, then implementation and tests. Runtime agents MUST read saved tables, not scrape during delivery.
