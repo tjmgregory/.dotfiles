@@ -9,7 +9,9 @@
   "floor_origin": {
     "commit": "107536c",
     "file": "references/model-evidence.md",
-    "note": "Per-mode incumbent scores frozen from the previous guidance; zero allowed loss. Not population quality guarantees."
+    "note": "Per-mode incumbent scores frozen from the previous guidance; zero allowed loss. Not population quality guarantees.",
+    "comparison_group": "aa-cai-1.4",
+    "index_version": "1.4"
   },
   "comparison_limits": {
     "harness_versions": null,

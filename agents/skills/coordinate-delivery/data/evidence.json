@@ -1,0 +1,477 @@
+{
+  "gaps": [
+    {
+      "harness": "claude-code",
+      "model": "haiku-4.5",
+      "reason": "mapped model absent from source table"
+    },
+    {
+      "harness": "claude-code",
+      "model": "sonnet-5",
+      "reason": "mapped model absent from source table"
+    },
+    {
+      "harness": "codex",
+      "model": "gpt-5.3-codex-spark",
+      "reason": "mapped model absent from source table"
+    }
+  ],
+  "records": [
+    {
+      "comparison_group": "aa-cai-1.4:claude-code",
+      "cost_usd": "9.18",
+      "effort": "max",
+      "fallback": true,
+      "harness": "claude-code",
+      "id": "claude-code:fable-5.1:max:fallback",
+      "model": "fable-5.1",
+      "provisional": true,
+      "scores": {
+        "deepswe": "66",
+        "qna": "56",
+        "terminal": "89"
+      },
+      "time_seconds": "1440"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:claude-code",
+      "cost_usd": "3.92",
+      "effort": "high",
+      "fallback": false,
+      "harness": "claude-code",
+      "id": "claude-code:opus-5:high",
+      "model": "opus-5",
+      "provisional": true,
+      "scores": {
+        "deepswe": "61",
+        "qna": "49",
+        "terminal": "87"
+      },
+      "time_seconds": "840"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:claude-code",
+      "cost_usd": "2.3",
+      "effort": "low",
+      "fallback": false,
+      "harness": "claude-code",
+      "id": "claude-code:opus-5:low",
+      "model": "opus-5",
+      "provisional": true,
+      "scores": {
+        "deepswe": "57",
+        "qna": "39",
+        "terminal": "82"
+      },
+      "time_seconds": "600"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:claude-code",
+      "cost_usd": "8.94",
+      "effort": "max",
+      "fallback": false,
+      "harness": "claude-code",
+      "id": "claude-code:opus-5:max",
+      "model": "opus-5",
+      "provisional": true,
+      "scores": {
+        "deepswe": "63",
+        "qna": "49",
+        "terminal": "89"
+      },
+      "time_seconds": "1452"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:claude-code",
+      "cost_usd": "3.17",
+      "effort": "medium",
+      "fallback": false,
+      "harness": "claude-code",
+      "id": "claude-code:opus-5:medium",
+      "model": "opus-5",
+      "provisional": true,
+      "scores": {
+        "deepswe": "63",
+        "qna": "44",
+        "terminal": "85"
+      },
+      "time_seconds": "732"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:claude-code",
+      "cost_usd": "3.53",
+      "effort": "none",
+      "fallback": false,
+      "harness": "claude-code",
+      "id": "claude-code:opus-5:none",
+      "model": "opus-5",
+      "provisional": true,
+      "scores": {
+        "deepswe": "44",
+        "qna": "52",
+        "terminal": "82"
+      },
+      "time_seconds": "708"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:claude-code",
+      "cost_usd": "8.17",
+      "effort": "xhigh",
+      "fallback": false,
+      "harness": "claude-code",
+      "id": "claude-code:opus-5:xhigh",
+      "model": "opus-5",
+      "provisional": true,
+      "scores": {
+        "deepswe": "60",
+        "qna": "55",
+        "terminal": "89"
+      },
+      "time_seconds": "1422"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "2.65",
+      "effort": "medium",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.5:medium",
+      "model": "gpt-5.5",
+      "provisional": true,
+      "scores": {
+        "deepswe": "57",
+        "qna": "31",
+        "terminal": "79"
+      },
+      "time_seconds": "384"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "4.75",
+      "effort": "xhigh",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.5:xhigh",
+      "model": "gpt-5.5",
+      "provisional": true,
+      "scores": {
+        "deepswe": "64",
+        "qna": "36",
+        "terminal": "83"
+      },
+      "time_seconds": "612"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.18",
+      "effort": "high",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-luna:high",
+      "model": "gpt-5.6-luna",
+      "provisional": true,
+      "scores": {
+        "deepswe": "53",
+        "qna": "29",
+        "terminal": "73"
+      },
+      "time_seconds": "342"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.04",
+      "effort": "low",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-luna:low",
+      "model": "gpt-5.6-luna",
+      "provisional": true,
+      "scores": {
+        "deepswe": "10",
+        "qna": "15",
+        "terminal": "50"
+      },
+      "time_seconds": "102"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.29",
+      "effort": "max",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-luna:max",
+      "model": "gpt-5.6-luna",
+      "provisional": true,
+      "scores": {
+        "deepswe": "63",
+        "qna": "33",
+        "terminal": "75"
+      },
+      "time_seconds": "480"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.09",
+      "effort": "medium",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-luna:medium",
+      "model": "gpt-5.6-luna",
+      "provisional": true,
+      "scores": {
+        "deepswe": "37",
+        "qna": "27",
+        "terminal": "62"
+      },
+      "time_seconds": "192"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.07",
+      "effort": "none",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-luna:none",
+      "model": "gpt-5.6-luna",
+      "provisional": true,
+      "scores": {
+        "deepswe": "6",
+        "qna": "17",
+        "terminal": "33"
+      },
+      "time_seconds": "132"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.24",
+      "effort": "xhigh",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-luna:xhigh",
+      "model": "gpt-5.6-luna",
+      "provisional": true,
+      "scores": {
+        "deepswe": "57",
+        "qna": "31",
+        "terminal": "71"
+      },
+      "time_seconds": "414"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "3",
+      "effort": "high",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-sol:high",
+      "model": "gpt-5.6-sol",
+      "provisional": true,
+      "scores": {
+        "deepswe": "65",
+        "qna": "45",
+        "terminal": "82"
+      },
+      "time_seconds": "372"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "1.29",
+      "effort": "low",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-sol:low",
+      "model": "gpt-5.6-sol",
+      "provisional": true,
+      "scores": {
+        "deepswe": "53",
+        "qna": "34",
+        "terminal": "78"
+      },
+      "time_seconds": "210"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "5",
+      "effort": "max",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-sol:max",
+      "model": "gpt-5.6-sol",
+      "provisional": true,
+      "scores": {
+        "deepswe": "69",
+        "qna": "43",
+        "terminal": "83"
+      },
+      "time_seconds": "612"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "2.19",
+      "effort": "medium",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-sol:medium",
+      "model": "gpt-5.6-sol",
+      "provisional": true,
+      "scores": {
+        "deepswe": "64",
+        "qna": "40",
+        "terminal": "81"
+      },
+      "time_seconds": "300"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "1.09",
+      "effort": "none",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-sol:none",
+      "model": "gpt-5.6-sol",
+      "provisional": true,
+      "scores": {
+        "deepswe": "35",
+        "qna": "34",
+        "terminal": "60"
+      },
+      "time_seconds": "198"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "3.74",
+      "effort": "xhigh",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-sol:xhigh",
+      "model": "gpt-5.6-sol",
+      "provisional": true,
+      "scores": {
+        "deepswe": "67",
+        "qna": "43",
+        "terminal": "80"
+      },
+      "time_seconds": "438"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "1.14",
+      "effort": "high",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-terra:high",
+      "model": "gpt-5.6-terra",
+      "provisional": true,
+      "scores": {
+        "deepswe": "60",
+        "qna": "31",
+        "terminal": "72"
+      },
+      "time_seconds": "360"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.39",
+      "effort": "low",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-terra:low",
+      "model": "gpt-5.6-terra",
+      "provisional": true,
+      "scores": {
+        "deepswe": "30",
+        "qna": "23",
+        "terminal": "63"
+      },
+      "time_seconds": "156"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "1.93",
+      "effort": "max",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-terra:max",
+      "model": "gpt-5.6-terra",
+      "provisional": true,
+      "scores": {
+        "deepswe": "67",
+        "qna": "36",
+        "terminal": "78"
+      },
+      "time_seconds": "492"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.67",
+      "effort": "medium",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-terra:medium",
+      "model": "gpt-5.6-terra",
+      "provisional": true,
+      "scores": {
+        "deepswe": "46",
+        "qna": "29",
+        "terminal": "70"
+      },
+      "time_seconds": "240"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "0.29",
+      "effort": "none",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-terra:none",
+      "model": "gpt-5.6-terra",
+      "provisional": true,
+      "scores": {
+        "deepswe": "13",
+        "qna": "19",
+        "terminal": "37"
+      },
+      "time_seconds": "90"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "1.36",
+      "effort": "xhigh",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-5.6-terra:xhigh",
+      "model": "gpt-5.6-terra",
+      "provisional": true,
+      "scores": {
+        "deepswe": "58",
+        "qna": "33",
+        "terminal": "77"
+      },
+      "time_seconds": "402"
+    },
+    {
+      "comparison_group": "aa-cai-1.4:codex",
+      "cost_usd": "4.72",
+      "effort": "max",
+      "fallback": false,
+      "harness": "codex",
+      "id": "codex:gpt-6-astra:max",
+      "model": "gpt-6-astra",
+      "provisional": true,
+      "scores": {
+        "deepswe": "67",
+        "qna": "51",
+        "terminal": "83"
+      },
+      "time_seconds": "1608"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "comparison_group": "aa-cai-1.4",
+    "index_version": "1.4",
+    "raw_sha256": "d5f64059ab87d792bd3a2ed17a4880709df56d9796d080d7f5b51a984ce0a348",
+    "retrieved_at": "2026-09-08T21:18:24.851863+00:00",
+    "url": "https://artificialanalysis.ai/agents/coding-agents/comparisons/claude-code-vs-codex"
+  }
+}

@@ -1,0 +1,2410 @@
+{
+  "decisions": [
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Haiku 4.5 default",
+      "mode": "conserve",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "lookup",
+      "selected_id": "claude-code:haiku-4.5:default"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Haiku 4.5 default",
+      "mode": "balanced",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "lookup",
+      "selected_id": "claude-code:haiku-4.5:default"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Haiku 4.5 default",
+      "mode": "burn",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "lookup",
+      "selected_id": "claude-code:haiku-4.5:default"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:fable-5.1:max:fallback",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (none)",
+      "mode": "conserve",
+      "reason": "conserve selection",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        }
+      ],
+      "route": "exploration",
+      "selected_id": "claude-code:opus-5:none"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:fable-5.1:max:fallback",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (xhigh)",
+      "mode": "balanced",
+      "reason": "incumbent retained: no candidate dominates",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        }
+      ],
+      "route": "exploration",
+      "selected_id": "claude-code:opus-5:xhigh"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:fable-5.1:max:fallback",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Fable 5.1 (max) (with fallback)",
+      "mode": "burn",
+      "reason": "burn selection",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        }
+      ],
+      "route": "exploration",
+      "selected_id": "claude-code:fable-5.1:max:fallback"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Sonnet 5 default",
+      "mode": "conserve",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "implementation",
+      "selected_id": "claude-code:sonnet-5:default"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (medium)",
+      "mode": "balanced",
+      "reason": "incumbent retained: no candidate dominates",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        }
+      ],
+      "route": "implementation",
+      "selected_id": "claude-code:opus-5:medium"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (medium)",
+      "mode": "burn",
+      "reason": "burn selection",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        }
+      ],
+      "route": "implementation",
+      "selected_id": "claude-code:opus-5:medium"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (medium)",
+      "mode": "conserve",
+      "reason": "conserve selection",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        }
+      ],
+      "route": "complex",
+      "selected_id": "claude-code:opus-5:medium"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (high)",
+      "mode": "balanced",
+      "reason": "incumbent retained: no candidate dominates",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        }
+      ],
+      "route": "complex",
+      "selected_id": "claude-code:opus-5:high"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Fable lead",
+      "mode": "burn",
+      "reason": "pinned: Lead-only Fable policy; compound route has no matching evaluation.",
+      "rejected": [],
+      "route": "complex",
+      "selected_id": null
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (high)",
+      "mode": "conserve",
+      "reason": "conserve selection",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        }
+      ],
+      "route": "terminal",
+      "selected_id": "claude-code:opus-5:high"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (high)",
+      "mode": "balanced",
+      "reason": "incumbent retained: no candidate dominates",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        }
+      ],
+      "route": "terminal",
+      "selected_id": "claude-code:opus-5:high"
+    },
+    {
+      "eligible": [
+        {
+          "id": "claude-code:opus-5:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "claude-code",
+      "label": "Opus 5 (xhigh)",
+      "mode": "burn",
+      "reason": "burn selection",
+      "rejected": [
+        {
+          "id": "claude-code:opus-5:high",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "claude-code:opus-5:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        }
+      ],
+      "route": "terminal",
+      "selected_id": "claude-code:opus-5:xhigh"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Opus 5 high",
+      "mode": "conserve",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "planning",
+      "selected_id": "claude-code:opus-5:high"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Opus 5 high",
+      "mode": "balanced",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "planning",
+      "selected_id": "claude-code:opus-5:high"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Fable 5.1 max",
+      "mode": "burn",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "planning",
+      "selected_id": "claude-code:fable-5.1:max:fallback"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Opus 5 high",
+      "mode": "conserve",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "review",
+      "selected_id": "claude-code:opus-5:high"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Opus 5 xhigh",
+      "mode": "balanced",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "review",
+      "selected_id": "claude-code:opus-5:xhigh"
+    },
+    {
+      "eligible": [],
+      "harness": "claude-code",
+      "label": "Fable 5.1 max",
+      "mode": "burn",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "review",
+      "selected_id": "claude-code:fable-5.1:max:fallback"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Luna medium",
+      "mode": "conserve",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "lookup",
+      "selected_id": "codex:gpt-5.6-luna:medium"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Luna medium",
+      "mode": "balanced",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "lookup",
+      "selected_id": "codex:gpt-5.6-luna:medium"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Luna medium",
+      "mode": "burn",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "lookup",
+      "selected_id": "codex:gpt-5.6-luna:medium"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Luna (max)",
+      "mode": "conserve",
+      "reason": "conserve selection",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        }
+      ],
+      "route": "exploration",
+      "selected_id": "codex:gpt-5.6-luna:max"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Sol (high)",
+      "mode": "balanced",
+      "reason": "incumbent retained: no candidate dominates",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        }
+      ],
+      "route": "exploration",
+      "selected_id": "codex:gpt-5.6-sol:high"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Astra (max)",
+      "mode": "burn",
+      "reason": "burn selection",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "qna below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "qna below floor"
+          ]
+        }
+      ],
+      "route": "exploration",
+      "selected_id": "codex:gpt-6-astra:max"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Luna (max)",
+      "mode": "conserve",
+      "reason": "conserve selection",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        }
+      ],
+      "route": "implementation",
+      "selected_id": "codex:gpt-5.6-luna:max"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Terra (max)",
+      "mode": "balanced",
+      "reason": "incumbent retained: no candidate dominates",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        }
+      ],
+      "route": "implementation",
+      "selected_id": "codex:gpt-5.6-terra:max"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Sol (max)",
+      "mode": "burn",
+      "reason": "burn selection",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        }
+      ],
+      "route": "implementation",
+      "selected_id": "codex:gpt-5.6-sol:max"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Terra (max)",
+      "mode": "conserve",
+      "reason": "conserve selection",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        }
+      ],
+      "route": "complex",
+      "selected_id": "codex:gpt-5.6-terra:max"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Sol (high)",
+      "mode": "balanced",
+      "reason": "incumbent retained: no candidate dominates",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        }
+      ],
+      "route": "complex",
+      "selected_id": "codex:gpt-5.6-sol:high"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Sol (max)",
+      "mode": "burn",
+      "reason": "burn selection",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "deepswe below floor",
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "deepswe below floor"
+          ]
+        }
+      ],
+      "route": "complex",
+      "selected_id": "codex:gpt-5.6-sol:max"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Luna (max)",
+      "mode": "conserve",
+      "reason": "conserve selection",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        }
+      ],
+      "route": "terminal",
+      "selected_id": "codex:gpt-5.6-luna:max"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "Sol (high)",
+      "mode": "balanced",
+      "reason": "incumbent retained: no candidate dominates",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "terminal below floor"
+          ]
+        }
+      ],
+      "route": "terminal",
+      "selected_id": "codex:gpt-5.6-sol:high"
+    },
+    {
+      "eligible": [
+        {
+          "id": "codex:gpt-5.5:xhigh",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        },
+        {
+          "id": "codex:gpt-6-astra:max",
+          "reasons": [
+            "meets all floors"
+          ]
+        }
+      ],
+      "harness": "codex",
+      "label": "5.5 (xhigh)",
+      "mode": "burn",
+      "reason": "burn selection",
+      "rejected": [
+        {
+          "id": "codex:gpt-5.5:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:high",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:max",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-luna:xhigh",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:high",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-sol:xhigh",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:high",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:low",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:max",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:medium",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:none",
+          "reasons": [
+            "terminal below floor"
+          ]
+        },
+        {
+          "id": "codex:gpt-5.6-terra:xhigh",
+          "reasons": [
+            "terminal below floor"
+          ]
+        }
+      ],
+      "route": "terminal",
+      "selected_id": "codex:gpt-5.5:xhigh"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Sol medium",
+      "mode": "conserve",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "planning",
+      "selected_id": "codex:gpt-5.6-sol:medium"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Sol high",
+      "mode": "balanced",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "planning",
+      "selected_id": "codex:gpt-5.6-sol:high"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Astra max",
+      "mode": "burn",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "planning",
+      "selected_id": "codex:gpt-6-astra:max"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Terra max",
+      "mode": "conserve",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "review",
+      "selected_id": "codex:gpt-5.6-terra:max"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Sol high",
+      "mode": "balanced",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "review",
+      "selected_id": "codex:gpt-5.6-sol:high"
+    },
+    {
+      "eligible": [],
+      "harness": "codex",
+      "label": "Astra max",
+      "mode": "burn",
+      "reason": "pinned: Inherited provisional route; no direct task-family evidence at this setting.",
+      "rejected": [],
+      "route": "review",
+      "selected_id": "codex:gpt-6-astra:max"
+    }
+  ],
+  "policy_sha256": "2501c80c69ee1baa90b5dbb38254bdb8a2842072d08d6cffc82c63e3319cfaa0",
+  "schema_version": 1,
+  "snapshot_sha256": "201ac8b290d781a725cea49166d59142c957ac5fe9f45bbaaac2f083584baa58"
+}
