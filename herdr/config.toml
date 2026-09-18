@@ -9,7 +9,11 @@ prompt_new_workspace_name = true
 # agent sets itself. The plugin also sorts agents by area, then priority.
 [ui.sidebar.agents]
 rows = [
-  ["state_icon", { token = "$area", dim = true }, "agent"],
+  ["state_icon", { token = "$area", dim = true, rules = [
+    { equals = "tse",      fg = "#F97316", dim = false },  # crafts.software icon orange
+    { equals = "letsirl",  fg = "#899C5D", dim = false },  # Olive Colour System, olive ramp step 5
+    { equals = "elephant", fg = "#266992", dim = false },  # primary-care-web MUI primary.light
+  ] }, "agent"],
   ["terminal_title_stripped"],
 ]
 
