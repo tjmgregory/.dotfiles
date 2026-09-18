@@ -1,9 +1,10 @@
 {
-  "tse":      ["~/tse"],
-  "elephant": ["~/work/elephant", "~/elephant"],
-  "letsirl":  ["~/work/letsirl", "~/letsirl"],
-  "kb":       ["~/knowledge-base"],
-  "projects": ["~/projects"],
-  "external": ["~/external"],
-  "notes":    ["~/Documents/Obsidian"]
+  "_comment": "paths: where the area lives on any machine (~ expands). marker: an invisible zero-width character the sidebar colour rules key on; keep it unique per coloured area and mirror it in herdr/config.toml.",
+  "tse":      { "paths": ["~/tse"],                          "marker": "​" },
+  "letsirl":  { "paths": ["~/work/letsirl", "~/letsirl"],    "marker": "‌" },
+  "elephant": { "paths": ["~/work/elephant", "~/elephant"],  "marker": "‍" },
+  "kb":       { "paths": ["~/knowledge-base"] },
+  "projects": { "paths": ["~/projects"] },
+  "external": { "paths": ["~/external"] },
+  "notes":    { "paths": ["~/Documents/Obsidian"] }
 }

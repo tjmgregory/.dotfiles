@@ -1,8 +1,8 @@
 id = "theo.sidebar"
 name = "Sidebar"
-version = "0.2.0"
+version = "0.3.0"
 min_herdr_version = "0.9.0"
-description = "Agent glyphs, area tokens from areas.json, and an Agents view grouped by area then priority"
+description = "Area tokens from areas.json, one-line agent rows coloured per area, Agents view grouped by area then priority, open-ticket action"
 platforms = ["macos", "linux"]
 
 [[startup]]
@@ -10,6 +10,14 @@ command = ["bash", "sidebar.sh", "startup"]
 
 [[events]]
 on = "pane.agent_detected"
+command = ["bash", "sidebar.sh", "event"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["bash", "sidebar.sh", "event"]
+
+[[events]]
+on = "workspace.renamed"
 command = ["bash", "sidebar.sh", "event"]
 
 [[actions]]

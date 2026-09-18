@@ -4,18 +4,18 @@ onboarding = false
 agent_panel_sort = "spaces"
 prompt_new_workspace_name = true
 
-# Agent panel, two lines per agent. Line one: state dot, area (root folder, from the
-# sidebar plugin's areas.json), glyphs (machine + agent), then the title the
-# agent sets itself, with the Linear ticket (if claimed) at the end of line one.
-# prefix+t opens that ticket in the browser. The plugin also sorts agents by
-# area, then priority.
+# Agent panel, two lines per agent. Line one: state dot, then a single $line token
+# built by the sidebar plugin: <machine glyph><agent glyph> <ticket> <space name>.
+# It starts with an invisible per-area marker (see plugins/sidebar/areas.json) so
+# the whole line takes the area's brand colour. Line two: the agent's own title.
+# prefix+t opens the ticket in Linear.
 [ui.sidebar.agents]
 rows = [
-  ["state_icon", { token = "$area", dim = true, rules = [
-    { equals = "tse",      fg = "#F97316", dim = false },  # crafts.software icon orange
-    { equals = "letsirl",  fg = "#899C5D", dim = false },  # Olive Colour System, olive ramp step 5
-    { equals = "elephant", fg = "#266992", dim = false },  # primary-care-web MUI primary.light
-  ] }, "agent", { token = "$ticket", bold = true }],
+  ["state_icon", { token = "$line", rules = [
+    { contains = "\u200B", fg = "#F97316" },  # tse: crafts.software icon orange
+    { contains = "\u200C", fg = "#899C5D" },  # letsirl: Olive Colour System, olive ramp step 5
+    { contains = "\u200D", fg = "#00A0AF" },  # elephant: primary-care-web MUI brand.main
+  ] }],
   ["terminal_title_stripped"],
 ]
 

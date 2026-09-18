@@ -11,4 +11,5 @@ id=$(printf '%s' "$text" | grep -oE '(linear issue update|worktrees/)[ /]*[A-Z][
 [ -n "$id" ] || exit 0
 "$H" workspace report-metadata "$HERDR_WORKSPACE_ID" --source ticket --token ticket="$id" >/dev/null 2>&1 || true
 [ -n "${HERDR_PANE_ID:-}" ] && "$H" pane report-metadata "$HERDR_PANE_ID" --source ticket --token ticket="$id" >/dev/null 2>&1 || true
+[ -n "${HERDR_PANE_ID:-}" ] && bash ~/.dotfiles/herdr/plugins/sidebar/sidebar.sh pane "$HERDR_PANE_ID" >/dev/null 2>&1 || true
 exit 0
