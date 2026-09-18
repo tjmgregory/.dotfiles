@@ -11,3 +11,9 @@ command = ["bash", "sidebar.sh", "startup"]
 [[events]]
 on = "pane.agent_detected"
 command = ["bash", "sidebar.sh", "event"]
+
+[[actions]]
+id = "open-ticket"
+title = "Open Linear ticket"
+contexts = ["pane", "workspace", "global"]
+command = ["bash", "open-ticket.sh"]
