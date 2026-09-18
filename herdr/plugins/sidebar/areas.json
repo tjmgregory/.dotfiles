@@ -1,0 +1,9 @@
+{
+  "tse":      ["~/tse"],
+  "elephant": ["~/work/elephant", "~/elephant"],
+  "letsirl":  ["~/work/letsirl", "~/letsirl"],
+  "kb":       ["~/knowledge-base"],
+  "projects": ["~/projects"],
+  "external": ["~/external"],
+  "notes":    ["~/Documents/Obsidian"]
+}

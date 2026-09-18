@@ -4,12 +4,12 @@ onboarding = false
 agent_panel_sort = "spaces"
 prompt_new_workspace_name = true
 
-# Agent panel, one line per agent: state dot, glyphs (machine + agent, set by
-# the agent-icons plugin), then the title the agent sets itself. The ticket
-# token lives on the Space row instead.
+# Agent panel, one line per agent: state dot, area (root folder, from the
+# sidebar plugin's areas.json), glyphs (machine + agent), then the title the
+# agent sets itself. The plugin also sorts agents by area, then priority.
 [ui.sidebar.agents]
 rows = [
-  ["state_icon", "agent", "terminal_title_stripped"],
+  ["state_icon", { token = "$area", dim = true }, "agent", "terminal_title_stripped"],
 ]
 
 [ui.sidebar.spaces]
