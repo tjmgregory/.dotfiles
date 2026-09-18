@@ -1,0 +1,26 @@
+onboarding = false
+
+[ui]
+agent_panel_sort = "spaces"
+prompt_new_workspace_name = true
+
+# Agent panel, one line per agent: state dot, machine glyph (hidden for Local),
+# agent glyph (set by the agent-icons plugin), Linear ticket (set by the
+# herdr-ticket hook), then the title the agent sets itself.
+[ui.sidebar.agents]
+rows = [
+  ["state_icon", { token = "machine", rules = [{ equals = "Local", hide = true }] }, "agent", { token = "$ticket", bold = true }, "terminal_title_stripped"],
+]
+
+[ui.sidebar.spaces]
+rows = [
+  ["state_icon", "workspace", { token = "$ticket", bold = true }],
+  ["branch", "git_status"],
+]
+
+[ui.toast]
+delivery = "system"
+delay_seconds = 1
+
+[ui.sound]
+enabled = true

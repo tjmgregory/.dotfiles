@@ -14,7 +14,13 @@ ln -s ~/.dotfiles/agents/skills ~/.claude/skills
 
 # Cursor
 ln -s ~/.dotfiles/agents/skills ~/.cursor/skills
+
+# Herdr (then: herdr integration install claude codex)
+ln -s ~/.dotfiles/herdr/config.toml ~/.config/herdr/config.toml
+herdr plugin link ~/.dotfiles/herdr/plugins/agent-icons
 ```
+
+Herdr's agent-icons plugin swaps agent names for Nerd Font glyphs in the sidebar. `claude/hooks/herdr-ticket.sh` reports the Linear ticket an agent claims to Herdr; Claude Code picks it up from `settings.json`, Codex needs the same PostToolUse entry in `~/.codex/hooks.json`.
 
 Skills are consolidated in `agents/skills/` following the [agentskills.io](https://agentskills.io/) standard and shared between Claude and Cursor.
 

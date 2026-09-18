@@ -1,0 +1,13 @@
+id = "theo.agent-icons"
+name = "Agent icons"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "Show a Nerd Font glyph instead of the agent name in the sidebar"
+platforms = ["macos", "linux"]
+
+[[startup]]
+command = ["bash", "icons.sh", "all"]
+
+[[events]]
+on = "pane.agent_detected"
+command = ["bash", "icons.sh", "event"]
