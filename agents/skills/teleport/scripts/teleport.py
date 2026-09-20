@@ -376,7 +376,10 @@ def resolve_source(kind, sid, pane=None):
         if a['agent_status'] not in ('idle', 'done'):
             raise RuntimeError('Source must finish its turn before teleporting')
         # Exit only this verified idle agent; keep its pane and all workspace processes.
-        herdr('agent', 'send-keys', a['pane_id'], 'ctrl+d')
+        if kind == 'claude':
+            herdr('agent', 'prompt', a['pane_id'], '/exit')
+        else:
+            herdr('agent', 'send-keys', a['pane_id'], 'ctrl+d')
         end = time.monotonic() + 15
         while time.monotonic() < end:
             if not any((x.get('agent_session') or {}).get('value') == sid for x in live_agents()):
@@ -748,6 +751,14 @@ def main():
                 raise
     else:
         result = endpoint(a.host, a.command, vars(a))
+        if a.command == 'launch':
+            record = ROOT / 'runs' / a.run_id / 'transfer.json'
+            if record.exists():
+                state = json.loads(record.read_text())
+                if state.get('destination') == a.host:
+                    state.update(status=result['status'], result=result)
+                    state.pop('error', None)
+                    save(record, state)
     print(json.dumps(result, indent=2))
 
 
