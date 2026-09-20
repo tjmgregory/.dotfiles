@@ -7,11 +7,12 @@ prompt_new_workspace_name = true
 # Agent panel, two lines per agent. Line one: state dot, then a single $line token
 # built by the sidebar plugin: <machine glyph><agent glyph> <ticket> <space name>.
 # It starts with an invisible per-area marker (see plugins/sidebar/areas.json) so
-# the whole line takes the area's brand colour. Line two: the agent's own title.
+# the whole line takes the area's brand colour; other areas are white. Line two:
+# the agent's own title.
 # prefix+t opens the ticket in Linear.
 [ui.sidebar.agents]
 rows = [
-  ["state_icon", { token = "$line", rules = [
+  ["state_icon", { token = "$line", fg = "#FFFFFF", rules = [
     { contains = "\u200B", fg = "#F97316" },  # tse: crafts.software icon orange
     { contains = "\u200C", fg = "#899C5D" },  # letsirl: Olive Colour System, olive ramp step 5
     { contains = "\u200D", fg = "#00A0AF" },  # elephant: primary-care-web MUI brand.main
@@ -37,3 +38,11 @@ key = "prefix+t"
 type = "plugin_action"
 command = "theo.sidebar.open-ticket"
 description = "open Linear ticket for this pane"
+
+[[keys.command]]
+key = "prefix+shift+m"
+type = "popup"
+command = "bash ~/.dotfiles/herdr/plugins/sidebar/new-space.sh"
+description = "new Space on a chosen machine"
+width = "60%"
+height = "60%"
