@@ -1,0 +1,97 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {
+        "id": "1",
+        "type": "model",
+        "color": "cyan"
+      },
+      {
+        "id": "3",
+        "type": "thinking-effort",
+        "color": "blue"
+      },
+      {
+        "id": "5",
+        "type": "current-working-dir",
+        "color": "green",
+        "metadata": {
+          "abbreviateHome": "true"
+        }
+      },
+      {
+        "id": "7",
+        "type": "git-branch",
+        "color": "magenta"
+      },
+      {
+        "id": "9",
+        "type": "git-changes",
+        "color": "yellow"
+      },
+      {
+        "id": "13",
+        "type": "custom-command",
+        "color": "brightYellow",
+        "commandPath": "bash /Users/theo/.claude/statusline-tickets.sh"
+      }
+    ],
+    [
+      {
+        "id": "20",
+        "type": "context-percentage",
+        "color": "cyan"
+      },
+      {
+        "id": "22",
+        "type": "context-length",
+        "color": "brightBlack"
+      },
+      {
+        "id": "24",
+        "type": "session-cost",
+        "color": "yellow"
+      },
+      {
+        "id": "26",
+        "type": "session-usage",
+        "color": "green"
+      },
+      {
+        "id": "28",
+        "type": "weekly-usage",
+        "color": "magenta"
+      },
+      {
+        "id": "30",
+        "type": "cache-timer",
+        "color": "blue"
+      }
+    ],
+    []
+  ],
+  "flexMode": "full-minus-40",
+  "compactThreshold": 60,
+  "colorLevel": 2,
+  "defaultPaddingSide": "both",
+  "inheritSeparatorColors": false,
+  "globalBold": false,
+  "gitCacheTtlSeconds": 5,
+  "minimalistMode": true,
+  "powerline": {
+    "enabled": true,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [],
+    "endCaps": [],
+    "autoAlign": false,
+    "continueThemeAcrossLines": false,
+    "theme": "nord-aurora"
+  },
+  "defaultPadding": " "
+}

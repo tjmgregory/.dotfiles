@@ -11,6 +11,9 @@ ln -s ~/.dotfiles/karabiner ~/.config/karabiner
 ln -s ~/.dotfiles/claude/CLAUDE.md ~/.claude/CLAUDE.md
 ln -s ~/.dotfiles/claude/settings.json ~/.claude/settings.json
 ln -s ~/.dotfiles/agents/skills ~/.claude/skills
+ln -s ~/.dotfiles/claude/statusline-tickets.sh ~/.claude/statusline-tickets.sh
+mkdir -p ~/.config/ccstatusline && ln -s ~/.dotfiles/ccstatusline/settings.json ~/.config/ccstatusline/settings.json
+npm install -g ccstatusline@2.2.25   # status line binary; settings.json calls it by name
 
 # Cursor
 ln -s ~/.dotfiles/agents/skills ~/.cursor/skills

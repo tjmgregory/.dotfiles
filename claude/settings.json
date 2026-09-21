@@ -189,7 +189,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "/Users/theo/.nvm/versions/node/v20.10.0/bin/ccstatusline"
+    "command": "ccstatusline"
   },
   "subagentStatusLine": {
     "type": "command",
